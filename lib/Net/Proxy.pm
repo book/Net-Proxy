@@ -15,8 +15,8 @@ my %PROXY;
 
 # Net::Proxy attributes
 my %CONNECTOR = (
-   in  => {},
-   out => {},
+    in  => {},
+    out => {},
 );
 
 #
@@ -25,7 +25,7 @@ my %CONNECTOR = (
 sub new {
     my ( $class, $args ) = @_;
 
-    my $self = bless \do{my $anon}, $class;
+    my $self = bless \do { my $anon }, $class;
 
     croak "Argument to new() must be a HASHREF" if ref $args ne 'HASH';
 
@@ -46,8 +46,8 @@ sub new {
         croak "Couldn't load $class for '$conn' connector" if $@;
 
         # create and store the Connector object
-        $CONNECTOR{$conn}{refaddr $self} = $class->new( $args->{$conn} );
-        $CONNECTOR{$conn}{refaddr $self}->set_proxy( $self );
+        $CONNECTOR{$conn}{ refaddr $self} = $class->new( $args->{$conn} );
+        $CONNECTOR{$conn}{ refaddr $self}->set_proxy($self);
     }
 
     return $self;
@@ -134,7 +134,7 @@ sub mainloop {
 
     # initialise all proxies
     for my $proxy ( values %PROXY ) {
-        my $in = $proxy->in_connector();
+        my $in    = $proxy->in_connector();
         my @socks = $in->listen();
         Net::Proxy->add_listeners(@socks);
         Net::Proxy->watch_sockets(@socks);
@@ -143,7 +143,7 @@ sub mainloop {
 
     # loop indefinitely
     while ( my @ready = $SELECT->can_read() ) {
-       SOCKET:
+    SOCKET:
         for my $sock (@ready) {
             if ( _is_listener($sock) ) {
 
@@ -157,7 +157,7 @@ sub mainloop {
                 my $peer = Net::Proxy->get_peer($sock);
                 my $data
                     = Net::Proxy->get_connector($sock)->get_data_from($sock);
-                next SOCKET if ! defined $data;
+                next SOCKET if !defined $data;
 
                 # TODO filtering by the proxy
 
@@ -313,7 +313,6 @@ classes and the parameters they recognise.
 =head1 COPYRIGHT
 
 =head1 LICENSE
-
 
 =cut
 
