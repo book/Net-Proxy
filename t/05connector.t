@@ -1,32 +1,18 @@
-use Test::More tests => 6;
+use Test::More tests => 3;
 use strict;
 use warnings;
 
+use Net::Proxy;
 use Net::Proxy::Connector;
 
-my $c1 = Net::Proxy::Connector->new( {} );
-my $c2 = Net::Proxy::Connector->new( {} );
-my $s1 = []; # array ref instead of socket
-my $s2 = [];
-my $s3 = [];
+my $c = Net::Proxy::Connector->new( );
+isa_ok( $c, 'Net::Proxy::Connector' );
 
-$c1->register_as_manager_of( $s1 );
-$c2->register_as_manager_of( $s2 );
-$c2->register_as_manager_of( $s3 );
+# proxy-related methods
+eval { $c->set_proxy( [] ); };
+like( $@, qr/is not a Net::Proxy object/, 'set_proxy() wants a Net::Proxy' );
 
-# MANAGERS
+my $p = bless {}, 'Net::Proxy';
+$c->set_proxy( $p );
+is( $c->get_proxy, $p, 'Got the Net::Proxy back' );
 
-# class method
-is( $c1, Net::Proxy::Connector->manager_of( $s1 ), "c1 manages s1" );
-
-# instance method (not very useful)
-is( $c2, $c2->manager_of( $s2 ), "c2 manages s2" );
-is( $c2, $c1->manager_of( $s3 ), "c2 manages s3" );
-
-# PEERS
-eval { $c1->set_peer( $s1 ); };
-like( $@, qr/is not a Net::Proxy::Connector object/, 'peer should be a NPC');
-
-$c1->set_peer( $c2 );
-is( $c1->get_peer(), $c2, "c2 is the peer of c1" );
-is( $c2->get_peer(), $c1, "c1 is the peer of c2" );
