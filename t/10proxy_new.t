@@ -1,4 +1,4 @@
-use Test::More tests => 9;
+use Test::More tests => 11;
 use strict;
 use warnings;
 use Net::Proxy;
@@ -15,6 +15,9 @@ like( $@, qr/^Argument to new\(\) must be a HASHREF/, 'new( HASHREF )' );
 # in argument
 eval { $proxy = Net::Proxy->new( {} ); };
 like( $@, qr/^'in' connector required/, 'in arg required' );
+
+eval { $proxy = Net::Proxy->new( { in => 'in' } ); };
+like( $@, qr/^'in' connector must be a HASHREF/, 'in must be a HASHREF');
 
 eval { $proxy = Net::Proxy->new( { in => {} } ); };
 like(
@@ -33,6 +36,9 @@ like(
 # out argument
 eval { $proxy = Net::Proxy->new( { in => { type => 'tcp' } } ); };
 like( $@, qr/^'out' connector required/, 'out arg required' );
+
+eval { $proxy = Net::Proxy->new( { in => { type => 'tcp' }, out => 'out' } ) };
+like( $@, qr/^'out' connector must be a HASHREF/, 'in must be a HASHREF');
 
 eval { $proxy = Net::Proxy->new( { in => { type => 'tcp' }, out => {} } ); };
 like(
