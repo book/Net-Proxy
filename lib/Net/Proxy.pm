@@ -235,6 +235,18 @@ to handle the specifics of each connection.
 
 This method does not return.
 
+=item add_listeners( @sockets )
+
+Add the given sockets to the list of listening sockets.
+
+=item watch_sockets( @sockets )
+
+Add the given sockets to the watch list.
+
+=item close_sockets( @sockets )
+
+Close the given sockets and cleanup the related internal structures.
+
 =back
 
 Some of the class methods are related to the socket objects handling
@@ -289,9 +301,9 @@ connection and handles the data coming from the "server" side.
 
 =back
 
-=head1 AVAILABLE PROTOCOLS
+=head1 AVAILABLE CONNECTOR TYPES
 
-All protocols are provided with the help of specialised classes.
+All connection types are provided with the help of specialised classes.
 The logic for protocol C<xxx> is provided by the C<Net::Proxy::Connector::xxx>
 class.
 
@@ -306,18 +318,6 @@ classes and the parameters they recognise.
     ------------+-----------------+----------------
      tcp        | host            | host
                 | port            | port
-    ------------+-----------------+----------------
-     connect    | N/A             | host
-                |                 | port
-                |                 | proxy_host
-                |                 | proxy_port
-                |                 | proxy_user
-                |                 | proxy_pass
-                |                 | proxy_agent
-    ------------+-----------------+----------------
-     httptunnel |                 |
-    ------------+-----------------+----------------
-     dual       |                 | N/A
     ------------+-----------------+----------------
      dummy      | N/A             | N/A
 
