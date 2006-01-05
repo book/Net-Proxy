@@ -70,7 +70,10 @@ SKIP: {
             for my $line (@lines) {
                 print $client $line;
                 is( <$server>, $line, "Line received" );
+                ($client, $server) = ($server, $client); # swap directions
             }
+            $client->close();
+            $server->close();
         }
     }
 }
