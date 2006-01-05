@@ -42,7 +42,7 @@ sub new_connection_on {
     my $peer = $out->connect();
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
         Net::Proxy->watch_sockets($peer);
-        Net::Proxy->set_connector( $peer, $self );
+        Net::Proxy->set_connector( $peer, $out );
         Net::Proxy->set_peer( $peer, $sock );
         Net::Proxy->set_peer( $sock, $peer );
     }
