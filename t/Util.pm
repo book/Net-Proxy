@@ -29,4 +29,24 @@ sub find_free_ports {
     return @socks;
 }
 
+# return a socket connected to port $port on localhost
+sub connect_to_port {
+    my ($port) = @_;
+    return IO::Socket::INET->new(
+        PeerAddr => 'localhost',
+        PeerPort => $port,
+        Proto    => 'tcp',
+    );
+}
+
+sub listen_on_port {
+    my ($port) = @_;
+    return IO::Socket::INET->new(
+        Listen    => 1,
+        LocalAddr => 'localhost',
+        LocalPort => $port,
+        Proto     => 'tcp',
+    );
+}
+
 1;

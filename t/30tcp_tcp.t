@@ -52,20 +52,12 @@ SKIP: {
             sleep 1;
 
             # the parent process does the testing
-            my $listener = IO::Socket::INET->new(
-                Listen    => 1,
-                LocalAddr => 'localhost',
-                LocalPort => $server_port,
-                Proto     => 'tcp',
-            ) or skip "Couldn't start the server: $!", $tests;
-            my $client = IO::Socket::INET->new(
-                PeerAddr => 'localhost',
-                PeerPort => $proxy_port,
-                Proto    => 'tcp',
-            ) or skip "Couldn't start the client: $!", $tests;
-
+            my $listener = listen_on_port($server_port)
+                or skip "Couldn't start the server: $!", $tests;
+            my $client = connect_to_port($proxy_port)
+                or skip "Couldn't start the client: $!", $tests;
             my $server = $listener->accept()
-             or skip "Proxy didn't connect: $!", $tests;
+                or skip "Proxy didn't connect: $!", $tests;
 
             # send some data through
             for my $line (@lines) {
@@ -73,6 +65,5 @@ SKIP: {
                 is( <$server>, $line, "Line received" );
             }
         }
-
     }
 }
