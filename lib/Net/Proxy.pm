@@ -12,6 +12,7 @@ my %SOCK_INFO;
 my %LISTENER;
 my $SELECT;
 my %PROXY;
+my $CONNECTIONS;
 
 # Net::Proxy attributes
 my %CONNECTOR = (
@@ -104,6 +105,11 @@ sub close_sockets {
         my $conn = Net::Proxy->get_connector($sock);
         $conn->close($sock) if $conn->can('close');
 
+        # count connections to the proxy "in connectors" only
+        if( refaddr $conn == refaddr $conn->get_proxy()->in_connector() ) {
+            $CONNECTIONS++;
+        }
+
         # clean up internal structures
         delete $SOCK_INFO{ refaddr $sock};
         delete $LISTENER{ refaddr $sock};
@@ -129,7 +135,11 @@ sub DESTROY {
 # the mainloop itself
 #
 sub mainloop {
+    my ( $class, $max_connections ) = @_;
+    $max_connections ||= 0;
 
+    # initialise the loop
+    $CONNECTIONS = 0;
     $SELECT = IO::Select->new();
 
     # initialise all proxies
@@ -164,6 +174,9 @@ sub mainloop {
                 Net::Proxy->get_connector($peer)->write_to( $peer, $data );
             }
         }
+    }
+    continue {
+        last if $CONNECTIONS == $max_connections;
     }
 }
 
