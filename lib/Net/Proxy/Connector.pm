@@ -4,48 +4,76 @@ use warnings;
 use Carp;
 use Scalar::Util qw( refaddr );
 
-# private class data
-my %MANAGER_OF;
-my %PEER_OF;
+my %PROXY_OF;
 
-sub debug {
-    use Data::Dumper;
-    print Data::Dumper->Dump( [\%MANAGER_OF, \%PEER_OF], [qw(*MANAGER_OF *PEER_OF )] );
-}
 #
 # the most basic constructor possible
 #
 sub new {
     my ( $class, $args ) = @_;
-    return bless {%$args}, $class;
+    return bless $args ? {%$args} : {}, $class;
 }
 
 #
-# link NPP objects and sockets
+# Each Connector is managed by a Net::Proxy object
 #
-sub register_as_manager_of {
-    my ( $self, $sock ) = @_;
-    $MANAGER_OF{ refaddr $sock} = $self;
+sub set_proxy {
+    my ( $self, $proxy ) = @_;
+    croak "$proxy is not a Net::Proxy object"
+        if !UNIVERSAL::isa( $proxy, 'Net::Proxy' );
+    return $PROXY_OF{ refaddr $self } = $proxy;
+}
+
+sub get_proxy { return $PROXY_OF{ refaddr $_[0] }; }
+
+#
+# the method that creates all the sockets
+#
+sub new_connection_on {
+    my ( $self, $listener ) = @_;
+
+    # call the actual Connector method
+    my $sock = $self->accept_from($listener);
+    Net::Proxy->set_connector( $sock, $self );
+    Net::Proxy->watch_sockets($sock);
+
+    # connect to the destination
+    my $out  = $self->get_proxy()->out_connector();
+    my $peer = $out->connect();
+    if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
+        Net::Proxy->watch_sockets($peer);
+        Net::Proxy->set_connector( $peer, $self );
+        Net::Proxy->set_peer( $peer, $sock );
+        Net::Proxy->set_peer( $sock, $peer );
+    }
+
     return;
 }
 
-sub manager_of { return $MANAGER_OF{ refaddr $_[1] }; }
+# return raw data from the socket
+sub raw_data_from {
+    my ( $self, $sock ) = @_;
 
-#
-#link NPP objects together
-#
-sub set_peer {
-    my ( $self, $peer ) = @_;
+    # low level read on the socket
+    my $close = 0;
+    my $buffer;
+    my $read = $sock->sysread( $buffer, 4096 );    # FIXME magic number
 
-    croak "$peer is not a Net::Proxy::Connector object"
-        if !UNIVERSAL::isa( $peer, 'Net::Proxy::Connector' );
+    # check for errors
+    if ( not defined $read ) {
+        carp sprintf( "Read undef from %s:%s (Error %d: %s)\n",
+            $sock->sockhost(), $sock->sockport(), $!, "$!" );
+        $close = 1;
+    }
 
-    # set each one as the peer of the other
-    $PEER_OF{ refaddr $self} = $peer;
-    $PEER_OF{ refaddr $peer} = $self;
+    # connection closed
+    if ( $read == 0 || $close ) {
+        $self->get_proxy()->close_sockets($sock);
+        return;
+    }
+
+    return $buffer;
 }
-
-sub get_peer { return $PEER_OF{ refaddr $_[0] }; }
 
 1;
 
@@ -68,6 +96,9 @@ Net::Proxy::Connector - Base class for Net::Proxy protocols
 
     # if it can be used as an 'out' connector
     sub open_connection { }
+
+    # to process data
+    sub get_data_from { }
 
     1;
 
