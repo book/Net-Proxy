@@ -24,15 +24,6 @@ my $server_port = $free[1]->sockport();
 SKIP: {
     skip "Not enough available ports", $tests if @free < 2;
 
-    my $proxy = Net::Proxy->new(
-        {   in => { type => 'tcp', host => 'localhost', port => $proxy_port },
-            out =>
-                { type => 'tcp', host => 'localhost', port => $server_port },
-        }
-    );
-
-    $proxy->register();
-
     # close the ports before forking
     $_->close() for @free;
 
@@ -43,6 +34,22 @@ SKIP: {
         if ( $pid == 0 ) {
 
             # the child process runs the proxy
+            my $proxy = Net::Proxy->new(
+                {   in => {
+                        type => 'tcp',
+                        host => 'localhost',
+                        port => $proxy_port
+                    },
+                    out => {
+                        type => 'tcp',
+                        host => 'localhost',
+                        port => $server_port
+                    },
+                }
+            );
+
+            $proxy->register();
+
             Net::Proxy->mainloop(1);
             exit;
         }
