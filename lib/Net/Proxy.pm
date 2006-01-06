@@ -12,7 +12,7 @@ my %SOCK_INFO;
 my %LISTENER;
 my $SELECT;
 my %PROXY;
-my $CONNECTIONS;
+my %STATS;
 
 # Net::Proxy attributes
 my %CONNECTOR = (
@@ -79,6 +79,19 @@ sub out_connector { return $CONNECTOR{out}{ refaddr $_[0] }; }
 }
 
 #
+# create statistical methods
+#
+for my $info (qw( opened closed )) {
+    no strict 'refs';
+    *{"stat_inc_$info"} = sub {
+        $STATS{ refaddr $_[0]}{$info}++;
+        $STATS{total}{$info}++;
+    };
+    *{"stat_$info"}       = sub { $STATS{ refaddr $_[0]}{$info} || 0; };
+    *{"stat_total_$info"} = sub { $STATS{total}{$info}; };
+}
+
+#
 # socket-related methods
 #
 sub add_listeners {
@@ -106,9 +119,10 @@ sub close_sockets {
         $conn->close($sock) if $conn->can('close');
 
         # count connections to the proxy "in connectors" only
-        if( refaddr $conn == refaddr $conn->get_proxy()->in_connector()
+        my $proxy = $conn->get_proxy();
+        if( refaddr $conn == refaddr $proxy->in_connector()
             && ! _is_listener( $sock ) ) {
-            $CONNECTIONS++;
+            $proxy->stat_inc_closed();
         }
 
         # clean up internal structures
@@ -140,7 +154,6 @@ sub mainloop {
     $max_connections ||= 0;
 
     # initialise the loop
-    $CONNECTIONS = 0;
     $SELECT = IO::Select->new();
 
     # initialise all proxies
@@ -157,8 +170,13 @@ sub mainloop {
     SOCKET:
         for my $sock (@ready) {
             if ( _is_listener($sock) ) {
+                
+                # prevent new connections
+                if ( Net::Proxy->stat_total_opened() == $max_connections ) {
+                    $sock->close();
+                    next SOCKET;
+                }
 
-                # FIXME eval {} for failure
                 # accept the new connection and connect to the destination
                 Net::Proxy->get_connector($sock)->new_connection_on($sock);
             }
@@ -177,7 +195,7 @@ sub mainloop {
         }
     }
     continue {
-        last if $CONNECTIONS == $max_connections;
+        last if Net::Proxy->stat_total_closed() == $max_connections;
     }
 
     # close the listening sockets
