@@ -51,7 +51,7 @@ sub new_connection_on {
 }
 
 # return raw data from the socket
-sub raw_data_from {
+sub raw_read_from {
     my ( $self, $sock ) = @_;
 
     # low level read on the socket
@@ -75,6 +75,17 @@ sub raw_data_from {
     return $buffer;
 }
 
+# send raw data to the socket
+sub raw_write_to {
+    my ($self, $sock, $data) = @_;
+    my $written = $sock->syswrite( $data );
+    if( ! defined $written ) {
+        carp sprintf("Read undef from %s:%s (Error %d: %s)\n",
+                     $sock->sockhost(), $sock->sockport(), $!, "$!");
+    }
+    return;
+}
+
 1;
 
 __END__
@@ -85,6 +96,9 @@ Net::Proxy::Connector - Base class for Net::Proxy protocols
 
 =head1 SYNOPSIS
 
+    #
+    # template for the zlonk connector
+    #
     package Net::Proxy::Connector::zlonk;
 
     use strict;
@@ -141,12 +155,22 @@ This method is called by C<Net::Proxy> to handle incoming connections,
 and in turn call C<accept_from()> on the 'in' connector and
 C<connect()> on the 'out' connector.
 
-=item raw_data_from( $socket )
+=item raw_read_from( $socket )
 
-This method can be used by C<Net::Proxy::Connector> subclasses to
-fetch the raw data on a socket.
+This method can be used by C<Net::Proxy::Connector> subclasses in their
+C<read_from()> methods, to fetch raw data on a socket.
+
+=item raw_write_to( $socket, $data )
+
+This method can be used by C<Net::Proxy::Connector> subclasses in their
+C<write_to()> methods, to send raw data on a socket.
 
 =back
+
+=head1 Subclass methods
+
+The following methods should be defined in C<Net::Proxy::Connector>
+subclasses:
 
 =head1 AUTHOR
 
