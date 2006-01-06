@@ -1,7 +1,6 @@
 package Net::Proxy::Connector::tcp;
 use strict;
 use warnings;
-use Carp;
 use IO::Socket::INET;
 
 use Net::Proxy::Connector;
@@ -17,7 +16,7 @@ sub listen {
         Proto     => 'tcp',
         ReuseAddr => 1,
     );
-    croak $! unless $sock;
+    die $! unless $sock;
 
     return $sock;
 }
@@ -25,7 +24,7 @@ sub listen {
 sub accept_from {
     my ($self, $listen) = @_;
     my $sock = $listen->accept();
-    croak $! unless $sock;
+    die $! unless $sock;
     return $sock;
 }
 
@@ -37,7 +36,7 @@ sub connect {
         PeerPort  => $self->{port},
         Proto     => 'tcp',
     );
-    croak $! unless $sock;
+    die $! unless $sock;
     return $sock;
 }
 
