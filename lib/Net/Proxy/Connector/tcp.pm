@@ -80,12 +80,15 @@ The connector accept the following options:
 
 =over 4
 
-=item host
+=item *
 
-I<(optional)> The listening address. If not given, the default is
-C<localhost>.
+host
 
-=item port
+The listening address. If not given, the default is C<localhost>.
+
+=item *
+
+port
 
 The listening port.
 
@@ -95,11 +98,15 @@ The listening port.
 
 =over 4
 
-=item host
+=item *
+
+host
 
 The remote host.
 
-=item port
+=item *
+
+port
 
 The remote port.
 
