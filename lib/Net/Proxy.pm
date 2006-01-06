@@ -191,7 +191,7 @@ __END__
 
 =head1 NAME
 
-Net::Proxy - Proxy network connections using various protocols
+Net::Proxy - Framework for proxying network connections in many ways
 
 =head1 SYNOPSIS
 
@@ -207,6 +207,8 @@ Net::Proxy - Proxy network connections using various protocols
     # register the proxy object
     $proxy->register();
 
+    # and you can setup multiple proxies
+
     # and now proxy connections indefinitely
     Net::Proxy->mainloop();
 
@@ -216,24 +218,32 @@ A C<Net::Proxy> object represents a proxy that accepts connections
 and then relays the data transfered between the source and the destination.
 
 The goal of this module is to abstract the different protocols used
-to connect from the proxy to the destination.
+to connect from the proxy to the destination. See L<AVAILABLE CONNECTORS>
 
 =head1 METHODS
+
+If you only intend to use C<Net::Proxy> and not write new
+connectors, you only need to know about C<new()>, C<register()>
+and C<mainloop()>.
 
 =head2 Class methods
 
 =over 4
 
-=item new( )
+=item new( { in => { ... }, { out => { ... } } )
 
-=item mainloop()
+Return a new C<Net::Proxy> object, with two connectors configured
+as described in the hashref.
+
+=item mainloop( $max_connections )
 
 This method initialises all the registered C<Net::Proxy> objects
 and then loops on all the sockets ready for reading, passing
 the data through the various C<Net::Proxy::Connector> objets
 to handle the specifics of each connection.
 
-This method does not return.
+If C<$max_connections> is given, the proxy will stop after having fully
+processed that many connections. Otherwise, this method does not return.
 
 =item add_listeners( @sockets )
 
@@ -301,18 +311,27 @@ connection and handles the data coming from the "server" side.
 
 =back
 
-=head1 AVAILABLE CONNECTOR TYPES
+=head1 AVAILABLE CONNECTORS
 
 All connection types are provided with the help of specialised classes.
 The logic for protocol C<xxx> is provided by the C<Net::Proxy::Connector::xxx>
 class.
 
-=head2 tcp (C<Net::Proxy::tcp>)
+=head2 tcp (C<Net::Proxy::Connector::tcp>)
+
+This is the simplest possible proxy. On the "in" side, it sits waiting
+for incoming connections, and on the "out" side, it connects to the
+configured host/port.
+
+=head2 dummy (C<Net::Proxy::Connector::dummy>)
+
+This proxy does nothing. You can use it as a template for writing
+new C<Net::Proxy::Connector> classes.
 
 =head2 Summary
 
 This table summarises all the available C<Net::Proxy::Connector>
-classes and the parameters they recognise.
+classes and the parameters their constructors recognise.
 
      Connector  | in parameters   | out parameters
     ------------+-----------------+----------------
@@ -323,9 +342,57 @@ classes and the parameters they recognise.
 
 =head1 AUTHOR
 
-=head1 COPYRIGHT
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
-=head1 LICENSE
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-net-proxy@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/>. I will be notified, and then you'll automatically
+be notified of progress on your bug as I make changes.
+
+=head1 TODO
+
+Here's my own wishlist:
+
+=over 4
+
+=item *
+
+port C<connect-tunnel> to use C<Net::Proxy>.
+
+This requires writing C<Net::Proxy::Connector::connect>.
+
+=item *
+
+port C<sslh> (unreleased reverse proxy that can listen on a port and
+proxy to a SSH server or a HTTPS server depending on the client) to
+use C<Net::Proxy>.
+
+This requires writing C<Net::Proxy::Connector::dual>.
+
+=item *
+
+write a script fully compatible with GNU httptunnel
+(L<http://www.nocrew.org/software/httptunnel.html>.
+
+This requires writing C<Net::Proxy::Connector::httptunnel>.
+
+=item *
+
+enhance the httptunnel protocol to support multiple connections
+
+This requires writing C<Net::Proxy::Connector::httptunnel2>
+(or whatever I may call it then).
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 
