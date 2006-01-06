@@ -40,10 +40,11 @@ sub new_connection_on {
     Net::Proxy->watch_sockets($sock);
 
     # connect to the destination
-    my $out  = $self->get_proxy()->out_connector();
-    my $peer = eval { $out->connect() };
-    if ($@) { # connect dies if the connection fails
-        close_sockets( $sock );
+    my $proxy = $self->get_proxy();
+    my $out   = $proxy->out_connector();
+    my $peer  = eval { $out->connect(); };
+    if ($@) { # connect() dies if the connection fails
+        Net::Proxy->close_sockets( $sock );
         return;
     }
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
@@ -52,7 +53,7 @@ sub new_connection_on {
         Net::Proxy->set_peer( $peer, $sock );
         Net::Proxy->set_peer( $sock, $peer );
     }
-
+    $proxy->stat_inc_opened();
     return;
 }
 
