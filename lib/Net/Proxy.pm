@@ -88,7 +88,7 @@ for my $info (qw( opened closed )) {
         $STATS{total}{$info}++;
     };
     *{"stat_$info"}       = sub { $STATS{ refaddr $_[0]}{$info} || 0; };
-    *{"stat_total_$info"} = sub { $STATS{total}{$info}; };
+    *{"stat_total_$info"} = sub { $STATS{total}{$info} || 0; };
 }
 
 #
