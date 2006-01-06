@@ -166,7 +166,7 @@ sub mainloop {
                 # read the data
                 my $peer = Net::Proxy->get_peer($sock);
                 my $data
-                    = Net::Proxy->get_connector($sock)->get_data_from($sock);
+                    = Net::Proxy->get_connector($sock)->read_from($sock);
                 next SOCKET if !defined $data;
 
                 # TODO filtering by the proxy
