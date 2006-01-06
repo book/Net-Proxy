@@ -281,7 +281,7 @@ Close the given sockets and cleanup the related internal structures.
 
 =back
 
-Some of the class methods are related to the socket objects handling
+Some of the class methods are related to the socket objects that handle
 the actual connections.
 
 =over 4
@@ -330,6 +330,34 @@ connection and handles the data coming from the "client" side.
 
 Return the C<Net::Proxy::Connector> objet that creates the outgoing 
 connection and handles the data coming from the "server" side.
+
+=back
+
+=head2 Statistical methods
+
+The following methods manage some statistical information
+about the individual proxies:
+
+=over 4
+
+=item stat_inc_opened()
+
+=item stat_inc_closed()
+
+Increment the "opened" or "closed" connection counter for this proxy.
+
+=item stat_opened()
+
+=item stat_closed()
+
+Return the count of "opened" or "closed" connections for this proxy.
+
+=item stat_total_opened()
+
+=item stat_total_closed()
+
+Return the total count of "opened" or "closed" connection across
+all proxy objects.
 
 =back
 
