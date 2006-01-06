@@ -11,7 +11,9 @@ my %PROXY_OF;
 #
 sub new {
     my ( $class, $args ) = @_;
-    return bless $args ? {%$args} : {}, $class;
+    my $self = bless $args ? {%$args} : {}, $class;
+    $self->init() if $self->can('init');
+    return $self;
 }
 
 #
@@ -171,6 +173,16 @@ C<write_to()> methods, to send raw data on a socket.
 
 The following methods should be defined in C<Net::Proxy::Connector>
 subclasses:
+
+=head2 Initialisation
+
+=over 4
+
+=item init()
+
+This method initalise the connector.
+
+=back
 
 =head2 Processing incoming/outgoing data
 
