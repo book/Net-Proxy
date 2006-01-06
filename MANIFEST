@@ -1,0 +1,17 @@
+Build.PL
+lib/Net/Proxy.pm
+lib/Net/Proxy/Connector.pm
+lib/Net/Proxy/Connector/dummy.pm
+lib/Net/Proxy/Connector/tcp.pm
+MANIFEST			This list of files
+META.yml
+t/00load.t
+t/05connector.t
+t/10proxy_new.t
+t/11proxy_accessor.t
+t/12proxy_connectors.t
+t/30tcp_tcp.t
+t/31tcp_tcp_multi.t
+t/pod-coverage.t
+t/pod.t
+t/Util.pm
