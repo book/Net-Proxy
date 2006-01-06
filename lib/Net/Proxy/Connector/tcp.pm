@@ -29,20 +29,6 @@ sub accept_from {
     return $sock;
 }
 
-# READ
-*get_data_from = \&Net::Proxy::Connector::raw_data_from;
-
-# WRITE
-sub write_to {
-    my ($self, $sock, $data) = @_;
-    my $written = $sock->syswrite( $data );
-    if( ! defined $written ) {
-        carp sprintf("Read undef from %s:%s (Error %d: %s)\n",
-                     $sock->sockhost(), $sock->sockport(), $!, "$!");
-    }
-    return;
-}
-
 # OUT
 sub connect {
     my ($self) = @_;
@@ -55,6 +41,12 @@ sub connect {
     return $sock;
 }
 
+# READ
+*read_from = \&Net::Proxy::Connector::raw_read_from;
+
+# WRITE
+*write_to = \&Net::Proxy::Connector::raw_write_to;
+
 1;
 
 __END__
@@ -65,24 +57,35 @@ Net::Proxy::Connector::tcp - Net::Proxy connector for standard tcp proxies
 
 =head1 SYNOPSIS
 
+    # sample proxy using Net::Proxy::Connector::tcp
     use Net::Proxy;
 
     my $proxy = Net::Proxy->new(
         in  => { proto => tcp, port => '6789' },
         out => { proto => tcp, host => 'remotehost', port => '9876' },
     );
-
     $proxy->register();
 
     Net::Proxy->mainloop();
 
 =head1 DESCRIPTION
 
-=head1 PROXY OPTIONS
+
+
+=head1 CONNECTOR OPTIONS
+
+The connector accept the following options:
 
 =head1 AUTHOR
 
-=head1 COPYRIGHT
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
-=head1 LICENSE
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
 
