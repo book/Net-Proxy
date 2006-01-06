@@ -33,7 +33,7 @@ sub new_connection_on {
     my ( $self, $listener ) = @_;
 
     # call the actual Connector method
-    my $sock = $self->accept_from($listener);
+    my $sock = $self->accept_from($listener); # FIXME may croak
     Net::Proxy->set_connector( $sock, $self );
     Net::Proxy->watch_sockets($sock);
 
@@ -88,17 +88,21 @@ Net::Proxy::Connector - Base class for Net::Proxy protocols
     package Net::Proxy::Connector::zlonk;
 
     use strict;
+    use Net::Proxy::Connector;
     our @ISA = qw( Net::Proxy::Connector );
+
+    # here are the methods you need to write for your connector
 
     # if it can be used as an 'in' connector
     sub listen { }
     sub accept_from { }
 
     # if it can be used as an 'out' connector
-    sub open_connection { }
+    sub connect { }
 
     # to process data
     sub get_data_from { }
+    sub write_to { }
 
     1;
 
@@ -117,25 +121,43 @@ The base class provides the following methods:
 
 =item new()
 
-=item manager_of( $sock )
-
 =back
 
 =head2 Instance methods
 
 =over 4
 
-=item register_as_manager_of( $sock )
+=item set_proxy( $proxy )
 
-=item set_peer( $proto )
+Define the proxy that "owns" the connector.
 
-=item get_peer()
+=item get_proxy()
+
+Return the C<Net::Proxy> object that "owns" the connector.
+
+=item new_connection_on( $socket )
+
+This method is called by C<Net::Proxy> to handle incoming connections,
+and in turn call C<accept_from()> on the 'in' connector and
+C<connect()> on the 'out' connector.
+
+=item raw_data_from( $socket )
+
+This method can be used by C<Net::Proxy::Connector> subclasses to
+fetch the raw data on a socket.
 
 =back
 
 =head1 AUTHOR
 
-=head1 COPYRIGHT
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
-=head1 LICENSE
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
 
