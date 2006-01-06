@@ -70,11 +70,41 @@ Net::Proxy::Connector::tcp - Net::Proxy connector for standard tcp proxies
 
 =head1 DESCRIPTION
 
-
+C<Net::Proxy::Connector::tcp> is a connector for handling basic, standard
+TCP connections.
 
 =head1 CONNECTOR OPTIONS
 
 The connector accept the following options:
+
+=head2 C<in>
+
+=over 4
+
+=item host
+
+I<(optional)> The listening address. If not given, the default is
+C<localhost>.
+
+=item port
+
+The listening port.
+
+=back
+
+=head2 C<out>
+
+=over 4
+
+=item host
+
+The remote host.
+
+=item port
+
+The remote port.
+
+=back
 
 =head1 AUTHOR
 
