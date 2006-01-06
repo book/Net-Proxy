@@ -1,8 +1,6 @@
 package Net::Proxy::Connector::dummy;
 use strict;
 use warnings;
-use Carp;
-use IO::Socket::INET;
 
 use Net::Proxy::Connector;
 our @ISA = qw( Net::Proxy::Connector );
@@ -12,14 +10,14 @@ sub listen { }
 
 sub accept_from { }
 
+# OUT
+sub connect { }
+
 # READ
 sub read_from { return '' }
 
 # WRITE
-sub write_data_to { }
-
-# OUT
-sub open_connection { }
+sub write_to { }
 
 1;
 
@@ -27,28 +25,35 @@ __END__
 
 =head1 NAME
 
-Net::Proxy::Connector::dummy - Net::Proxy connector for standard tcp proxies
-
-=head1 SYNOPSIS
-
-    use Net::Proxy;
-
-    my $proxy = Net::Proxy->new(
-        in  => { type => 'dual', port => '6789' },
-        out => { type => 'dummy' }
-    );
-
-    $proxy->register();
-
-    Net::Proxy->mainloop();
+Net::Proxy::Connector::dummy - Dummy Net::Proxy connector
 
 =head1 DESCRIPTION
 
-=head1 PROXY OPTIONS
+C<Net::Proxy::Connecter::dummy> is a C<Net::Proxy::Connector>
+that does I<nothing>. It doesn't listen for incoming connections
+and does connect to other hosts.
+
+Future connectors may have their C<accept_from()> method also
+handle the connection to a remote host. In this case, C<dummy>
+may be used as an 'out' connector.
+
+You could also use the source code of this module as a template
+for writing new C<Net::Proxy::Connector> classes.
+
+=head1 CONNECTOR OPTIONS
+
+None.
 
 =head1 AUTHOR
 
-=head1 COPYRIGHT
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
-=head1 LICENSE
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
 
