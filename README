@@ -1,0 +1,6 @@
+Net::Proxy
+----------
+
+This module is a framework for creating various kinds of network
+proxies in a very simple way.
+
