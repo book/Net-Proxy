@@ -5,7 +5,7 @@ use Carp;
 use Scalar::Util qw( refaddr );
 use IO::Select;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # interal socket information table
 my %SOCK_INFO;
