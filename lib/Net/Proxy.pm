@@ -84,7 +84,7 @@ sub out_connector { return $CONNECTOR{out}{ refaddr $_[0] }; }
 sub add_listeners {
     my ( $class, @socks ) = @_;
     for my $sock (@socks) {
-        $LISTENER{ refaddr $sock} = 1;
+        $LISTENER{ refaddr $sock} = $sock;
     }
     return;
 }
@@ -106,7 +106,8 @@ sub close_sockets {
         $conn->close($sock) if $conn->can('close');
 
         # count connections to the proxy "in connectors" only
-        if( refaddr $conn == refaddr $conn->get_proxy()->in_connector() ) {
+        if( refaddr $conn == refaddr $conn->get_proxy()->in_connector()
+            && ! _is_listener( $sock ) ) {
             $CONNECTIONS++;
         }
 
@@ -178,6 +179,9 @@ sub mainloop {
     continue {
         last if $CONNECTIONS == $max_connections;
     }
+
+    # close the listening sockets
+    Net::Proxy->close_sockets( values %LISTENER );
 }
 
 #
