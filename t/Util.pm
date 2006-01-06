@@ -11,20 +11,10 @@ sub find_free_ports {
     my @socks;
 
     while ( @socks < $n && $port > 1023 ) {
-
-        my $sock = IO::Socket::INET->new(
-            Listen    => 1,
-            LocalAddr => 'localhost',
-            LocalPort => $port,
-            Proto     => 'tcp',
-        );
-
+        my $sock = listen_on_port( $port );
         push @socks, $sock if defined $sock;
         $port--;
     }
-
-    # failure
-    return if @socks != $n;
 
     return @socks;
 }
