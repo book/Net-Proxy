@@ -7,7 +7,7 @@ use Scalar::Util qw( refaddr );
 my %PROXY_OF;
 
 #
-# the most basic constructor possible
+# the most basic possible constructor
 #
 sub new {
     my ( $class, $args ) = @_;
@@ -171,6 +171,46 @@ C<write_to()> methods, to send raw data on a socket.
 
 The following methods should be defined in C<Net::Proxy::Connector>
 subclasses:
+
+=head2 Processing incoming/outgoing data
+
+=over 4
+
+=item read_from( $socket )
+
+Return the data that was possibly decapsulated by the connector.
+
+=item write_to( $socket, $data )
+
+Write C<$data> to the given C<$socket>, according to the connector
+scheme.
+
+=back
+
+=head2 C<in> connector
+
+=over 4
+
+=item listen()
+
+Initiate listening sockets and return them.
+
+=item accept_from( $socket )
+
+C<$socket> is a listening socket created by C<listen()>.
+This method returns the connected socket.
+
+=back
+
+=head2 C<out> connector
+
+=over 4
+
+=item connect()
+
+Return a socket connected to the remote server.
+
+=back
 
 =head1 AUTHOR
 
