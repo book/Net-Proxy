@@ -41,7 +41,11 @@ sub new_connection_on {
 
     # connect to the destination
     my $out  = $self->get_proxy()->out_connector();
-    my $peer = $out->connect();
+    my $peer = eval { $out->connect() };
+    if ($@) { # connect dies if the connection fails
+        close_sockets( $sock );
+        return;
+    }
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
         Net::Proxy->watch_sockets($peer);
         Net::Proxy->set_connector( $peer, $out );
