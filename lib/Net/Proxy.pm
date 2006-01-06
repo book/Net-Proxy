@@ -385,6 +385,11 @@ enhance the httptunnel protocol to support multiple connections
 This requires writing C<Net::Proxy::Connector::httptunnel2>
 (or whatever I may call it then).
 
+=item *
+
+Add support for filters, so that the data can be transformed on the fly
+(could be useful to deceive intrusion detection systems, for example).
+
 =back
 
 =head1 COPYRIGHT & LICENSE
