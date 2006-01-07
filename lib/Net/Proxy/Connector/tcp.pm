@@ -7,19 +7,7 @@ use Net::Proxy::Connector;
 our @ISA = qw( Net::Proxy::Connector );
 
 # IN
-sub listen {
-    my $self = shift;
-    my $sock = IO::Socket::INET->new(
-        Listen    => 1,
-        LocalAddr => $self->{host},
-        LocalPort => $self->{port},
-        Proto     => 'tcp',
-        ReuseAddr => 1,
-    );
-    die $! unless $sock;
-
-    return $sock;
-}
+*listen = \&Net::Proxy::Connector::raw_listen;
 
 sub accept_from {
     my ($self, $listen) = @_;
