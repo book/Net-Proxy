@@ -28,6 +28,16 @@ sub set_proxy {
 
 sub get_proxy { return $PROXY_OF{ refaddr $_[0] }; }
 
+sub is_in {
+    my $id = refaddr $_[0];
+    return $id == refaddr $PROXY_OF{$id}->in_connector();
+}
+
+sub is_out {
+    my $id = refaddr $_[0];
+    return $id == refaddr $PROXY_OF{$id}->out_connector();
+}
+
 #
 # the method that creates all the sockets
 #
@@ -91,6 +101,21 @@ sub raw_write_to {
                      $sock->sockhost(), $sock->sockport(), $!, "$!");
     }
     return;
+}
+
+# the most basic possible listen()
+sub raw_listen {
+    my $self = shift;
+    my $sock = IO::Socket::INET->new(
+        Listen    => 1,
+        LocalAddr => $self->{host},
+        LocalPort => $self->{port},
+        Proto     => 'tcp',
+        ReuseAddr => 1,
+    );
+    die $! unless $sock;
+
+    return $sock;
 }
 
 1;
