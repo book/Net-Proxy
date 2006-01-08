@@ -41,4 +41,13 @@ sub listen_on_port {
     );
 }
 
+# compute a seed and show it
+use POSIX qw( INT_MAX );
+
+sub init_rand {
+    my $seed = @_ ? $_[0] : int rand INT_MAX;
+    diag "Random seed $seed";
+    srand $seed;
+}
+
 1;
