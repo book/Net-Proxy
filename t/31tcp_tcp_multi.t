@@ -3,7 +3,6 @@ use strict;
 use warnings;
 use IO::Socket::INET;
 use t::Util;
-use POSIX qw( INT_MAX );
 
 use Net::Proxy;
 
@@ -28,9 +27,7 @@ my @lines = (
 );
 
 # compute a seed and show it
-my $seed = @ARGV ? $ARGV[0] : int rand INT_MAX;
-diag "Random seed $seed";
-srand $seed;
+init_rand( @ARGV );
 
 # compute random configurations
 my @confs = sort { $a->[0] <=> $b->[0] }
