@@ -181,6 +181,16 @@ Define the proxy that "owns" the connector.
 
 Return the C<Net::Proxy> object that "owns" the connector.
 
+=item is_in()
+
+Return a boolean value indicating if the C<Net::Proxy::Connector>
+object is the C<in> connector of its proxy.
+
+=item is_out()
+
+Return a boolean value indicating if the C<Net::Proxy::Connector>
+object is the C<out> connector of its proxy.
+
 =item new_connection_on( $socket )
 
 This method is called by C<Net::Proxy> to handle incoming connections,
@@ -196,6 +206,12 @@ C<read_from()> methods, to fetch raw data on a socket.
 
 This method can be used by C<Net::Proxy::Connector> subclasses in their
 C<write_to()> methods, to send raw data on a socket.
+
+=item raw_listen( )
+
+This method can be used by C<Net::Proxy::Connector> subclasses in their
+C<listen()> methods, to create a listening socket on their C<host>
+and C<port> parameters.
 
 =back
 
@@ -236,6 +252,8 @@ scheme.
 =item listen()
 
 Initiate listening sockets and return them.
+This method can use the C<raw_listen()> method to do the low-listen
+listen call.
 
 =item accept_from( $socket )
 
