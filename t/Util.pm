@@ -56,4 +56,17 @@ sub random_swap {
     return rand > 0.5 ? ($first, $second) : ( $second, $first );
 }
 
+# skip but fail
+# extends Test::More
+use Test::Builder;
+sub skip_fail {
+    my ($why, $how_many) = @_;
+    my $Test = Test::Builder->new();
+    for( 1 .. $how_many ) {
+        $Test->ok( 0, $why );
+    }
+    no warnings;
+    last SKIP;
+}
+
 1;
