@@ -6,15 +6,16 @@ use IO::Socket::INET;
 # we can use sockport() to learn the port values
 # and close() to close the socket just before reopening it
 sub find_free_ports {
-    my $n    = shift;
-    my $port = 30000;
+    my $n = shift;
     my @socks;
 
-    while ( @socks < $n && $port > 1023 ) {
-        my $sock = listen_on_port( $port );
-        push @socks, $sock if defined $sock;
-        $port--;
+    for ( 1 .. $n ) {
+        my $sock = listen_on_port(0);
+        if ($sock) {
+            push @socks, $sock;
+        }
     }
+    diag join ' ', 'ports:', map { $_->sockport() } @socks;
 
     return @socks;
 }
@@ -29,6 +30,7 @@ sub connect_to_port {
     );
 }
 
+# return a socket listening on $port on localhost
 sub listen_on_port {
     my ($port) = @_;
     return IO::Socket::INET->new(
