@@ -441,6 +441,11 @@ This requires writing C<Net::Proxy::Connector::httptunnel2>
 
 =item *
 
+Implement RFC 3093 - Firewall Enhancement Protocol (FEP), as
+C<Net::Proxy::Connector::FEP>. This RFC was published on April 1, 2001.
+
+=item *
+
 Add support for filters, so that the data can be transformed on the fly
 (could be useful to deceive intrusion detection systems, for example).
 
