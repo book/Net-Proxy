@@ -33,12 +33,7 @@ my @free = find_free_ports(2);
 SKIP: {
     skip "Not enough available ports", $tests if @free < 2;
 
-    my $proxy_port     = $free[0]->sockport();
-    my $web_proxy_port = $free[1]->sockport();
-
-    # close the ports before forking
-    $_->close() for @free;
-
+    my ($proxy_port, $web_proxy_port) = @free;
     my $pid = fork;
 
   SKIP: {
