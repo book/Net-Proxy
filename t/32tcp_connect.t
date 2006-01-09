@@ -92,10 +92,11 @@ SKIP: {
             $server->send_response($res);
 
             # send some data through
+            # FIXME is blocks when $server speaks first
             for my $line (@lines) {
-                ( $client, $server ) = random_swap( $client, $server );
                 print $client $line;
                 is( <$server>, $line, "Line received" );
+                ( $client, $server ) = random_swap( $client, $server );
             }
             $client->close();
             $server->close();
