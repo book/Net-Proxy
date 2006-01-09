@@ -7,13 +7,15 @@ use t::Util;
 use Net::Proxy;
 
 my @lines = (
-    "fettuccia_riccia galla_genovese sedanetti pennine_rigate gobboni",
-    "fenescecchie barbina gianduini umbricelli maniche",
-    "gozzetti pepe tofarelle anelli_margherite_lisce farfallette",
-    "sciviotti_ziti_rigati gobbini gomiti cravattine penne_di_zitoni",
-    "amorosi cuoricini cicorie tempestina tortellini",
+    "fettuccia_riccia galla_genovese sedanetti pennine_rigate gobboni\n",
+    "fenescecchie barbina gianduini umbricelli maniche\n",
+    "gozzetti pepe tofarelle anelli_margherite_lisce farfallette\n",
+    "sciviotti_ziti_rigati gobbini gomiti cravattine penne_di_zitoni\n",
+    "amorosi cuoricini cicorie tempestina tortellini\n",
 );
-my $tests = @lines + 3;
+my $tests = @lines + 2;
+
+init_rand(@ARGV);
 
 plan tests => $tests;
 
@@ -72,15 +74,15 @@ SKIP: {
             sleep 1;
 
             # the parent process does the testing
-            my $listener = listen_on_port($web_proxy_port)
+            my $daemon = HTTP::Daemon->new(
+               LocalAddr => 'localhost',
+               LocalPort => $web_proxy_port,
+               )
               or skip "Couldn't start the server: $!", $tests;
             my $client = connect_to_port($proxy_port)
               or skip_fail "Couldn't start the client: $!", $tests;
-            my $server = $listener->accept()
+            my $server = $daemon->accept()
               or skip_fail "Proxy didn't connect: $!", $tests;
-
-            # turn the server socket into a HTTP::Daemon socket
-            bless $server, 'HTTP::Daemon::ClientConn';
 
             # the server will first play the role of the web proxy,
             # and after a 200 OK will also act as a real server
@@ -88,14 +90,7 @@ SKIP: {
             # check the request
             my $req = $server->get_request();
             is( $req->method(), 'CONNECT', 'Proxy did a CONNECT' );
-            is( $req->uri(), 'zlonk.crunch.com:443', 'Target host:port' );
-
-            my $headers = $req->headers();
-            is(
-                $headers->header('User-Agent'),
-                'Net::Proxy/$Net::Proxy::VERSION',
-                'User-Agent header'
-            );
+            is( $req->uri()->host_port(), 'zlonk.crunch.com:443', 'host:port' );
 
             # first time, the web proxy says 200
             my $res = HTTP::Response->new('200');
