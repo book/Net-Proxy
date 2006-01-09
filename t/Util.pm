@@ -15,9 +15,12 @@ sub find_free_ports {
             push @socks, $sock;
         }
     }
-    diag join ' ', 'ports:', map { $_->sockport() } @socks;
+    my @ports = map { $_->sockport() } @socks;
+    diag "ports: @ports";
 
-    return @socks;
+    # close the sockets and return the ports
+    $_->close() for @socks;
+    return @ports;
 }
 
 # return a socket connected to port $port on localhost
