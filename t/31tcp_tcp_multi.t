@@ -124,12 +124,18 @@ SKIP: {
                         next PAIR;
                     }
 
-                    # send data through the connection
+                    # fetch data to send
                     $n %= @lines;
                     my $line = $lines[$n];
-                    print { $pair->[ $step % 2 ] } $line;
-                    is( $pair->[ 1 - $step % 2 ]->getline(),
-                        $line, "Step $step: line $n sent through pair $pair->[3]" );
+
+                    # randomly swap client/server
+                    @{$pair}[ 0, 1 ] = random_swap(@{$pair}[ 0, 1 ]);
+
+                    # send data through the connection
+                    print { $pair->[0] } $line;
+                    is( $pair->[1]->getline(),
+                        $line,
+                        "Step $step: line $n sent through pair $pair->[3]" );
                     $pair->[2]--;
                     $n++;
 
