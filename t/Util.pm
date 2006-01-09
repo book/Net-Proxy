@@ -52,8 +52,8 @@ sub init_rand {
 
 # randomly exchange (or not) a pair
 sub random_swap {
-    my ($first, $second) = @_;
-    return rand > 0.5 ? ($first, $second) : ( $second, $first );
+    my ( $first, $second ) = @_;
+    return rand > 0.5 ? ( $first, $second ) : ( $second, $first );
 }
 
 # skip but fail
