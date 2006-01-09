@@ -7,31 +7,45 @@ use Net::Proxy::Connector;
 our @ISA = qw( Net::Proxy::Connector );
 
 sub init {
-    my ( $class, $args ) = @_;
-    my $self = bless $args ? {%$args} : {}, $class;
+    my ($self) = @_;
 
     # check params
-    for my $attr (qw( host port proxy_host proxy_port ) ) {
+    for my $attr (qw( host port )) {
         croak "$attr parameter is required"
-          if ! exists $self->{attr};
+            if !exists $self->{$attr};
     }
 
     # create a user agent class linked to this connector
     my $id = refaddr $self;
     require LWP::UserAgent;
-    eval << "END_PACKAGE";
+    {
+        no warnings;
+        eval << "END_PACKAGE";
 package LWP::UserAgent::$id;
 our \@ISA = qw( LWP::UserAgent );
 sub get_basic_credentials {
-    return ( \$self->{http_user}, \$self->{http_pass} );
+    return ( \$self->{proxy_user}, \$self->{proxy_pass} );
 }
 END_PACKAGE
+    }
 
-    $self->{agent} = "LWP::UserAgent::$id"->new(
+    $self->{agent} = my $ua = "LWP::UserAgent::$id"->new(
         agent      => $self->{proxy_agent},
-        env_proxy  => 1,
         keep_alive => 1,
     );
+
+    # set the agent proxy
+    if ( $self->{proxy_host} ) {
+        $self->{proxy_port} ||= 8080;
+        $ua->proxy(
+            http => "http://$self->{proxy_host}:$self->{proxy_port}/" );
+    }
+    else {
+        $self->{agent}->env_proxy();
+    }
+
+    # no proxy defined!
+    croak 'proxy_host parameter is required' unless $ua->proxy('http');
 
     return $self;
 }
@@ -43,16 +57,16 @@ sub connect {
     my ($self) = (@_);
 
     # connect to the proxy
-    my $req =
-      HTTP::Request->new( CONNECT => "http://$self->{host}:$self->{port}/" );
+    my $req = HTTP::Request->new(
+        CONNECT => "http://$self->{host}:$self->{port}/" );
     my $res = $self->{agent}->request($req);
 
     # FIXME - Not sure about this
     require LWP::Authen::Ntlm
-     if grep { /NTLM/ } $res->headers()->header( 'WWW-Authenticate' );
+        if grep {/NTLM/} $res->headers()->header('WWW-Authenticate');
 
     # authentication failed
-    die $res->status_line() if ! $res->is_success();
+    die $res->status_line() if !$res->is_success();
 
     # the socket connected to the proxy
     return $res->{client_socket};
