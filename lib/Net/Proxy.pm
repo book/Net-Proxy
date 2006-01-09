@@ -19,6 +19,7 @@ my %CONNECTOR = (
     in  => {},
     out => {},
 );
+my %LOGGER;
 
 #
 # constructor
@@ -89,6 +90,28 @@ for my $info (qw( opened closed )) {
     };
     *{"stat_$info"}       = sub { $STATS{ refaddr $_[0]}{$info} || 0; };
     *{"stat_total_$info"} = sub { $STATS{total}{$info} || 0; };
+}
+
+#
+# logging methods
+#
+sub add_loggers {
+    my ( $class, @loggers ) = @_;
+
+    for my $logger (@loggers) {
+        croak "$logger cannot log()" if !$logger->can('log');
+
+        # $logger can be a string (class name)
+        $LOGGER{ refaddr $logger || $logger} = $logger;
+    }
+}
+
+sub log {
+    my ( $class, %args ) = @_;
+
+    for my $logger ( values %LOGGER ) {
+        $logger->log( %args );
+    }
 }
 
 #
@@ -282,6 +305,20 @@ Add the given sockets to the watch list.
 =item close_sockets( @sockets )
 
 Close the given sockets and cleanup the related internal structures.
+
+=item add_loggers( @loggers )
+
+Add the given loggers to the list of logging objects managed by the class.
+
+They all must have a C<log()> method that accepts a list of pair with
+arguments C<message> and C<level>, just like C<Log::Dispatch>.
+Levels are exactly the same as those used by C<Log::Dispatch>. Internally,
+C<Net::Proxy> will only use numerical values for C<level>.
+
+=item log( message => $mesg, level => $level )
+
+Log a message that will be dispatched to the loggers registered with
+C<add_logger()>.
 
 =back
 
