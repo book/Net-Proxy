@@ -32,8 +32,11 @@ init_rand( @ARGV );
 # compute random configurations
 my @confs = sort { $a->[0] <=> $b->[0] }
     map { [ int rand 16, int rand 8 ] } 1 .. 3;
+
+# compute the total number of tests
 my $tests = 1 + ( my $first = int rand 8 );
 $tests += $_->[1] for @confs;
+$tests += 1 + @confs;
 
 # show the config if 
 if( @ARGV ) { 
@@ -142,6 +145,8 @@ SKIP: {
                     # close the connection if finished
                     if ( $pair->[2] <= 0 ) {
                         $pair->[0]->close();
+                        is_closed( $pair->[1],
+                            "other socket of pair $pair->[3]" );
                         $pair->[1]->close();
                         delete $pairs{$pair};
                         next PAIR;
