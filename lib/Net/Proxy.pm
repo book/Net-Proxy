@@ -109,6 +109,7 @@ sub add_loggers {
 sub log {
     my ( $class, %args ) = @_;
 
+    $args{message} = caller() . ': ' . $args{message} . "\n"; 
     for my $logger ( values %LOGGER ) {
         $logger->log( %args );
     }
@@ -138,14 +139,16 @@ sub close_sockets {
     for my $sock (@socks) {
 
         # clean up connector
-        my $conn = Net::Proxy->get_connector($sock);
-        $conn->close($sock) if $conn->can('close');
+        if ( my $conn = Net::Proxy->get_connector($sock) ) {
+            $conn->close($sock) if $conn->can('close');
 
-        # count connections to the proxy "in connectors" only
-        my $proxy = $conn->get_proxy();
-        if( refaddr $conn == refaddr $proxy->in_connector()
-            && ! _is_listener( $sock ) ) {
-            $proxy->stat_inc_closed();
+            # count connections to the proxy "in connectors" only
+            my $proxy = $conn->get_proxy();
+            if ( refaddr $conn == refaddr $proxy->in_connector()
+                && !_is_listener($sock) )
+            {
+                $proxy->stat_inc_closed();
+            }
         }
 
         # clean up internal structures
@@ -209,13 +212,14 @@ sub mainloop {
 
                 # read the data
                 my $peer = Net::Proxy->get_peer($sock);
-                my $data
-                    = Net::Proxy->get_connector($sock)->read_from($sock);
-                next SOCKET if !defined $data;
+                if ( my $conn = Net::Proxy->get_connector($sock) ) {
+                    my $data = $conn->read_from($sock);
+                    next SOCKET if !defined $data;
 
-                # TODO filtering by the proxy
+                    # TODO filtering by the proxy
 
-                Net::Proxy->get_connector($peer)->write_to( $peer, $data );
+                    Net::Proxy->get_connector($peer)->write_to( $peer, $data );
+                }
             }
         }
     }
