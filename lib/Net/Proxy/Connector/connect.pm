@@ -26,6 +26,7 @@ sub init {
     # set the agent proxy
     if ( $self->{proxy_host} ) {
         $self->{proxy_port} ||= 8080;
+        $self->{proxy_pass} ||= '';
         my $auth = $self->{proxy_user}
             ? "$self->{proxy_user}:$self->{proxy_pass}\@"
             : '';
