@@ -14,6 +14,7 @@ sub new {
     my ( $class, $args ) = @_;
     my $self = bless $args ? {%$args} : {}, $class;
     $self->init() if $self->can('init');
+    delete $self->{_proxy_}; # this link back is now unnecessary
     return $self;
 }
 
@@ -51,13 +52,22 @@ sub new_connection_on {
     Net::Proxy->watch_sockets($sock);
 
     # connect to the destination
-    my $proxy = $self->get_proxy();
-    my $out   = $proxy->out_connector();
-    my $peer  = eval { $out->connect(); };
-    if ($@) { # connect() dies if the connection fails
+    my $out = $self->get_proxy()->out_connector();
+    $self->_out_connect_from($out, $sock);
+
+    # update the stats
+    $self->get_proxy()->stat_inc_opened();
+    return;
+}
+
+sub _out_connect_from {
+    my ( $self, $out, $sock ) = @_;
+
+    my $peer = eval { $out->connect(); };
+    if ($@) {    # connect() dies if the connection fails
         $@ =~ s/ at .*?\z//s;
         warn "connect() failed with error '$@'\n";
-        Net::Proxy->close_sockets( $sock );
+        Net::Proxy->close_sockets($sock);
         return;
     }
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
@@ -66,7 +76,7 @@ sub new_connection_on {
         Net::Proxy->set_peer( $peer, $sock );
         Net::Proxy->set_peer( $sock, $peer );
     }
-    $proxy->stat_inc_opened();
+
     return;
 }
 
@@ -112,7 +122,7 @@ sub raw_listen {
     my $self = shift;
     my $sock = IO::Socket::INET->new(
         Listen    => 1,
-        LocalAddr => $self->{host},
+        LocalAddr => $self->{host} || 'localhost',
         LocalPort => $self->{port},
         Proto     => 'tcp',
         ReuseAddr => 1,
