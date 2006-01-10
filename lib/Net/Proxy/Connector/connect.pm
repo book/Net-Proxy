@@ -16,20 +16,9 @@ sub init {
     }
 
     # create a user agent class linked to this connector
-    my $id = refaddr $self;
     require LWP::UserAgent;
-    {
-        no warnings;
-        eval << "END_PACKAGE";
-package LWP::UserAgent::$id;
-our \@ISA = qw( LWP::UserAgent );
-sub get_basic_credentials {
-    return ( \$self->{proxy_user}, \$self->{proxy_pass} );
-}
-END_PACKAGE
-    }
 
-    $self->{agent} = my $ua = "LWP::UserAgent::$id"->new(
+    $self->{agent} = my $ua = LWP::UserAgent->new(
         agent      => $self->{proxy_agent},
         keep_alive => 1,
     );
@@ -37,8 +26,11 @@ END_PACKAGE
     # set the agent proxy
     if ( $self->{proxy_host} ) {
         $self->{proxy_port} ||= 8080;
+        my $auth = $self->{proxy_user}
+            ? "$self->{proxy_user}:$self->{proxy_pass}\@"
+            : '';
         $ua->proxy(
-            http => "http://$self->{proxy_host}:$self->{proxy_port}/" );
+            http => "http://$auth$self->{proxy_host}:$self->{proxy_port}/" );
     }
     else {
         $self->{agent}->env_proxy();
