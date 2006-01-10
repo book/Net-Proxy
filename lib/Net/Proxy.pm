@@ -396,6 +396,11 @@ This is the simplest possible proxy. On the "in" side, it sits waiting
 for incoming connections, and on the "out" side, it connects to the
 configured host/port.
 
+=head2 connect (C<Net::Proxy::Connector::connect>)
+
+This proxy can connect to a TCP server though a web proxy that
+accepts HTTP CONNECT requests.
+
 =head2 dummy (C<Net::Proxy::Connector::dummy>)
 
 This proxy does nothing. You can use it as a template for writing
@@ -410,6 +415,14 @@ classes and the parameters their constructors recognise.
     ------------+-----------------+----------------
      tcp        | host            | host
                 | port            | port
+    ------------+-----------------+----------------
+     connect    | N/A             | host
+                |                 | port
+                |                 | proxy_host
+                |                 | proxy_port
+                |                 | proxy_user
+                |                 | proxy_pass
+                |                 | proxy_agent
     ------------+-----------------+----------------
      dummy      | N/A             | N/A
 
