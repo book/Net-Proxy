@@ -63,6 +63,7 @@ SKIP: {
                 or skip "Proxy didn't connect: $!", $tests;
 
             # mainloop(1) limits incoming connections to 1
+            sleep 1;
             my $client2 = connect_to_port($proxy_port);
             is( $client2, undef, "second client fails: $!");
 
