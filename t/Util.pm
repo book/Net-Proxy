@@ -25,11 +25,12 @@ sub find_free_ports {
 
 # return a socket connected to port $port on localhost
 sub connect_to_port {
-    my ($port) = @_;
+    my ($port, %opts) = @_;
     return IO::Socket::INET->new(
         PeerAddr => 'localhost',
         PeerPort => $port,
         Proto    => 'tcp',
+        %opts
     );
 }
 
