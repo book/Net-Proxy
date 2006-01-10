@@ -16,7 +16,9 @@ use Test::More;
     my $i = 0;
     sub log {
         my ( $self, %args ) = @_;
-        is_deeply( \%args, $msg[$i], "Log $i received" );
+        my $expected = { %{$msg[$i]} }; # clone
+        $expected->{message} = "main: $expected->{message}\n";
+        is_deeply( \%args, $expected, "Log $i received" );
         $i++;
     }
 }
