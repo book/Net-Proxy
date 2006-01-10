@@ -55,6 +55,8 @@ sub new_connection_on {
     my $out   = $proxy->out_connector();
     my $peer  = eval { $out->connect(); };
     if ($@) { # connect() dies if the connection fails
+        $@ =~ s/ at .*?\z//s;
+        carp "connect() failed with error '$@'";
         Net::Proxy->close_sockets( $sock );
         return;
     }
