@@ -87,7 +87,7 @@ sub raw_read_from {
     }
 
     # connection closed
-    if ( $read == 0 || $close ) {
+    if ( $close || $read == 0 ) {
         my $peer = Net::Proxy->get_peer($sock);
         $self->get_proxy()->close_sockets( $sock, $peer );
         return;
