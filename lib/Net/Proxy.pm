@@ -45,9 +45,10 @@ sub new {
         # load the class
         my $class = 'Net::Proxy::Connector::' . $args->{$conn}{type};
         eval "require $class";
-        croak "Couldn't load $class for '$conn' connector" if $@;
+        croak "Couldn't load $class for '$conn' connector: $@" if $@;
 
         # create and store the Connector object
+        $args->{$conn}{_proxy_} = $self;
         $CONNECTOR{$conn}{ refaddr $self} = $class->new( $args->{$conn} );
         $CONNECTOR{$conn}{ refaddr $self}->set_proxy($self);
     }
