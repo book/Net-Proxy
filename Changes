@@ -1,6 +1,6 @@
 Revision history for Perl extension Net::Proxy
 
-0.02 Tue Jan 10 03:03:35 CET 2006
+0.02 Tue Jan 10 09:43:23 CET 2006
         [ENHANCEMENTS]
         - added the README and Changes files
         - added statistical methods to Net::Proxy
