@@ -93,29 +93,6 @@ for my $info (qw( opened closed )) {
 }
 
 #
-# logging methods
-#
-sub add_loggers {
-    my ( $class, @loggers ) = @_;
-
-    for my $logger (@loggers) {
-        croak "$logger cannot log()" if !$logger->can('log');
-
-        # $logger can be a string (class name)
-        $LOGGER{ refaddr $logger || $logger} = $logger;
-    }
-}
-
-sub log {
-    my ( $class, %args ) = @_;
-
-    $args{message} = caller() . ': ' . $args{message} . "\n"; 
-    for my $logger ( values %LOGGER ) {
-        $logger->log( %args );
-    }
-}
-
-#
 # socket-related methods
 #
 sub add_listeners {
