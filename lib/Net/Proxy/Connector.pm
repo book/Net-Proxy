@@ -56,7 +56,7 @@ sub new_connection_on {
     my $peer  = eval { $out->connect(); };
     if ($@) { # connect() dies if the connection fails
         $@ =~ s/ at .*?\z//s;
-        carp "connect() failed with error '$@'";
+        warn "connect() failed with error '$@'\n";
         Net::Proxy->close_sockets( $sock );
         return;
     }
@@ -81,7 +81,7 @@ sub raw_read_from {
 
     # check for errors
     if ( not defined $read ) {
-        carp sprintf( "Read undef from %s:%s (Error %d: %s)\n",
+        warn sprintf( "Read undef from %s:%s (Error %d: %s)\n",
             $sock->sockhost(), $sock->sockport(), $!, "$!" );
         $close = 1;
     }
@@ -101,7 +101,7 @@ sub raw_write_to {
     my ($self, $sock, $data) = @_;
     my $written = $sock->syswrite( $data );
     if( ! defined $written ) {
-        carp sprintf("Read undef from %s:%s (Error %d: %s)\n",
+        warn sprintf("Read undef from %s:%s (Error %d: %s)\n",
                      $sock->sockhost(), $sock->sockport(), $!, "$!");
     }
     return;
