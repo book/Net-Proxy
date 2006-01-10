@@ -2,18 +2,25 @@ Build.PL
 Changes
 lib/Net/Proxy.pm
 lib/Net/Proxy/Connector.pm
+lib/Net/Proxy/Connector/connect.pm
 lib/Net/Proxy/Connector/dummy.pm
 lib/Net/Proxy/Connector/tcp.pm
+Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
+script/connect-tunnel
 t/00load.t
 t/05connector.t
 t/10proxy_new.t
 t/11proxy_accessor.t
 t/12proxy_connectors.t
+t/13proxy_stat.t
+t/14proxy_log.t
 t/30tcp_tcp.t
 t/31tcp_tcp_multi.t
+t/32tcp_connect.t
+t/90compile.t
 t/pod-coverage.t
 t/pod.t
 t/Util.pm
