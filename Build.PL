@@ -8,6 +8,9 @@ my $build = Module::Build->new(
         'IO::Select'   => 0,
         'IO::Socket'   => 0,
     },
+    recommends         => { 'LWP::UserAgent' => 2, },
+    script_files       => [ glob 'script/*' ],
+    add_to_cleanup     => ['Net-Proxy-*'],
 );
-$build->create_build_script;
+$build->create_build_script();
 
