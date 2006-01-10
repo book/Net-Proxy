@@ -5,7 +5,8 @@ WriteMakefile
           'PL_FILES' => {},
           'NAME' => 'Net::Proxy',
           'EXE_FILES' => [
-                           'script/connect-tunnel'
+                           'script/connect-tunnel',
+                           'script/sslh'
                          ],
           'VERSION_FROM' => 'lib/Net/Proxy.pm',
           'PREREQ_PM' => {
