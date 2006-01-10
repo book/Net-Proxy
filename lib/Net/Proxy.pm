@@ -414,6 +414,12 @@ configured host/port.
 This proxy can connect to a TCP server though a web proxy that
 accepts HTTP CONNECT requests.
 
+=head2 dual (C<Net::Proxy::Connector::dual>)
+
+This proxy is a Y-shaped proxy: depending on the client behaviour
+right after the connection is established, it connects it to one
+of two services, handled by two distinct connectors.
+
 =head2 dummy (C<Net::Proxy::Connector::dummy>)
 
 This proxy does nothing. You can use it as a template for writing
@@ -440,7 +446,17 @@ in that position (either C<in> or C<out>).
                 |                 | proxy_pass
                 |                 | proxy_agent
     ------------+-----------------+----------------
+     dual       | host            | N/A
+                | port            |
+                | timeout         |
+                | server_first    |
+                | client_first    |
+    ------------+-----------------+----------------
      dummy      | N/A             | N/A
+
+C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
+a C<Net::Proxy::Connector::dual>, since the later is linked to two
+different connector objects.
 
 =head1 AUTHOR
 
