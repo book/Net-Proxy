@@ -173,14 +173,6 @@ sub mainloop {
     SOCKET:
         for my $sock (@ready) {
             if ( _is_listener($sock) ) {
-                
-                # prevent new connections
-                if ( $max_connections
-                    && Net::Proxy->stat_total_opened() == $max_connections )
-                {
-                    $sock->close();
-                    next SOCKET;
-                }
 
                 # accept the new connection and connect to the destination
                 Net::Proxy->get_connector($sock)->new_connection_on($sock);
@@ -201,9 +193,18 @@ sub mainloop {
         }
     }
     continue {
-        last
-            if $max_connections
-            && Net::Proxy->stat_total_closed() == $max_connections;
+        if( $max_connections ) {
+
+            # stop after that many connections
+            last if Net::Proxy->stat_total_closed() == $max_connections;
+
+            # prevent new connections
+            if ( %LISTENER
+                && Net::Proxy->stat_total_opened() == $max_connections )
+            {
+                Net::Proxy->close_sockets( values %LISTENER );
+            }
+        }
     }
 
     # close the listening sockets
