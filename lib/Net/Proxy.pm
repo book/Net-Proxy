@@ -231,8 +231,8 @@ Net::Proxy - Framework for proxying network connections in many ways
     # proxy connections from localhost:6789 to remotehost:9876
     # using standard TCP connections
     my $proxy = Net::Proxy->new(
-        in  => { proto => tcp, port => '6789' },
-        out => { proto => tcp, host => 'remotehost', port => '9876' },
+        in  => { type => tcp, port => '6789' },
+        out => { type => tcp, host => 'remotehost', port => '9876' },
     );
 
     # register the proxy object
@@ -248,8 +248,20 @@ Net::Proxy - Framework for proxying network connections in many ways
 A C<Net::Proxy> object represents a proxy that accepts connections
 and then relays the data transfered between the source and the destination.
 
-The goal of this module is to abstract the different protocols used
-to connect from the proxy to the destination. See L<AVAILABLE CONNECTORS>
+The goal of this module is to abstract the different methods used
+to connect from the proxy to the destination.
+
+A proxy is a program that transfer data across a network boundary           
+between a client and a server. C<Net::Proxy> introduces the concept of         
+"connectors" (implemented as C<Net::Proxy::Connector> subclasses),
+which abstract the server part (connected to the              
+client) and the client part (connected to the server) of the proxy.         
+                                                                            
+This architecture makes it easy to implement specific techniques to
+cross a given network boundary, possibly by using a proxy on one side
+of the network fence, and a reverse-proxy on the other side of the fence.
+
+See L<AVAILABLE CONNECTORS> for details about the existing connectors.
 
 =head1 METHODS
 
@@ -411,6 +423,9 @@ new C<Net::Proxy::Connector> classes.
 This table summarises all the available C<Net::Proxy::Connector>
 classes and the parameters their constructors recognise.
 
+C<N/A> means that the given C<Net::Proxy::Connector> cannot be used
+in that position (either C<in> or C<out>).
+
      Connector  | in parameters   | out parameters
     ------------+-----------------+----------------
      tcp        | host            | host
@@ -445,7 +460,7 @@ Here's my own wishlist:
 
 =item *
 
-port C<sslh> (unreleased reverse proxy that can listen on a port and
+Port C<sslh> (unreleased reverse proxy that can listen on a port and
 proxy to a SSH server or a HTTPS server depending on the client) to
 use C<Net::Proxy>.
 
@@ -453,14 +468,14 @@ This requires writing C<Net::Proxy::Connector::dual>.
 
 =item *
 
-write a script fully compatible with GNU httptunnel
-(L<http://www.nocrew.org/software/httptunnel.html>.
+Write a script fully compatible with GNU httptunnel
+(L<http://www.nocrew.org/software/httptunnel.html>).
 
 This requires writing C<Net::Proxy::Connector::httptunnel>.
 
 =item *
 
-enhance the httptunnel protocol to support multiple connections
+Enhance the httptunnel protocol to support multiple connections.
 
 This requires writing C<Net::Proxy::Connector::httptunnel2>
 (or whatever I may call it then).
@@ -472,8 +487,30 @@ C<Net::Proxy::Connector::FEP>. This RFC was published on April 1, 2001.
 
 =item *
 
+Implement DNS tunnel connectors (see
+L<http://savannah.nongnu.org/projects/nstx/>,
+OzymanDNS, L<http://www.doxpara.com/slides/BH_EU_05-Kaminsky.pdf>.
+L<http://thomer.com/howtos/nstx.html>).
+
+=item *
+
+Implement ICMP tunnel connectors (see
+L<http://www.linuxexposed.com/Articles/Hacking/Case-of-a-wireless-hack.html>,
+L<http://sourceforge.net/projects/itun>,
+L<http://www.cs.uit.no/~daniels/PingTunnel/>,
+L<http://thomer.com/icmptx/>).
+
+Since this does not imply TCP connections, it's for a distant future.
+
+=item *
+
 Add support for filters, so that the data can be transformed on the fly
 (could be useful to deceive intrusion detection systems, for example).
+
+=item *
+
+Look for inspiration in the I<Firewall-Piercing HOWTO>, 
+at L<http://fare.tunes.org/files/fwprc/>.
 
 =back
 
