@@ -492,9 +492,11 @@ Add support for filters, so that the data can be transformed on the fly
 
 =back
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT
 
 Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+ 
+=head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

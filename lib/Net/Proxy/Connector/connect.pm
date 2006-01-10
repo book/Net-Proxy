@@ -155,9 +155,11 @@ It was first published on CPAN on March 2003.
 A better version of C<connect-tunnel> (using C<Net::Proxy>) is provided
 this distribution.
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT
 
 Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+=head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
