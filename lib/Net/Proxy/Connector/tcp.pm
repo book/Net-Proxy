@@ -48,8 +48,8 @@ Net::Proxy::Connector::tcp - Net::Proxy connector for standard tcp proxies
     use Net::Proxy;
 
     my $proxy = Net::Proxy->new(
-        in  => { proto => tcp, port => '6789' },
-        out => { proto => tcp, host => 'remotehost', port => '9876' },
+        in  => { type => tcp, port => '6789' },
+        out => { type => tcp, host => 'remotehost', port => '9876' },
     );
     $proxy->register();
 
