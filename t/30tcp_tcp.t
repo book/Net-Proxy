@@ -14,10 +14,10 @@ my @lines = (
 );
 my $tests = @lines;
 
-plan tests => $tests;
+plan tests => $tests + 1;
 
 # lock 2 ports
-my @free        = find_free_ports(2);
+my @free = find_free_ports(2);
 
 SKIP: {
     skip "Not enough available ports", $tests if @free < 2;
@@ -61,6 +61,10 @@ SKIP: {
                 or skip "Couldn't start the client: $!", $tests;
             my $server = $listener->accept()
                 or skip "Proxy didn't connect: $!", $tests;
+
+            # mainloop(1) limits incoming connections to 1
+            my $client2 = connect_to_port($proxy_port);
+            is( $client2, undef, "second client fails: $!");
 
             # send some data through
             for my $line (@lines) {
