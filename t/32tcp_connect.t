@@ -13,7 +13,7 @@ my @lines = (
     "sciviotti_ziti_rigati gobbini gomiti cravattine penne_di_zitoni\n",
     "amorosi cuoricini cicorie tempestina tortellini\n",
 );
-my $tests = @lines + 2;
+my $tests = @lines + 3;
 
 init_rand(@ARGV);
 
@@ -60,7 +60,7 @@ SKIP: {
 
             $proxy->register();
 
-            Net::Proxy->mainloop(1);
+            Net::Proxy->mainloop(2);
             exit;
         }
         else {
@@ -88,8 +88,7 @@ SKIP: {
             is( $req->uri()->host_port(), 'zlonk.crunch.com:443', 'host:port' );
 
             # first time, the web proxy says 200
-            my $res = HTTP::Response->new('200');
-            $server->send_response($res);
+            $server->send_response( HTTP::Response->new('200') );
 
             # send some data through
             # FIXME is blocks when $server speaks first
@@ -102,7 +101,14 @@ SKIP: {
             $server->close();
 
             # second time, the web proxy says 403 (how to test this?)
-            # TODO
+            $client = connect_to_port($proxy_port)
+              or skip_fail "Couldn't start the client: $!", 1;
+            $server = $daemon->accept()
+              or skip_fail "Proxy didn't connect: $!", 1;
+
+            $server->get_request(); # ignore it
+            $server->send_response( HTTP::Response->new('403') );
+            is_closed($client);
         }
     }
 }
