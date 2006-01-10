@@ -75,6 +75,32 @@ __END__
 
 Net::Proxy::Connector::connect - Create CONNECT tunnels through HTTP proxies
 
+=head1 SYNOPSIS
+
+    # sample proxy using Net::Proxy::Connector::tcp
+    #                and Net::Proxy::Connector::connect
+    use Net::Proxy;
+
+    # listen on localhost:6789
+    # and proxy to remotehost:9876 through proxy.company.com:8080
+    # using the given credentials
+    my $proxy = Net::Proxy->new(
+        in  => { type => 'tcp', port => '6789' },
+        out => {
+            type        => 'connect',
+            host        => 'remotehost',
+            port        => '9876',
+            proxy_host  => 'proxy.company.com',
+            proxy_port  => '8080',
+            proxy_user  => 'jrandom',
+            proxy_pass  => 's3kr3t',
+            proxy_agent => 'Mozilla/4.04 (X11; I; SunOS 5.4 sun4m)',
+        },
+    );
+    $proxy->register();
+
+    Net::Proxy->mainloop();
+
 =head1 DESCRIPTION
 
 C<Net::Proxy::Connecter::connect> is a C<Net::Proxy::Connector> that
