@@ -63,7 +63,6 @@ for my $tunnel ( @{ $CONF{tunnel} } ) {
     );
 
     $proxy->register();
-
 }
 
 # the main loop
@@ -227,12 +226,12 @@ a corporate proxy.
 Version 0.02 and version 0.03 were released on CPAN in 2003.
 
 Version 0.04 sits half-finished in a CVS repository at home: I couldn't
-decypher the spaghetti of my data structures.
+decypher the spaghetti of my data structures any more. C<:-(>
 
-Version 0.05 and higher are based on C<Net::Proxy>, and included with
+Version 0.05 (and higher) are based on C<Net::Proxy>, and included with
 the C<Net::Proxy> distribution.
 
-=head1 COPYRIGHT & LICENSE
+=head1 COPYRIGHT
 
 Copyright 2003-2006, Philippe Bruhat. All rights reserved.
 
@@ -240,4 +239,6 @@ Copyright 2003-2006, Philippe Bruhat. All rights reserved.
 
 This module is free software; you can redistribute it or modify it under
 the same terms as Perl itself.
+
+=cut
 
