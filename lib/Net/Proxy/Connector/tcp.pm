@@ -20,7 +20,7 @@ sub accept_from {
 sub connect {
     my ($self) = @_;
     my $sock = IO::Socket::INET->new(
-        PeerAddr  => $self->{host},
+        PeerAddr  => $self->{host} || 'localhost',
         PeerPort  => $self->{port},
         Proto     => 'tcp',
     );
