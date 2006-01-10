@@ -14,7 +14,9 @@ my @lines = (
 );
 my $tests = @lines;
 
-plan tests => $tests + 1;
+plan tests => $tests + 2;
+
+init_rand(@ARGV);
 
 # lock 2 ports
 my @free = find_free_ports(2);
@@ -22,7 +24,7 @@ my @free = find_free_ports(2);
 SKIP: {
     skip "Not enough available ports", $tests if @free < 2;
 
-    my ($proxy_port, $server_port) = @free;
+    my ( $proxy_port, $server_port ) = @free;
     my $pid = fork;
 
 SKIP: {
@@ -65,15 +67,19 @@ SKIP: {
             # mainloop(1) limits incoming connections to 1
             sleep 1;
             my $client2 = connect_to_port($proxy_port);
-            is( $client2, undef, "second client fails: $!");
+            is( $client2, undef, "second client fails: $!" );
 
-            # send some data through
             for my $line (@lines) {
+
+                # anyone speaks first
+                ( $client, $server ) = random_swap( $server, $client );
+
+                # send some data through
                 print $client $line;
                 is( <$server>, $line, "Line received" );
-                ($client, $server) = ($server, $client); # swap directions
             }
             $client->close();
+            is_closed( $server, 'peer' );
             $server->close();
         }
     }
