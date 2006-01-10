@@ -445,12 +445,6 @@ Here's my own wishlist:
 
 =item *
 
-port C<connect-tunnel> to use C<Net::Proxy>.
-
-This requires writing C<Net::Proxy::Connector::connect>.
-
-=item *
-
 port C<sslh> (unreleased reverse proxy that can listen on a port and
 proxy to a SSH server or a HTTPS server depending on the client) to
 use C<Net::Proxy>.
