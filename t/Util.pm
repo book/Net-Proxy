@@ -73,4 +73,18 @@ sub skip_fail {
     last SKIP;
 }
 
+use IO::Select;
+use Test::More;
+sub is_closed {
+    my ($sock, $name) = @_;
+    $name ||= "$sock";
+    my $select = IO::Select->new( $sock );
+    my @read   =  $select->can_read();
+    if( @read ) {
+        my $buf;
+        my $read = $read[0]->sysread( $buf, 4096 );
+        is( $read, 0, "$name closed" );
+    }
+}
+
 1;
