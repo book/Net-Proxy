@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use Carp;
 use Scalar::Util qw( refaddr );
+use Net::Proxy;
 
 my %PROXY_OF;
 
@@ -85,7 +86,8 @@ sub raw_read_from {
 
     # connection closed
     if ( $read == 0 || $close ) {
-        $self->get_proxy()->close_sockets($sock);
+        my $peer = Net::Proxy->get_peer($sock);
+        $self->get_proxy()->close_sockets( $sock, $peer );
         return;
     }
 
