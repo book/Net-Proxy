@@ -477,14 +477,6 @@ Here's my own wishlist:
 
 =item *
 
-Port C<sslh> (unreleased reverse proxy that can listen on a port and
-proxy to a SSH server or a HTTPS server depending on the client) to
-use C<Net::Proxy>.
-
-This requires writing C<Net::Proxy::Connector::dual>.
-
-=item *
-
 Write a script fully compatible with GNU httptunnel
 (L<http://www.nocrew.org/software/httptunnel.html>).
 
