@@ -61,10 +61,6 @@ sub connect {
         CONNECT => "http://$self->{host}:$self->{port}/" );
     my $res = $self->{agent}->request($req);
 
-    # FIXME - Not sure about this
-    require LWP::Authen::Ntlm
-        if grep {/NTLM/} $res->headers()->header('WWW-Authenticate');
-
     # authentication failed
     die $res->status_line() if !$res->is_success();
 
@@ -139,6 +135,16 @@ The user-agent string to use when connecting to the proxy.
 =head1 AUTHOR
 
 Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
+
+=head1 BUGS
+
+All the authentication schemes supported by C<LWP::UserAgent> should be
+supported (we use an C<LWP::UserAgent> internally to contact the proxy).
+
+This means we should also support NTLM, since it is supported as from
+C<libwww-perl> 5.66. C<Net::Proxy::Connector::connect> has not been
+actually tested with NTLM, though. Any report of success or failure
+with a NTLM proxy will be appreciated.
 
 =head1 HISTORY
 
