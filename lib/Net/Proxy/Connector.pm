@@ -53,7 +53,7 @@ sub new_connection_on {
 
     # connect to the destination
     my $out = $self->get_proxy()->out_connector();
-    $self->_out_connect_from($out, $sock);
+    $out->_out_connect_from($sock);
 
     # update the stats
     $self->get_proxy()->stat_inc_opened();
@@ -61,9 +61,9 @@ sub new_connection_on {
 }
 
 sub _out_connect_from {
-    my ( $self, $out, $sock ) = @_;
+    my ( $self, $sock ) = @_;
 
-    my $peer = eval { $out->connect(); };
+    my $peer = eval { $self->connect(); };
     if ($@) {    # connect() dies if the connection fails
         $@ =~ s/ at .*?\z//s;
         warn "connect() failed with error '$@'\n";
@@ -72,7 +72,7 @@ sub _out_connect_from {
     }
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
         Net::Proxy->watch_sockets($peer);
-        Net::Proxy->set_connector( $peer, $out );
+        Net::Proxy->set_connector( $peer, $self );
         Net::Proxy->set_peer( $peer, $sock );
         Net::Proxy->set_peer( $sock, $peer );
     }

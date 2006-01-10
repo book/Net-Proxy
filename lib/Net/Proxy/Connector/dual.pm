@@ -50,7 +50,7 @@ sub accept_from {
     my $type   = @waited ? 'client_first' : 'server_first';
 
     # do the outgoing connection
-    $self->_out_connect_from($self->{$type}, $sock);
+    $self->{$type}->_out_connect_from($sock);
 
     return $sock;
 }
