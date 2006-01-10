@@ -91,7 +91,7 @@ SKIP: {
             $server->send_response( HTTP::Response->new('200') );
 
             # send some data through
-            # FIXME is blocks when $server speaks first
+            # FIXME this blocks when $server speaks first
             for my $line (@lines) {
                 print $client $line;
                 is( <$server>, $line, "Line received" );
