@@ -82,15 +82,41 @@ based on the client connection, before any data is exchanged.
 
 This connector can only work as an C<in> connector.
 
+The C<server_first> and C<client_first> options are required: they
+are hashrefs containing the options necessary to create two C<out>
+C<Net::Proxy::Connector> objects that will be used to connect to
+the requested service.
+
+The C<Net::Proxy::Connector::dual> object decides between the two
+services by waiting during a short timeout. If the client sends
+some data directly, then it is connected via the C<client_first>
+connector. Otherwise, at the end of the timeout, it is connected
+via the C<server_first> connector.
+
 =over 4
+
+=item * host
+
+The hostname on which the connector will listen for client connections.
+Default is C<localhost>.
+
+=item * port
+
+The port on which the connector will listen for client connections.
 
 =item * server_first
 
-Typically a SSH server or any service that sends a banner line.
+Typically an C<out> connector to a SSH server or any service that sends
+a banner line.
 
 =item * client_first
 
-Typically a web server or SSL server.
+Typically an C<out> connectrot to a web server or SSL server.
+
+=item * timeout
+
+The timeout in seconds (can be decimal) to make a decision.
+Default is 1 second.
 
 =back
 
