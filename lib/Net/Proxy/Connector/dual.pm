@@ -16,7 +16,7 @@ sub init {
         croak "'$conn' connector must be a HASHREF"
             if ref $self->{$conn} ne 'HASH';
 
-        croak "'type' key required for '$conn' connector'"
+        croak "'type' key required for '$conn' connector"
             if !exists $self->{$conn}{type};
 
         # load the class
@@ -30,6 +30,7 @@ sub init {
     }
 
     # other parameters
+    croak q{Parameter 'port' is required} if !exists $self->{port};
     $self->{timeout} ||= 1;    # by default wait a second
 
     return;
