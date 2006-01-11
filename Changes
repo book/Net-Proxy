@@ -1,12 +1,21 @@
 Revision history for Perl extension Net::Proxy
 
+0.03 Wed Jan 11 02:10:52 CET 2006
+        [DOCUMENTATION]
+        - Correct SYNOPSIS for Net::Proxy::Connector::tcp
+        - Added a SYNOPSIS for Net::Proxy::Connector::connect
+        [NEW CONNECTORS]
+        - Net::Proxy::Connector::dual
+        [SCRIPTS]
+        - previously unreleased sslh script ported to use Net::Proxy
+
 0.02 Tue Jan 10 09:43:23 CET 2006
         [ENHANCEMENTS]
         - added the README and Changes files
         - added statistical methods to Net::Proxy
         - mainloop($max) will refuse new connections after $max
           connections have started
-        [CONNECTORS]
+        [NEW CONNECTOR]
         - Net::Proxy::Connector::connect
         [SCRIPTS]
         - connect-tunnel ported to use Net::Proxy
