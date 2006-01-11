@@ -6,40 +6,16 @@ use t::Util;
 
 use Net::Proxy;
 
-plan tests => my $tests = 2;
+plan tests => my $tests = 1;
 
 # lock 2 ports
-my @free = find_free_ports(4);
+my @free = find_free_ports(2);
 
 SKIP: {
-    skip "Not enough available ports", $tests if @free < 4;
+    skip "Not enough available ports", $tests if @free < 2;
 
-    my ( $proxy_port, $server_port, $proxy_port2, $server_port2 ) = @free;
+    my ( $proxy_port, $server_port ) = @free;
 
-    # test for mainloop failure
-    # lock one proxy port
-    my $server2 = listen_on_port( $proxy_port2 )
-        or skip "Failed to lock port $proxy_port2", $tests;
-    
-    my $proxy2 = Net::Proxy->new(
-        {   in => {
-                type => 'tcp',
-                host => 'localhost',
-                port => $proxy_port2,
-            },
-            out => {
-                type => 'tcp',
-                host => 'localhost',
-                port => $server_port2,
-            },
-        }
-    );
-    $proxy2->register();
-    eval { Net::Proxy->mainloop(); };
-    like( $@, qr/^Can't listen on localhost port \d+: /, 'Port in use' );
-    $proxy2->unregister();
-
-    # now fork and test
     my $pid = fork;
 
 SKIP: {
