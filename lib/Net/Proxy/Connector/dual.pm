@@ -41,8 +41,7 @@ sub init {
 
 sub accept_from {
     my ( $self, $listen ) = @_;
-    my $sock = $listen->accept();
-    die $! unless $sock;
+    my $sock = $self->raw_accept_from($listen);
 
     # find out who speaks first
     # if the client talks first, it's a client_first connection
