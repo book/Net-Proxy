@@ -477,44 +477,50 @@ Here's my own wishlist:
 
 =item *
 
-Write a script fully compatible with GNU httptunnel
+Write a connector fully compatible with GNU httptunnel
 (L<http://www.nocrew.org/software/httptunnel.html>).
 
-This requires writing C<Net::Proxy::Connector::httptunnel>.
+This one will probably be named C<Net::Proxy::Connector::httptunnel>.
 
 =item *
 
 Enhance the httptunnel protocol to support multiple connections.
-
-This requires writing C<Net::Proxy::Connector::httptunnel2>
-(or whatever I may call it then).
 
 =item *
 
 Implement RFC 3093 - Firewall Enhancement Protocol (FEP), as
 C<Net::Proxy::Connector::FEP>. This RFC was published on April 1, 2001.
 
+This is probably impossible with C<Net::Proxy>, since the FEP driver is
+a rather low-level driver (at the IP level of the network stack).
+
 =item *
 
-Implement DNS tunnel connectors (see
-L<http://savannah.nongnu.org/projects/nstx/>,
+Implement DNS tunnel connectors.
+
+See L<http://savannah.nongnu.org/projects/nstx/>,
 OzymanDNS, L<http://www.doxpara.com/slides/BH_EU_05-Kaminsky.pdf>.
-L<http://thomer.com/howtos/nstx.html>).
+L<http://thomer.com/howtos/nstx.html> for examples.
 
 =item *
 
-Implement ICMP tunnel connectors (see
+Implement ICMP tunnel connectors.
+
+See
 L<http://www.linuxexposed.com/Articles/Hacking/Case-of-a-wireless-hack.html>,
 L<http://sourceforge.net/projects/itun>,
 L<http://www.cs.uit.no/~daniels/PingTunnel/>,
-L<http://thomer.com/icmptx/>).
+L<http://thomer.com/icmptx/> for examples.
 
-Since this does not imply TCP connections, it's for a distant future.
+Since ICMP implies low-level packet reading and writing, it may not be
+possible for C<Net::Proxy> to handle it.
 
 =item *
 
 Add support for filters, so that the data can be transformed on the fly
 (could be useful to deceive intrusion detection systems, for example).
+
+One callback in each direction should be enough.
 
 =item *
 
