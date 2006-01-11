@@ -80,6 +80,10 @@ sub _out_connect_from {
     return;
 }
 
+#
+# base methods for exchanging raw data
+#
+
 # return raw data from the socket
 sub raw_read_from {
     my ( $self, $sock ) = @_;
@@ -117,6 +121,10 @@ sub raw_write_to {
     return;
 }
 
+#
+# base methods for listen() and accept_from()
+#
+
 # the most basic possible listen()
 sub raw_listen {
     my $self = shift;
@@ -129,6 +137,14 @@ sub raw_listen {
     );
     die $! unless $sock;
 
+    return $sock;
+}
+
+# accept on a socket and return the new connected socket
+sub raw_accept_from {
+    my ($self, $listen) = @_;
+    my $sock = $listen->accept();
+    die $! unless $sock;
     return $sock;
 }
 
@@ -227,6 +243,11 @@ This method can be used by C<Net::Proxy::Connector> subclasses in their
 C<listen()> methods, to create a listening socket on their C<host>
 and C<port> parameters.
 
+=item raw_accept_from( $socket )
+
+This method can be used internaly by C<Net::Proxy::Connector> subclasses
+in their C<accept_from()> methods, to accept a newly connected socket.
+
 =back
 
 =head1 Subclass methods
@@ -266,13 +287,17 @@ scheme.
 =item listen()
 
 Initiate listening sockets and return them.
-This method can use the C<raw_listen()> method to do the low-listen
+
+This method can use the C<raw_listen()> method to do the low-level
 listen call.
 
 =item accept_from( $socket )
 
 C<$socket> is a listening socket created by C<listen()>.
 This method returns the connected socket.
+
+This method can use the C<raw_accept_from()> method to do the low-level
+accept call.
 
 =back
 
