@@ -133,7 +133,6 @@ sub raw_listen {
         LocalAddr => $self->{host} ||= 'localhost',
         LocalPort => $self->{port},
         Proto     => 'tcp',
-        ReuseAddr => 1,
     );
 
     # this exception is not catched by Net::Proxy
