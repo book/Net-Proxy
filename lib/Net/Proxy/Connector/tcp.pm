@@ -9,12 +9,7 @@ our @ISA = qw( Net::Proxy::Connector );
 # IN
 *listen = \&Net::Proxy::Connector::raw_listen;
 
-sub accept_from {
-    my ($self, $listen) = @_;
-    my $sock = $listen->accept();
-    die $! unless $sock;
-    return $sock;
-}
+*accept_from = \&Net::Proxy::Connector::raw_accept_from;
 
 # OUT
 sub connect {
