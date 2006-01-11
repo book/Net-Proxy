@@ -19,6 +19,7 @@ t/11proxy_accessor.t
 t/12proxy_connectors.t
 t/13proxy_stat.t
 t/21connect.t
+t/22dual.t
 t/30tcp_tcp.t
 t/31tcp_tcp_multi.t
 t/32tcp_connect.t
