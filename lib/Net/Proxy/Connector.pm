@@ -130,12 +130,14 @@ sub raw_listen {
     my $self = shift;
     my $sock = IO::Socket::INET->new(
         Listen    => 1,
-        LocalAddr => $self->{host} || 'localhost',
+        LocalAddr => $self->{host} ||= 'localhost',
         LocalPort => $self->{port},
         Proto     => 'tcp',
         ReuseAddr => 1,
     );
-    die $! unless $sock;
+
+    # this exception is not catched by Net::Proxy
+    die "Can't listen on $self->{host} port $self->{port}: $!" unless $sock;
 
     return $sock;
 }
