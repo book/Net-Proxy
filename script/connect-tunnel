@@ -231,6 +231,22 @@ decypher the spaghetti of my data structures any more. C<:-(>
 Version 0.05 (and higher) are based on C<Net::Proxy>, and included with
 the C<Net::Proxy> distribution.
 
+=head1 
+
+Even though it's not rocket science, B<connect-tunnel> has been cited
+in at least one academic works:
+
+=over 4
+
+=item * I<HTTP Tunnels Through Proxies>, Daniel Alman
+
+Available at SANS InfoSec Reading Room: Covert Channels
+L<http://www.sans.org/rr/whitepapers/covert/>
+
+Direct link: L<http://www.sans.org/rr/whitepapers/covert/1202.php>
+
+=back
+
 =head1 COPYRIGHT
 
 Copyright 2003-2006, Philippe Bruhat. All rights reserved.
