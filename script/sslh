@@ -125,8 +125,8 @@ Is this tool actually useful? Yes.
 For example one can use it to access both a SSH server and a secure
 web server via a corporate proxy that only accepts to relay connections
 to port 443. Creating a tunnel that passes SSH connection through a
-CONNECT-enabled web proxy is easy with B<connect-tunnel> (see my
-CPAN directory for this other script).
+CONNECT-enabled web proxy is easy with B<connect-tunnel> (also
+included in the C<Net::Proxy> distribution).
 
 The proxy will let both SSH and HTTPS connections out (since they
 all point to port 443), and the home server will connect those incoming
@@ -154,6 +154,10 @@ presenting itself by saying something like:
 With SSL, it's always the client that speaks first.
 
 =back
+
+This means that B<sslh> can be used with any pair of protocols/services
+that share this property (the client speaks first for one and the server
+speaks first for the other).
 
 =head1 AUTHORS
 
