@@ -19,7 +19,6 @@ my %CONNECTOR = (
     in  => {},
     out => {},
 );
-my %LOGGER;
 
 #
 # constructor
@@ -71,7 +70,7 @@ sub out_connector { return $CONNECTOR{out}{ refaddr $_[0] }; }
 #
 {
     my $n = 0;
-    for my $attr (qw( peer connector state )) {
+    for my $attr (qw( peer connector state nick )) {
         no strict 'refs';
         my $i = $n;
         *{"get_$attr"} = sub { $SOCK_INFO{ refaddr $_[1] }[$i]; };
@@ -170,7 +169,7 @@ sub mainloop {
     }
 
     # loop indefinitely
-    while ( my @ready = $SELECT->can_read() ) {
+    while ( $continue and my @ready = $SELECT->can_read() ) {
     SOCKET:
         for my $sock (@ready) {
             if ( _is_listener($sock) ) {
@@ -338,9 +337,16 @@ Get or set the socket connector (a C<Net::Proxy::Connector> object).
 
 =item set_state( $socket, $state )
 
-Get or set the socket state. Some C<Net::Proxy::Connector> classes
+Get or set the socket state. Some C<Net::Proxy::Connector> subclasses
 may wish to use this to store some internal information about the
 socket or the connection.
+
+=item get_nick( $socket )
+
+=item set_nick( $socket, $nickname )
+
+Get or set the socket nickname. Typically used by C<Net::Proxy::Connector>
+to give informative names to socket (used in the log messages).
 
 =back
 
