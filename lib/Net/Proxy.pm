@@ -25,7 +25,6 @@ my %CONNECTOR = (
 #
 sub new {
     my ( $class, $args ) = @_;
-
     my $self = bless \do { my $anon }, $class;
 
     croak "Argument to new() must be a HASHREF" if ref $args ne 'HASH';
@@ -168,6 +167,13 @@ sub mainloop {
         Net::Proxy->set_connector( $_, $in ) for @socks;
     }
 
+    my $continue = 1;
+    for my $signal (qw( INT HUP )) {
+        $SIG{$signal} = sub {
+            $continue = 0;
+        };
+    }
+
     # loop indefinitely
     while ( $continue and my @ready = $SELECT->can_read() ) {
     SOCKET:
@@ -207,8 +213,8 @@ sub mainloop {
         }
     }
 
-    # close the listening sockets
-    Net::Proxy->close_sockets( values %LISTENER );
+    # close all remaining sockets
+    Net::Proxy->close_sockets( $SELECT->handles() );
 }
 
 #
