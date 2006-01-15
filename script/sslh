@@ -41,6 +41,7 @@ $CONF{$_} = [ split /:/, $CONF{$_} ] for qw( ssl ssh );
 
 my $proxy = Net::Proxy->new( {
     in => {
+        type => 'dual',
         host => 'localhost',
         port => $CONF{port},
         timeout => $CONF{timeout},
