@@ -1,11 +1,11 @@
 #!/usr/bin/perl -w
 use strict;
-use Net::Proxy;
 use Getopt::Long;
+use Net::Proxy;
 
 use vars qw( %CONF $VERSION );
 
-$VERSION = 0.02;
+$VERSION = 0.03;
 
 # default values
 %CONF = (
@@ -13,14 +13,16 @@ $VERSION = 0.02;
     timeout => 2,
     ssh     => 'localhost:22',
     ssl     => 'localhost:443',
+    verbose => 0,
 );
 
 # get the options
 Getopt::Long::Configure("bundling");
-GetOptions(
-    \%CONF,       "help|h",    "port|p=i", "timeout|t=i",
-    "verbose|v+", "version|V", "ssh|s=s",  "ssl|https|l=s",
-);
+GetOptions( \%CONF, "help|h", "port|p=i", "timeout|t=i", "verbose|v+",
+    "version|V", "ssh|s=s", "ssl|https|l=s", )
+    or die << 'USAGE';
+Usage: sslh [-v] [-p port] [-t timeout] [--ssh host:port] [--ssl host:port]
+USAGE
 
 # check the options
 die "--timeout <seconds> must be a positive number (possibly fractional)\n"
