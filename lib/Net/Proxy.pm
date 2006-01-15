@@ -533,6 +533,8 @@ One callback in each direction should be enough.
 Look for inspiration in the I<Firewall-Piercing HOWTO>, 
 at L<http://fare.tunes.org/files/fwprc/>.
 
+Look also here: L<http://gray-world.net/tools/>
+
 =back
 
 =head1 COPYRIGHT
