@@ -19,6 +19,14 @@ my %CONNECTOR = (
     in  => {},
     out => {},
 );
+my $VERBOSITY = 0; # be silent by default
+
+#
+# some logging-related methods
+#
+sub set_verbosity { $VERBOSITY = $_[1]; }
+sub notice { return if $VERBOSITY < 1; print STDERR "$_[1]\n"; }
+sub info   { return if $VERBOSITY < 2; print STDERR "$_[1]\n"; }
 
 #
 # constructor
@@ -97,6 +105,7 @@ for my $info (qw( opened closed )) {
 sub add_listeners {
     my ( $class, @socks ) = @_;
     for my $sock (@socks) {
+        Net::Proxy->notice( 'Add ' . Net::Proxy->get_nick($sock) );
         $LISTENER{ refaddr $sock} = $sock;
     }
     return;
@@ -113,6 +122,7 @@ sub close_sockets {
     my ( $class, @socks ) = @_;
 
     for my $sock (@socks) {
+        Net::Proxy->notice( 'Closing ' . Net::Proxy->get_nick( $sock ) );
 
         # clean up connector
         if ( my $conn = Net::Proxy->get_connector($sock) ) {
@@ -170,6 +180,7 @@ sub mainloop {
     my $continue = 1;
     for my $signal (qw( INT HUP )) {
         $SIG{$signal} = sub {
+            Net::Proxy->notice("Caught $signal signal");
             $continue = 0;
         };
     }
