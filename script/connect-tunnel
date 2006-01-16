@@ -19,6 +19,9 @@ our %CONF = (
 GetOptions( \%CONF, "verbose|v+", "tunnel|T=s@", "proxy|P=s",
     "proxy-authentication|A=s", "local-only|L", "user-agent|U=s" );
 
+# set up the verbosity level
+Net::Proxy->set_verbosity( $CONF{verbose} );
+
 # check for a proxy
 if ( $CONF{proxy} ) {
     $CONF{proxy} .= ":8080" if not $CONF{proxy} =~ /:/;
