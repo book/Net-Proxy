@@ -24,6 +24,9 @@ GetOptions( \%CONF, "help|h", "port|p=i", "timeout|t=i", "verbose|v+",
 Usage: sslh [-v] [-p port] [-t timeout] [--ssh host:port] [--ssl host:port]
 USAGE
 
+# set up the verbosity level
+Net::Proxy->set_verbosity( $CONF{verbose} );
+
 # check the options
 die "--timeout <seconds> must be a positive number (possibly fractional)\n"
   unless $CONF{timeout} > 0;
@@ -182,7 +185,7 @@ Version 0.01 of the script was a quick hack designed in 2003 as a proof
 of concept.
 
 Version 0.02 (and higher) are based on C<Net::Proxy>, and included with
-the C<Net::Proxy> distribution.
+the C<Net::Proxy> distribution. Version 0.02 didn't work, though.
 
 =head1 SEE ALSO
 
