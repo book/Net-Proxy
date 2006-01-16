@@ -6,6 +6,14 @@ use IO::Socket::INET;
 use Net::Proxy::Connector;
 our @ISA = qw( Net::Proxy::Connector );
 
+sub init {
+    my ($self) = @_;
+
+    # set up some defaults
+    $self->{host}    ||= 'localhost';
+    $self->{timeout} ||= 1;
+}
+
 # IN
 *listen = \&Net::Proxy::Connector::raw_listen;
 
@@ -15,9 +23,10 @@ our @ISA = qw( Net::Proxy::Connector );
 sub connect {
     my ($self) = @_;
     my $sock = IO::Socket::INET->new(
-        PeerAddr  => $self->{host} || 'localhost',
+        PeerAddr  => $self->{host},
         PeerPort  => $self->{port},
         Proto     => 'tcp',
+        Timeout   => $self->{timeout},
     );
     die $! unless $sock;
     return $sock;
@@ -92,6 +101,12 @@ The remote host.
 port
 
 The remote port.
+
+=item *
+
+timeout
+
+The socket timeout for connection (C<out> only).
 
 =back
 
