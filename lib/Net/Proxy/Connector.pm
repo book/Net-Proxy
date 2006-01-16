@@ -45,6 +45,8 @@ sub is_out {
 #
 sub new_connection_on {
     my ( $self, $listener ) = @_;
+    Net::Proxy->notice(
+        'New connection on ' . Net::Proxy->get_nick($listener) );
 
     # call the actual Connector method
     my $sock = $self->accept_from($listener); # FIXME may croak
@@ -73,8 +75,18 @@ sub _out_connect_from {
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
         Net::Proxy->watch_sockets($peer);
         Net::Proxy->set_connector( $peer, $self );
+        Net::Proxy->set_nick( $peer,
+                  $peer->sockhost() . ':'
+                . $peer->sockport() . ' -> '
+                . $peer->peerhost() . ':'
+                . $peer->peerport() );
+        Net::Proxy->notice( 'Connected ' . Net::Proxy->get_nick( $peer ) );
+
         Net::Proxy->set_peer( $peer, $sock );
         Net::Proxy->set_peer( $sock, $peer );
+        Net::Proxy->notice( 'Peered '
+                . Net::Proxy->get_nick($sock) . ' with '
+                . Net::Proxy->get_nick($peer) );
     }
 
     return;
@@ -138,6 +150,9 @@ sub raw_listen {
     # this exception is not catched by Net::Proxy
     die "Can't listen on $self->{host} port $self->{port}: $!" unless $sock;
 
+    Net::Proxy->set_nick( $sock,
+        'listener ' . $sock->sockhost() . ':' . $sock->sockport() );
+
     return $sock;
 }
 
@@ -146,6 +161,13 @@ sub raw_accept_from {
     my ($self, $listen) = @_;
     my $sock = $listen->accept();
     die $! unless $sock;
+
+    Net::Proxy->set_nick( $sock,
+              $sock->peerhost() . ':'
+            . $sock->peerport() . ' -> '
+            . $sock->sockhost() . ':'
+            . $sock->sockport() );
+
     return $sock;
 }
 
