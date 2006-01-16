@@ -5,7 +5,7 @@ use Net::Proxy;
 use LWP::UserAgent;
 use Getopt::Long;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # default configuration
 our %CONF = (
