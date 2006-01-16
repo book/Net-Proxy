@@ -72,15 +72,11 @@ The connector accept the following options:
 
 =over 4
 
-=item *
-
-host
+=item * host
 
 The listening address. If not given, the default is C<localhost>.
 
-=item *
-
-port
+=item * port
 
 The listening port.
 
@@ -90,21 +86,15 @@ The listening port.
 
 =over 4
 
-=item *
-
-host
+=item * host
 
 The remote host.
 
-=item *
-
-port
+=item * port
 
 The remote port.
 
-=item *
-
-timeout
+=item * timeout
 
 The socket timeout for connection (C<out> only).
 
