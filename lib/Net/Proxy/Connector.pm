@@ -142,7 +142,7 @@ sub raw_listen {
     my $self = shift;
     my $sock = IO::Socket::INET->new(
         Listen    => 1,
-        LocalAddr => $self->{host} ||= 'localhost',
+        LocalAddr => $self->{host},
         LocalPort => $self->{port},
         Proto     => 'tcp',
     );
