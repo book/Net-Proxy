@@ -67,4 +67,4 @@ SKIP: {
 }
 
 # and remove all files
-#unlink $err;
+unlink $err;
