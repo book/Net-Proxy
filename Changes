@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::Proxy
 
+0.04 Tue Jan 17 14:30:20 CET 2006
+        [ENHANCEMENTS]
+        - added some basic information logging 
+          (enable with Net::Proxy->set_verbosity( $level ))
+        [TESTS]
+        - test for several failure cases
+        - the test suite now covers more than 95% of the code
+        [SCRIPTS]
+        - patched sslh so that it works correctly, now
+
 0.03 Wed Jan 11 02:10:52 CET 2006
         [DOCUMENTATION]
         - Correct SYNOPSIS for Net::Proxy::Connector::tcp
