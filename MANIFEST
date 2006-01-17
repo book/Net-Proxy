@@ -18,12 +18,16 @@ t/10proxy_new.t
 t/11proxy_accessor.t
 t/12proxy_connectors.t
 t/13proxy_stat.t
+t/14proxy_debug.t
+t/20dummy.t
 t/21connect.t
 t/22dual.t
 t/30tcp_tcp.t
 t/31tcp_tcp_multi.t
 t/32tcp_connect.t
 t/33dual.t
+t/40tcp_fail.t
+t/41listen_fail.t
 t/90compile.t
 t/pod-coverage.t
 t/pod.t
