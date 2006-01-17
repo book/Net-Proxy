@@ -36,12 +36,13 @@ SKIP: {
                 {   in => {
                         type => 'tcp',
                         host => 'localhost',
-                        port => $proxy_port
+                        port => $proxy_port,
+                        timeout => 1,
                     },
                     out => {
                         type => 'tcp',
                         host => 'localhost',
-                        port => $server_port
+                        port => $server_port,
                     },
                 }
             );
