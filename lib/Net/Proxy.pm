@@ -317,19 +317,17 @@ Add the given sockets to the watch list.
 
 Close the given sockets and cleanup the related internal structures.
 
-=item add_loggers( @loggers )
+=item set_verbosity( $level )
 
-Add the given loggers to the list of logging objects managed by the class.
+Set the logging level. C<0> means not messages except warnings and errors.
 
-They all must have a C<log()> method that accepts a list of pair with
-arguments C<message> and C<level>, just like C<Log::Dispatch>.
-Levels are exactly the same as those used by C<Log::Dispatch>. Internally,
-C<Net::Proxy> will only use numerical values for C<level>.
+=item notice( $message )
 
-=item log( message => $mesg, level => $level )
+Log $message to STDERR if verbosity level is equal to C<1> or more.
 
-Log a message that will be dispatched to the loggers registered with
-C<add_logger()>.
+=item info( $message )
+
+Log $message to STDERR if verbosity level is equal to C<2> or more.
 
 =back
 
