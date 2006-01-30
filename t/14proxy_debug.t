@@ -64,7 +64,8 @@ SKIP: {
         is( $_, "$expected[$i]\n", "Expected line $i" );
         $i++;
     }
+
+    # and remove all files
+    unlink $err;
 }
 
-# and remove all files
-unlink $err;
