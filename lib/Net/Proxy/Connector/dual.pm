@@ -31,7 +31,8 @@ sub init {
 
     # other parameters
     croak q{Parameter 'port' is required} if !exists $self->{port};
-    $self->{timeout} ||= 1;    # by default wait a second
+    $self->{timeout} ||= 1;              # by default wait a second
+    $self->{host}    ||= 'localhost';    # by default listen on localhost
 
     return;
 }
