@@ -5,7 +5,7 @@ use Carp;
 use Scalar::Util qw( refaddr );
 use IO::Select;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 # interal socket information table
 my %SOCK_INFO;
@@ -27,6 +27,7 @@ my $VERBOSITY = 0; # be silent by default
 sub set_verbosity { $VERBOSITY = $_[1]; }
 sub notice { return if $VERBOSITY < 1; print STDERR "$_[1]\n"; }
 sub info   { return if $VERBOSITY < 2; print STDERR "$_[1]\n"; }
+sub debug  { return if $VERBOSITY < 3; print STDERR "$_[1]\n"; }
 
 #
 # constructor
@@ -187,6 +188,9 @@ sub mainloop {
 
     # loop indefinitely
     while ( $continue and my @ready = $SELECT->can_read() ) {
+
+        # Net::Proxy->debug( 0+@ready . " sockets ready" );
+
     SOCKET:
         for my $sock (@ready) {
             if ( _is_listener($sock) ) {
