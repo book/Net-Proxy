@@ -333,6 +333,10 @@ Log $message to STDERR if verbosity level is equal to C<1> or more.
 
 Log $message to STDERR if verbosity level is equal to C<2> or more.
 
+=item debug( $message )
+
+Log $message to STDERR if verbosity level is equal to C<3> or more.
+
 =back
 
 Some of the class methods are related to the socket objects that handle
