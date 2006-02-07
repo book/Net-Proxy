@@ -6,6 +6,7 @@ use Scalar::Util qw( refaddr );
 use Net::Proxy;
 
 my %PROXY_OF;
+my $BUFFSIZE = 4096;
 
 #
 # the most basic possible constructor
@@ -51,7 +52,7 @@ sub new_connection_on {
     # call the actual Connector method
     my $sock = $self->accept_from($listener); # FIXME may croak
     Net::Proxy->set_connector( $sock, $self );
-    Net::Proxy->watch_sockets($sock);
+    Net::Proxy->watch_reader_sockets($sock);
 
     # connect to the destination
     my $out = $self->get_proxy()->out_connector();
@@ -73,7 +74,7 @@ sub _out_connect_from {
         return;
     }
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
-        Net::Proxy->watch_sockets($peer);
+        Net::Proxy->watch_reader_sockets($peer);
         Net::Proxy->set_connector( $peer, $self );
         Net::Proxy->set_nick( $peer,
                   $peer->sockhost() . ':'
@@ -103,7 +104,9 @@ sub raw_read_from {
     # low level read on the socket
     my $close = 0;
     my $buffer;
-    my $read = $sock->sysread( $buffer, 4096 );    # FIXME magic number
+    my $read = $sock->sysread( $buffer, $BUFFSIZE );
+
+    ## Net::Proxy->debug("Read $read bytes from " . Net::Proxy->get_nick($sock));
 
     # check for errors
     if ( not defined $read ) {
@@ -124,11 +127,24 @@ sub raw_read_from {
 
 # send raw data to the socket
 sub raw_write_to {
-    my ($self, $sock, $data) = @_;
-    my $written = $sock->syswrite( $data );
+    my ($self, $sock) = @_;
+    my $data = Net::Proxy->get_buffer( $sock );
+
+    ## Net::Proxy->debug("Writing @{[length $data]} bytes (max $BUFFSIZE) to " . Net::Proxy->get_nick($sock));
+
+    my $written = $sock->syswrite( $data, $BUFFSIZE );
+
+    ## Net::Proxy->debug("Wrote $written bytes to " . Net::Proxy->get_nick($sock));
     if( ! defined $written ) {
         warn sprintf("Read undef from %s:%s (Error %d: %s)\n",
                      $sock->sockhost(), $sock->sockport(), $!, "$!");
+    }
+    elsif ( $written == length $data ) {
+        Net::Proxy->remove_writer_sockets( $sock );
+        Net::Proxy->set_buffer( $sock, '' );
+    }
+    else { # there is some data left to write
+        Net::Proxy->set_buffer( $sock, substr( $data, $written ) );
     }
     return;
 }
@@ -145,6 +161,7 @@ sub raw_listen {
         LocalAddr => $self->{host},
         LocalPort => $self->{port},
         Proto     => 'tcp',
+        ReuseAddr => 1,
     );
 
     # this exception is not catched by Net::Proxy

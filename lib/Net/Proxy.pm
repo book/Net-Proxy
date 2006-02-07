@@ -10,7 +10,8 @@ our $VERSION = '0.05';
 # interal socket information table
 my %SOCK_INFO;
 my %LISTENER;
-my $SELECT;
+my $READERS;
+my $WRITERS;
 my %PROXY;
 my %STATS;
 
@@ -76,15 +77,19 @@ sub out_connector { return $CONNECTOR{out}{ refaddr $_[0] }; }
 # create the socket setter/getter methods
 # these are actually Net::Proxy clas methods
 #
-{
+BEGIN {
     my $n = 0;
-    for my $attr (qw( peer connector state nick )) {
+    my $buffer_id;
+    for my $attr (qw( peer connector state nick buffer )) {
         no strict 'refs';
         my $i = $n;
         *{"get_$attr"} = sub { $SOCK_INFO{ refaddr $_[1] }[$i]; };
         *{"set_$attr"} = sub { $SOCK_INFO{ refaddr $_[1] }[$i] = $_[2]; };
+        $buffer_id = $n if $attr eq 'buffer';
         $n++;
     }
+    # special shortcut
+    sub add_to_buffer { $SOCK_INFO{ refaddr $_[1] }[$buffer_id] .= $_[2]; }
 }
 
 #
@@ -112,13 +117,6 @@ sub add_listeners {
     return;
 }
 
-# this one will explode if $SELECT is undef
-sub watch_sockets {
-    my ( $class, @socks ) = @_;
-    $SELECT->add(@socks);
-    return;
-}
-
 sub close_sockets {
     my ( $class, @socks ) = @_;
 
@@ -143,10 +141,31 @@ sub close_sockets {
         delete $LISTENER{ refaddr $sock};
 
         # clean up sockets
-        $SELECT->remove($sock);
+        $READERS->remove($sock);
         $sock->close();
     }
 
+    return;
+}
+
+#
+# select() stuff
+#
+sub watch_reader_sockets {
+    my ( $class, @socks ) = @_;
+    $READERS->add(@socks);
+    return;
+}
+
+sub watch_writer_sockets {
+    my ( $class, @socks ) = @_;
+    $WRITERS->add(@socks);
+    return;
+}
+
+sub remove_writer_sockets {
+    my ( $class, @socks ) = @_;
+    $WRITERS->remove(@socks);
     return;
 }
 
@@ -167,14 +186,15 @@ sub mainloop {
     $max_connections ||= 0;
 
     # initialise the loop
-    $SELECT = IO::Select->new();
+    $READERS = IO::Select->new();
+    $WRITERS = IO::Select->new();
 
     # initialise all proxies
     for my $proxy ( values %PROXY ) {
         my $in    = $proxy->in_connector();
         my @socks = $in->listen();
         Net::Proxy->add_listeners(@socks);
-        Net::Proxy->watch_sockets(@socks);
+        Net::Proxy->watch_reader_sockets(@socks);
         Net::Proxy->set_connector( $_, $in ) for @socks;
     }
 
@@ -187,12 +207,16 @@ sub mainloop {
     }
 
     # loop indefinitely
-    while ( $continue and my @ready = $SELECT->can_read() ) {
+    while ( $continue and my @ready = IO::Select->select( $READERS, $WRITERS ) ) {
 
-        # Net::Proxy->debug( 0+@ready . " sockets ready" );
+        ## Net::Proxy->debug( 0+@{$ready[0]} . " sockets ready for reading" );
+        ## Net::Proxy->debug( join "\n  ", "Readers:", map { Net::Proxy->get_nick($_) } $READERS->handles() );
+        ## Net::Proxy->debug( 0+@{$ready[1]} . " sockets ready for writing" );
+        ## Net::Proxy->debug( join "\n  ", "Writers:", map { Net::Proxy->get_nick($_) } $WRITERS->handles() );
 
-    SOCKET:
-        for my $sock (@ready) {
+        # first read
+    READER:
+        for my $sock (@{$ready[0]}) {
             if ( _is_listener($sock) ) {
 
                 # accept the new connection and connect to the destination
@@ -201,17 +225,27 @@ sub mainloop {
             else {
 
                 # read the data
-                my $peer = Net::Proxy->get_peer($sock);
                 if ( my $conn = Net::Proxy->get_connector($sock) ) {
                     my $data = $conn->read_from($sock);
-                    next SOCKET if !defined $data;
+                    next READER if !defined $data;
 
                     # TODO filtering by the proxy
 
-                    Net::Proxy->get_connector($peer)->write_to( $peer, $data );
+                    my $peer = Net::Proxy->get_peer($sock);
+                    Net::Proxy->add_to_buffer( $peer, $data );
+                    Net::Proxy->watch_writer_sockets( $peer );
+
+                    ## Net::Proxy->debug( "Will write " . length( Net::Proxy->get_buffer($peer)). " bytes to " .  Net::Proxy->get_nick( $peer ));
                 }
             }
         }
+
+        # then write
+        for my $sock (@{$ready[1]}) {
+            my $conn = Net::Proxy->get_connector($sock);
+            $conn->write_to($sock);
+        }
+
     }
     continue {
         if( $max_connections ) {
@@ -229,7 +263,7 @@ sub mainloop {
     }
 
     # close all remaining sockets
-    Net::Proxy->close_sockets( $SELECT->handles() );
+    Net::Proxy->close_sockets( $READERS->handles(), $WRITERS->handles() );
 }
 
 #
@@ -313,9 +347,17 @@ processed that many connections. Otherwise, this method does not return.
 
 Add the given sockets to the list of listening sockets.
 
-=item watch_sockets( @sockets )
+=item watch_reader_sockets( @sockets )
 
-Add the given sockets to the watch list.
+Add the given sockets to the readers watch list.
+
+=item watch_writer_sockets( @sockets )
+
+Add the given sockets to the writers watch list.
+
+=item remove_writer_sockets( @sockets )
+
+Remove the given sockets from the writers watch list.
 
 =item close_sockets( @sockets )
 
@@ -336,6 +378,9 @@ Log $message to STDERR if verbosity level is equal to C<2> or more.
 =item debug( $message )
 
 Log $message to STDERR if verbosity level is equal to C<3> or more.
+
+(Note: throughout the C<Net::Proxy> source code, calls to C<debug()> are
+commented with C<##>.)
 
 =back
 
@@ -370,6 +415,17 @@ socket or the connection.
 
 Get or set the socket nickname. Typically used by C<Net::Proxy::Connector>
 to give informative names to socket (used in the log messages).
+
+=item get_buffer( $socket )
+=item set_buffer( $socket, $data )
+
+Get or set the content of the writing buffer for the socket.
+Used by C<Net::Proxy::Connector>, in C<raw_read_from()> and
+C<ranw_write_to()>.
+
+=item add_to_buffer( $socket, $data )
+
+Add data to the writing buffer of the socket.
 
 =back
 
