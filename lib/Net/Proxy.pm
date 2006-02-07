@@ -241,11 +241,12 @@ sub mainloop {
 
                     # TODO filtering by the proxy
 
-                    my $peer = Net::Proxy->get_peer($sock);
-                    Net::Proxy->add_to_buffer( $peer, $data );
-                    Net::Proxy->watch_writer_sockets($peer);
+                    if ( my $peer = Net::Proxy->get_peer($sock) ) {
+                        Net::Proxy->add_to_buffer( $peer, $data );
+                        Net::Proxy->watch_writer_sockets($peer);
 
-                    ## Net::Proxy->debug( "Will write " . length( Net::Proxy->get_buffer($peer)). " bytes to " .  Net::Proxy->get_nick( $peer ));
+                        ## Net::Proxy->debug( "Will write " . length( Net::Proxy->get_buffer($peer)). " bytes to " .  Net::Proxy->get_nick( $peer ));
+                    }
                 }
             }
         }
