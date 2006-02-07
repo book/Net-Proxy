@@ -184,6 +184,7 @@ sub raw_accept_from {
             . $sock->peerport() . ' -> '
             . $sock->sockhost() . ':'
             . $sock->sockport() );
+    Net::Proxy->notice( 'Accepted ' . Net::Proxy->get_nick( $sock ) );
 
     return $sock;
 }
