@@ -10,6 +10,7 @@ our $VERSION = '0.05';
 # interal socket information table
 my %SOCK_INFO;
 my %LISTENER;
+my %CLOSING;
 my $READERS;
 my $WRITERS;
 my %PROXY;
@@ -120,7 +121,14 @@ sub add_listeners {
 sub close_sockets {
     my ( $class, @socks ) = @_;
 
+  SOCKET:
     for my $sock (@socks) {
+        if( my $data = Net::Proxy->get_buffer( $sock ) ) {
+            ## Net::Proxy->debug( length($data) . ' bytes left to write on ' . Net::Proxy->get_nick( $sock ) );
+            $CLOSING{ refaddr $sock} = $sock;
+            next SOCKET;
+        }
+
         Net::Proxy->notice( 'Closing ' . Net::Proxy->get_nick( $sock ) );
 
         # clean up connector
@@ -139,9 +147,11 @@ sub close_sockets {
         # clean up internal structures
         delete $SOCK_INFO{ refaddr $sock};
         delete $LISTENER{ refaddr $sock};
+        delete $CLOSING{ refaddr $sock};
 
         # clean up sockets
         $READERS->remove($sock);
+        $WRITERS->remove($sock);
         $sock->close();
     }
 
@@ -233,7 +243,7 @@ sub mainloop {
 
                     my $peer = Net::Proxy->get_peer($sock);
                     Net::Proxy->add_to_buffer( $peer, $data );
-                    Net::Proxy->watch_writer_sockets( $peer );
+                    Net::Proxy->watch_writer_sockets($peer);
 
                     ## Net::Proxy->debug( "Will write " . length( Net::Proxy->get_buffer($peer)). " bytes to " .  Net::Proxy->get_nick( $peer ));
                 }
@@ -248,6 +258,9 @@ sub mainloop {
 
     }
     continue {
+        if( %CLOSING ) {
+            Net::Proxy->close_sockets( values %CLOSING );
+        }
         if( $max_connections ) {
 
             # stop after that many connections
