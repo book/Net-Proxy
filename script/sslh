@@ -5,11 +5,11 @@ use Net::Proxy;
 
 use vars qw( %CONF $VERSION );
 
-$VERSION = 0.03;
+$VERSION = 0.04;
 
 # default values
 %CONF = (
-    port    => 443,
+    port    => 'localhost:443',
     timeout => 2,
     ssh     => 'localhost:22',
     ssl     => 'localhost:443',
@@ -18,10 +18,10 @@ $VERSION = 0.03;
 
 # get the options
 Getopt::Long::Configure("bundling");
-GetOptions( \%CONF, "help|h", "port|p=i", "timeout|t=i", "verbose|v+",
+GetOptions( \%CONF, "help|h", "port|p=s", "timeout|t=i", "verbose|v+",
     "version|V", "ssh|s=s", "ssl|https|l=s", )
     or die << 'USAGE';
-Usage: sslh [-v] [-p port] [-t timeout] [--ssh host:port] [--ssl host:port]
+Usage: sslh [-v] [-p host:port] [-t timeout] [--ssh host:port] [--ssl host:port]
 USAGE
 
 # set up the verbosity level
@@ -33,20 +33,42 @@ die "--timeout <seconds> must be a positive number (possibly fractional)\n"
 die "--ssh and -ssl must point to different servers\n"
   if $CONF{ssh} eq $CONF{ssl};
 
-# check that ssl/ssh and port are all different machine:port
-# TODO
-
 # create the proxy listening socket
 die "--port <port> option required\n"
   unless exists $CONF{port};
 
-$CONF{$_} = [ split /:/, $CONF{$_} ] for qw( ssl ssh );
+# compute host / port
+{
+    my %hostport;
+    for (qw( ssl ssh port )) {
+        $CONF{$_} = "localhost:$CONF{$_}"
+            if index( $CONF{$_}, ':' ) < 0;
+        $CONF{$_} = [ split /:/, $CONF{$_} ];
+        push @{
+            $hostport{
+                join ':', ( gethostbyname( $CONF{$_}[0] ) )[0],
+                $CONF{$_}[1]
+                }
+            },
+            $_;
+    }
 
+    # check for duplicates
+    for( keys %hostport ) {
+        if( @{$hostport{$_}} != 1 ) {
+            die "Options "
+                . join( " and ", map {"--$_"} @{ $hostport{$_} } )
+                . " are identical! ($_)\n";
+        }
+    }
+}
+
+# create the proxy
 my $proxy = Net::Proxy->new( {
     in => {
         type => 'dual',
-        host => 'localhost',
-        port => $CONF{port},
+        host => $CONF{port}[0],
+        port => $CONF{port}[1],
         timeout => $CONF{timeout},
         server_first => {
             type => 'tcp',
@@ -74,8 +96,8 @@ sslh - Switch incoming connection between SSH and SSL/HTTPS servers
 
 =head1 SYNOPSIS
 
-B<sslh> S<[ B<-v> ]> S<[ B<-p> I<port> ]> S<[ B<-t> I<timeout> ]>
-     S<[ B<--ssh> I<host:port> ]> S<[ B<--ssl> I<host:port> ]>
+B<sslh> S<[ B<-v> ]> S<[ B<-p> I<[host:]port> ]> S<[ B<-t> I<timeout> ]>
+     S<[ B<--ssh> I<[host:]port> ]> S<[ B<--ssl> I<[host:]port> ]>
 
 =head1 DESCRIPTION
 
@@ -95,10 +117,11 @@ options starting with two dashes.
 
 =over 4
 
-=item B<-p>, B<--port> I<port>
+=item B<-p>, B<--port> I<[host:]port>
 
 The port the proxy will listen to.
 If no port is given, 443 is used by default.
+If no host is given, C<localhost> is used by default.
 
 =item B<-s>, B<--ssh> I<[host:]port>
 
@@ -186,6 +209,11 @@ of concept.
 
 Version 0.02 (and higher) are based on C<Net::Proxy>, and included with
 the C<Net::Proxy> distribution. Version 0.02 didn't work, though.
+
+Version 0.03 correctly initialised the C<in> connector.
+
+Version 0.04 lets the proxy listen on any address (instead of C<localhost>,
+which is still the default). Thanks to Dieter Voegtli for spotting this.
 
 =head1 SEE ALSO
 
