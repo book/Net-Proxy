@@ -22,6 +22,7 @@ my %CONNECTOR = (
     out => {},
 );
 my $VERBOSITY = 0; # be silent by default
+my $BUFFSIZE  = 16384;
 
 #
 # some logging-related methods
@@ -234,6 +235,11 @@ sub mainloop {
             }
             else {
 
+                # have we read too much?
+                my $peer = Net::Proxy->get_peer($sock);
+                next READER
+                    if length( Net::Proxy->get_buffer($peer) ) >= $BUFFSIZE;
+
                 # read the data
                 if ( my $conn = Net::Proxy->get_connector($sock) ) {
                     my $data = $conn->read_from($sock);
@@ -241,7 +247,7 @@ sub mainloop {
 
                     # TODO filtering by the proxy
 
-                    if ( my $peer = Net::Proxy->get_peer($sock) ) {
+                    if ($peer) {
                         Net::Proxy->add_to_buffer( $peer, $data );
                         Net::Proxy->watch_writer_sockets($peer);
 
