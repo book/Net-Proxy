@@ -12,9 +12,9 @@ my @lines = (
     "glipp zwapp urkkk cr_r_a_a_ck glurpp\n",
     "zzzzzwap thwapp zgruppp awk eee_yow\n",
 );
-my $tests = @lines;
+my $tests = @lines + 2;
 
-plan tests => $tests + 2;
+plan tests => $tests;
 
 init_rand(@ARGV);
 
