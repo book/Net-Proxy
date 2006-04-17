@@ -238,7 +238,8 @@ sub mainloop {
                 # have we read too much?
                 my $peer = Net::Proxy->get_peer($sock);
                 next READER
-                    if length( Net::Proxy->get_buffer($peer) ) >= $BUFFSIZE;
+                    if !$peer
+                    || length( Net::Proxy->get_buffer($peer) ) >= $BUFFSIZE;
 
                 # read the data
                 if ( my $conn = Net::Proxy->get_connector($sock) ) {
