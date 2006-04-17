@@ -52,6 +52,7 @@ sub new_connection_on {
     # call the actual Connector method
     my $sock = $self->accept_from($listener); # FIXME may croak
     Net::Proxy->set_connector( $sock, $self );
+    Net::Proxy->set_buffer( $sock, '' );
     Net::Proxy->watch_reader_sockets($sock);
 
     # connect to the destination
@@ -76,6 +77,7 @@ sub _out_connect_from {
     if ($peer) {    # $peer is undef for Net::Proxy::Connector::dummy
         Net::Proxy->watch_reader_sockets($peer);
         Net::Proxy->set_connector( $peer, $self );
+        Net::Proxy->set_buffer( $peer, '' );
         Net::Proxy->set_nick( $peer,
                   $peer->sockhost() . ':'
                 . $peer->sockport() . ' -> '
