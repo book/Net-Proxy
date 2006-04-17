@@ -1,5 +1,17 @@
 Revision history for Perl extension Net::Proxy
 
+0.05 Mon Apr 17 20:42:22 CEST 2006
+        [ENHANCEMENTS]
+        - added a debug() method (but all uses of it are commented out)
+        - better socket management algorithm:
+          + prevents deadlocks (as could occur when having a connection and
+            a tunneled connection within it both going through Net::Proxy)
+          + limits buffering (so as to avoid sucking a lot of memory
+            when one socket sends data faster than its peer can accept it)
+        [SCRIPTS]
+        - patched sslh so that it can listen not only on localhost.
+          (Thanks to Dieter Voegtli.)
+
 0.04 Tue Jan 17 14:47:20 CET 2006
         [ENHANCEMENTS]
         - added some basic information logging 
