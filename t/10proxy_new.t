@@ -1,4 +1,4 @@
-use Test::More tests => 11;
+use Test::More tests => 13;
 use strict;
 use warnings;
 use Net::Proxy;
@@ -26,6 +26,15 @@ like(
     'type required for in arg'
 );
 
+eval {
+    $proxy = Net::Proxy->new( { in => { type => 'zlonk', hook => {} } } );
+};
+like(
+    $@,
+    qr/^'hook' key is not a CODE reference for 'in' connector/,
+    'hook must be a CODE reference'
+);
+
 eval { $proxy = Net::Proxy->new( { in => { type => 'zlonk' } } ); };
 like(
     $@,
@@ -45,6 +54,19 @@ like(
     $@,
     qr/^'type' key required for 'out' connector/,
     'type required for out arg'
+);
+
+eval {
+    $proxy = Net::Proxy->new(
+        {   in  => { type => 'tcp' },
+            out => { type => 'zlonk', hook => bless {}, 'CODE' }
+        }
+    );
+};
+like(
+    $@,
+    qr/^'hook' key is not a CODE reference for 'out' connector/,
+    'hook must be a CODE reference'
 );
 
 eval {
