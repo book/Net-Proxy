@@ -54,8 +54,7 @@ sub new {
 
         croak "'hook' key is not a CODE reference for '$conn' connector"
             if $args->{$conn}{hook}
-            && reftype( $args->{$conn}{hook} )
-            !~ /^CODE$|=CODE\(0x[a-f0-9]+\)$/;
+            && reftype( $args->{$conn}{hook} ) ne 'CODE';
  
         # load the class
         my $class = 'Net::Proxy::Connector::' . $args->{$conn}{type};
