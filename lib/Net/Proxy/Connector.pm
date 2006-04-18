@@ -79,6 +79,7 @@ sub _out_connect_from {
         Net::Proxy->watch_reader_sockets($peer);
         Net::Proxy->set_connector( $peer, $self );
         Net::Proxy->set_buffer( $peer, '' );
+        Net::Proxy->set_callback( $peer, $self->{hook} ) if $self->{hook};
         Net::Proxy->set_nick( $peer,
                   $peer->sockhost() . ':'
                 . $peer->sockport() . ' -> '
