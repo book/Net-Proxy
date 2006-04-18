@@ -12,7 +12,12 @@ my @names = split ' ', $Config{sig_name};
 
 
 my $tests = 1;
-plan tests => $tests;
+if( $^O eq 'MSWin32' ) {
+    plan skip_all => 'Test irrelevant on MSWin32';
+}
+else {
+    plan tests => $tests;
+}
 
 my $pid = fork;
 
