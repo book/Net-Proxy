@@ -2,10 +2,10 @@ package Net::Proxy;
 use strict;
 use warnings;
 use Carp;
-use Scalar::Util qw( refaddr );
+use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 # interal socket information table
 my %SOCK_INFO;
@@ -49,9 +49,14 @@ sub new {
         croak "'$conn' connector must be a HASHREF"
             if ref $args->{$conn} ne 'HASH';
 
-        croak "'type' key required for '$conn' connector'"
+        croak "'type' key required for '$conn' connector"
             if !exists $args->{$conn}{type};
 
+        croak "'hook' key is not a CODE reference for '$conn' connector"
+            if $args->{$conn}{hook}
+            && reftype( $args->{$conn}{hook} )
+            !~ /^CODE$|=CODE\(0x[a-f0-9]+\)$/;
+ 
         # load the class
         my $class = 'Net::Proxy::Connector::' . $args->{$conn}{type};
         eval "require $class";
@@ -82,7 +87,7 @@ sub out_connector { return $CONNECTOR{out}{ refaddr $_[0] }; }
 BEGIN {
     my $n = 0;
     my $buffer_id;
-    for my $attr (qw( peer connector state nick buffer )) {
+    for my $attr (qw( peer connector state nick buffer callback )) {
         no strict 'refs';
         my $i = $n;
         *{"get_$attr"} = sub { $SOCK_INFO{ refaddr $_[1] }[$i]; };
@@ -246,7 +251,9 @@ sub mainloop {
                     my $data = $conn->read_from($sock);
                     next READER if !defined $data;
 
-                    # TODO filtering by the proxy
+                    # run the hook on incoming data
+                    my $callback = Net::Proxy->get_callback( $sock );
+                    $callback->(\$data, $conn) if $callback;
 
                     if ($peer) {
                         Net::Proxy->add_to_buffer( $peer, $data );
@@ -354,6 +361,9 @@ and C<mainloop()>.
 Return a new C<Net::Proxy> object, with two connectors configured
 as described in the hashref.
 
+The connector parameters are described in the table below, as well
+as in each connector documentation.
+
 =item mainloop( $max_connections )
 
 This method initialises all the registered C<Net::Proxy> objects
@@ -438,11 +448,18 @@ Get or set the socket nickname. Typically used by C<Net::Proxy::Connector>
 to give informative names to socket (used in the log messages).
 
 =item get_buffer( $socket )
+
 =item set_buffer( $socket, $data )
 
 Get or set the content of the writing buffer for the socket.
-Used by C<Net::Proxy::Connector>, in C<raw_read_from()> and
+Used by C<Net::Proxy::Connector> in C<raw_read_from()> and
 C<ranw_write_to()>.
+
+=item get_callback( $socket )
+
+=item set_callback( $socket, $coderef )
+
+Get or set the callback currently associated with the socket.
 
 =item add_to_buffer( $socket, $data )
 
@@ -563,6 +580,24 @@ in that position (either C<in> or C<out>).
 C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
 a C<Net::Proxy::Connector::dual>, since the later is linked to two
 different connector objects.
+
+=head2 Connector hooks
+
+There is a single parameter that all connectors accept: C<hook>.
+Given a code reference, the code reference will be called on the
+data received on the corresponding socket.
+
+The code reference should have the following signature:
+
+    sub callback {
+        my ($dataref, $connector) = @_;
+        ...
+    }
+
+C<$dataref> is a reference to the chunk of data received, and
+C<$connector> is the C<Net::Proxy::Connector> object that created the
+socket. This allows someone to eventually store data in a stash stored
+in the connector, so as to share data between sockets.
 
 =head1 AUTHOR
 
