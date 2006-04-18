@@ -16,8 +16,17 @@ my @messages = (
     'Woodstock Rerun Peppermint_Patty Schroeder Pigpen Lucy Snoopy Linus',
     'manganese eckstine lowenstein gebrail gland maijstral girgis godolphin',
     'corge quux foobar fred waldo garply fubar grault',
+    'strontium platine germanium rhodium hafnium californium chrome terbium',
+    'maxime laboris adipisicing ullamco harum nobis sed inventore',
+    'Braga Pittsburgh Saint_Louis Merlbourne Ottawa Belfast Chicago Paris',
+    'mardi jeudi mercredi dimanche vendredi samedi lundi jeudi',
+    'Gregory_Gaillard Delphine_Moussin Michael_Denard Geraldine_Wiart',
+    'MONGOLIAN_LETTER_LA COMBINING_LATIN_SMALL_LETTER_X MYANMAR_SIGN_ANUSVARA',
+    'ansys_lm kis netinfo_local pcia_rxp_b xpl hri_port nkd stmf',
+    'holy_greed holy_ghost_writer holy_jawbreaker holy_barracuda',
+    'Rea Sushi Stretch Garfield Clive Caped_Avenger Squeak Arlene',
 );
-my @expected = @messages[4,6,7,8];
+my @expected = @messages[6,9,10,12,15,16,17];
 
 my $err = 'stderr.out';
 
@@ -37,21 +46,31 @@ SKIP: {
     my $i = 0;
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(0);
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(1);
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(2);
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(1);
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
+    Net::Proxy->set_verbosity(3);
+    Net::Proxy->notice( $messages[ $i++ ] );
+    Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(0);
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
+    Net::Proxy->debug( $messages[ $i++ ] );
 
     # get the old STDERR back
     open STDERR, ">&OLDERR" or die "Can't dup OLDERR: $!";
