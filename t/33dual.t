@@ -41,7 +41,6 @@ SKIP: {
                         client_first => {
                             type => 'tcp',
                             port => $ssl_port,
-                            host => '127.0.0.1',
                         }
                     },
                     out => { type => 'dummy' },
