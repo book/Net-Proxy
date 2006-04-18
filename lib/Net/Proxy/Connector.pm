@@ -164,7 +164,7 @@ sub raw_listen {
         LocalAddr => $self->{host},
         LocalPort => $self->{port},
         Proto     => 'tcp',
-        ReuseAddr => 1,
+        ReuseAddr => $^O eq 'MSWin32' ? 0 : 1,
     );
 
     # this exception is not catched by Net::Proxy
