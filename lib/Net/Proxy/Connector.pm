@@ -53,6 +53,7 @@ sub new_connection_on {
     my $sock = $self->accept_from($listener); # FIXME may croak
     Net::Proxy->set_connector( $sock, $self );
     Net::Proxy->set_buffer( $sock, '' );
+    Net::Proxy->set_callback( $sock, $self->{hook} ) if $self->{hook};
     Net::Proxy->watch_reader_sockets($sock);
 
     # connect to the destination
