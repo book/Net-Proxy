@@ -584,8 +584,8 @@ different connector objects.
 =head2 Connector hooks
 
 There is a single parameter that all connectors accept: C<hook>.
-Given a code reference, the code reference will be called on the
-data received on the corresponding socket.
+Given a code reference, the code reference will be called when
+data is I<received> on the corresponding socket.
 
 The code reference should have the following signature:
 
