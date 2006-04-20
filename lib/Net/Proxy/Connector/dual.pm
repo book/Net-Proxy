@@ -2,6 +2,7 @@ package Net::Proxy::Connector::dual;
 use strict;
 use warnings;
 use Carp;
+use Scalar::Util qw( reftype );
 
 use Net::Proxy::Connector;
 our @ISA = qw( Net::Proxy::Connector );
@@ -19,6 +20,10 @@ sub init {
         croak "'type' key required for '$conn' connector"
             if !exists $self->{$conn}{type};
 
+        croak "'hook' key is not a CODE reference for '$conn' connector"
+            if $self->{$conn}{hook}
+            && reftype( $self->{$conn}{hook} ) ne 'CODE';
+
         # load the class
         my $class = 'Net::Proxy::Connector::' . $self->{$conn}{type};
         eval "require $class";
@@ -31,7 +36,7 @@ sub init {
 
     # other parameters
     croak q{Parameter 'port' is required} if !exists $self->{port};
-    $self->{timeout} ||= 1;              # by default wait a second
+    $self->{timeout} ||= 1;              # by default wait for one second
     $self->{host}    ||= 'localhost';    # by default listen on localhost
 
     return;
