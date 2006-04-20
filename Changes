@@ -1,5 +1,11 @@
 Revision history for Perl extension Net::Proxy
 
+0.06 Thu Apr 20 21:27:00 CEST 2006
+        [ENHANCEMENTS]
+        - add support for "hooks" on received data, as proposed by Martin
+          Werthmöller (see http://www.cpanforum.com/threads/1991),
+          but with a different implementation
+
 0.05 Mon Apr 17 20:42:22 CEST 2006
         [ENHANCEMENTS]
         - added a debug() method (but all uses of it are commented out)
