@@ -250,11 +250,13 @@ sub mainloop {
                     my $data = $conn->read_from($sock);
                     next READER if !defined $data;
 
-                    # run the hook on incoming data
-                    my $callback = Net::Proxy->get_callback( $sock );
-                    $callback->(\$data, $conn) if $callback;
-
                     if ($peer) {
+
+                        # run the hook on incoming data
+                        my $callback = Net::Proxy->get_callback( $sock );
+                        $callback->( \$data, $conn )
+                            if $callback && defined $data;
+
                         Net::Proxy->add_to_buffer( $peer, $data );
                         Net::Proxy->watch_writer_sockets($peer);
 
