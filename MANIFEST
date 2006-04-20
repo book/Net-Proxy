@@ -26,7 +26,9 @@ t/30tcp_tcp.t
 t/31tcp_tcp_multi.t
 t/32tcp_connect.t
 t/33dual.t
-t/34hook.t
+t/34hook_in.t
+t/34hook_out.t
+t/35hook_dual.t
 t/35signal.t
 t/40tcp_fail.t
 t/41listen_fail.t
