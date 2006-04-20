@@ -665,7 +665,7 @@ Add support for filters, so that the data can be transformed on the fly
 One callback in each direction should be enough (I don't want to recreate
 the whole system I did for C<HTTP::Proxy>).
 
-Martin WerthmÃ¶ller sent me an interesting patch to this end:
+Martin Werthmöller sent me an interesting patch to this end:
 L<http://www.cpanforum.com/threads/1991>.
 
 =item *
@@ -679,7 +679,7 @@ Look also here: L<http://gray-world.net/tools/>
 
 Add support for SSL/TLS connectors.
 
-Martin WerthmÃ¶ller provided a full implementation of a connector than
+Martin Werthmöller provided a full implementation of a connector than
 can handle IMAP connections and upgrade them to TLS if the client sends
 a C<STARTTLS> command.
 
