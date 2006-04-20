@@ -222,7 +222,7 @@ Net::Proxy::Connector - Base class for Net::Proxy protocols
     sub connect { }
 
     # to process data
-    sub get_data_from { }
+    sub read_from { }
     sub write_to { }
 
     1;
