@@ -5,7 +5,7 @@ use Carp;
 use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # interal socket information table
 my %SOCK_INFO;
@@ -521,33 +521,57 @@ all proxy objects.
 
 =back
 
-=head1 AVAILABLE CONNECTORS
+=head1 CONNECTORS
 
 All connection types are provided with the help of specialised classes.
 The logic for protocol C<xxx> is provided by the C<Net::Proxy::Connector::xxx>
 class.
 
-=head2 tcp (C<Net::Proxy::Connector::tcp>)
+=head2 Connector hooks
+
+There is a single parameter that all connectors accept: C<hook>.
+Given a code reference, the code reference will be called when
+data is I<received> on the corresponding socket.
+
+The code reference should have the following signature:
+
+    sub callback {
+        my ($dataref, $connector) = @_;
+        ...
+    }
+
+C<$dataref> is a reference to the chunk of data received, and
+C<$connector> is the C<Net::Proxy::Connector> object that created the
+socket. This allows someone to eventually store data in a stash stored
+in the connector, so as to share data between sockets.
+
+=head2 Available connectors
+
+=over 4
+
+=item * tcp (C<Net::Proxy::Connector::tcp>)
 
 This is the simplest possible proxy. On the "in" side, it sits waiting
 for incoming connections, and on the "out" side, it connects to the
 configured host/port.
 
-=head2 connect (C<Net::Proxy::Connector::connect>)
+=item * connect (C<Net::Proxy::Connector::connect>)
 
 This proxy can connect to a TCP server though a web proxy that
 accepts HTTP CONNECT requests.
 
-=head2 dual (C<Net::Proxy::Connector::dual>)
+=item * dual (C<Net::Proxy::Connector::dual>)
 
 This proxy is a Y-shaped proxy: depending on the client behaviour
 right after the connection is established, it connects it to one
 of two services, handled by two distinct connectors.
 
-=head2 dummy (C<Net::Proxy::Connector::dummy>)
+=item * dummy (C<Net::Proxy::Connector::dummy>)
 
 This proxy does nothing. You can use it as a template for writing
 new C<Net::Proxy::Connector> classes.
+
+=back
 
 =head2 Summary
 
@@ -581,24 +605,6 @@ in that position (either C<in> or C<out>).
 C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
 a C<Net::Proxy::Connector::dual>, since the later is linked to two
 different connector objects.
-
-=head2 Connector hooks
-
-There is a single parameter that all connectors accept: C<hook>.
-Given a code reference, the code reference will be called when
-data is I<received> on the corresponding socket.
-
-The code reference should have the following signature:
-
-    sub callback {
-        my ($dataref, $connector) = @_;
-        ...
-    }
-
-C<$dataref> is a reference to the chunk of data received, and
-C<$connector> is the C<Net::Proxy::Connector> object that created the
-socket. This allows someone to eventually store data in a stash stored
-in the connector, so as to share data between sockets.
 
 =head1 AUTHOR
 
