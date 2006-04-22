@@ -1,0 +1,200 @@
+=head1 NAME
+
+Net::Proxy::Tutorial - Network proxies for fun and profit
+
+=head1 SYNOPSIS
+
+This document describes in detail how to use C<Net::Proxy> in several
+real-life situations.
+
+=head1 DEFINTIONS
+
+=head2 What is a proxy?
+
+You need a proxy every time you have to cross boundaries to reach a service
+that is not directly accessible.
+
+The typical example is the corporate web proxy in a company. The corporate
+firewall is a boundary, usually very tightly protected, between the corporate
+network and the outside world (wild wild Internet).
+
+To let the employees access all the nice web sites outside, the company
+sets up a web proxy, that is authorised to cross the boundary (firewall)
+on your behalf. The web browser ask the proxy for whatever it needs, and
+the proxy goes and fetch the requested stuff on the web.
+
+Since the proxy sees the client requests, it can check if they fit the
+corporate browsing policy and decide if it will fetch the document for
+the requestor. It can also request authentication, and log the username
+with the request.
+
+Transparent proxies mimic the actual service you asked for, and reply
+as if they were the actual service provider. Except the client doesn't
+notice there is a proxy. Most transparent web proxies grab outgoing traffic
+on port 80. Some ISP does this to cache request and spare their bandwidth.
+
+=head2 Why do I need a proxy?
+
+Sometimes, the traffic you want to send or receive doesn't quite fit
+the model that the network designers had in mind.
+
+For example, if you need to almost transparently modify network traffic
+at a high level, you probably need C<Net::Proxy>.
+
+=head1 DESCRIPTION
+
+In this section, we will see actual examples of use of C<Net::Proxy>.
+
+=head2 The basics
+
+    #!perl
+    use strict;
+    use warning,
+    use Net::Proxy,
+
+    # create and register your proxy
+    # you can create as many as needed
+    my $proxy = Net::Proxy->new( ... );
+    $proxy->register();
+
+    # setup the verbosity level
+    Net::Proxy->set_verbosity(1);
+
+    # start proxying connection!
+    Net::Proxy->mainloop();
+
+=head2 Contacting a SSH server through the corporate web proxy
+
+The corporate firewall doesn't let you connect outside with SSH,
+
+    my $proxy_connect = Net::Proxy->new(
+        in => {
+            type => 'tcp',
+            host => 'localhost',
+            port => 22,
+        },
+        out => {
+            type       => 'connect',
+            host       => 'me.dyndns.org',
+            port       => 22,
+
+            # proxy
+            proxy_host => 'proxy.mycompany.com',
+            proxy_port => 8080,
+
+            # credentials
+            proxy_user => 'me',
+            proxy_pass => 's3kr3t',
+        },
+    );
+
+ssh localhost will connect you back home transparently.
+
+
+
+This functionnality is provided in many SSH clients (like PuTTY)
+
+=head2 Running two services on the same TCP port
+
+While trying to get out of the corporate network, you discovered
+that the corporate proxy will only let you out on port 443 (the
+default https port). So you set up your ssh server to listen on
+port 443.
+
+    # sshd_config
+    Port 22
+    Port 443
+
+Well, that works, but you also have a https server on port 443,
+and you want to connect to it as well.
+
+The only option is to run both the SSL web server and the SSH server on
+I<the same port>. How is that possible? You need a proxy that can tell
+what the client want without contacting the server.
+
+Luckily, the is a difference of behaviour between a http/s client and a
+SSH client:
+
+=over 4
+
+=item * during a HTTP(S) connection, the client "speaks" first
+
+=item * during a SSH, connection, the server sends a banner first
+
+=back
+
+C<Net::Proxy>'s C<dual> connector is able to detect between two such client
+by the way of a timeout.
+
+    my $proxy = Net::Proxy->new(
+        {   in =>
+            {   
+                type         => 'dual',
+                host         => '0.0.0.0',
+                port         => 443,
+                client_first =>
+                {
+                    type => 'tcp',
+                    port => 444,     # move the https server to another port
+                },
+                server_first =>
+                {
+                    type => 'tcp',
+                    port => 22,      # good old SSH
+                },
+  
+                # wait during a 2 second timeout
+                timeout      => 2,
+            },
+            out => { type => 'dummy' },
+        }
+    );
+
+=head2 Hiding SSH connection through the corporate proxy from IDS
+
+This example requires at least C<Net::Proxy> version 0.06.
+
+You want to deceive Intrusion Detection Systems (IDS) by modifying the
+cleartext part of your SSH connection.
+
+Near the client:
+
+    my $rot13 = sub { ${ $_[0] } =~ y/A-Za-z/N-ZA-Mn-za-m/ };
+
+    Net::Proxy->new(
+        {   in  => { type => 'tcp', port => 5000, hook => $rot13 },
+            out => {
+                type => 'connect',
+                host => 'me.dyndns.org',
+                port => 22,
+                hook => $rot13,
+
+                # proxy
+                proxy_host => 'proxy.mycompany.com',
+                proxy_port => 8080,
+
+                # credentials
+                proxy_user => 'me',
+                proxy_pass => 's3kr3t',
+            },
+        }
+    )->register();
+
+Near the server:
+
+    my $rot13 = sub { ${ $_[0] } =~ y/A-Za-z/N-ZA-Mn-za-m/ };
+
+    Net::Proxy->new(
+        {   in  => { type => "tcp", port => 443, hook => $rot13 },
+            out => { type => "tcp", port => 22,  hook => $rot13 }
+        }
+    )->register;
+
+
+
+=head1 AUTHOR
+
+Philippe "BooK" Bruhat, C<< <book@cpan.org> >>.
+
+=cut
+
