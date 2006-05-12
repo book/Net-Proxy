@@ -315,8 +315,9 @@ Net::Proxy - Framework for proxying network connections in many ways
     # proxy connections from localhost:6789 to remotehost:9876
     # using standard TCP connections
     my $proxy = Net::Proxy->new(
-        in  => { type => tcp, port => '6789' },
-        out => { type => tcp, host => 'remotehost', port => '9876' },
+        {   in  => { type => tcp, port => '6789' },
+            out => { type => tcp, host => 'remotehost', port => '9876' },
+        }
     );
 
     # register the proxy object
