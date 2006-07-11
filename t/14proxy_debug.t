@@ -85,7 +85,9 @@ SKIP: {
         $i++;
     }
 
-    # and remove all files
-    unlink $err;
+    
+    # close and remove all files
+    close $fh   or diag "close: $!";
+    unlink $err or diag "unlink: $!";
 }
 
