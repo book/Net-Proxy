@@ -277,18 +277,28 @@ with the help of a timeout.
         }
     );
 
-=head2 Hiding SSH connection through the corporate proxy from IDS
+=head2 Hiding SSH connections going through the corporate proxy from IDS
 
 (This example requires at least C<Net::Proxy> version 0.06 to work.)
 
 The first technique we presented (using a CONNECT request to get out
 of the corporate network) is so well-known that many Intrusion
 Detection Systems (IDS) check the first packets of a connection to
-try an find SSH connection
+try and find hidden SSH connections crossing the corporate boundaries
+outwards.
+
+The server banner looks like this:
+
+    SSH-2.0-OpenSSH_3.9p1
+
+while the client banner may look like this:
+
+    SSH-2.0-OpenSSH_4.2p1 Debian-5
 
 You want to deceive Intrusion Detection Systems (IDS) by modifying the
-cleartext part of your SSH connection.
-
+cleartext part of your SSH connection. Since the detection code simply
+looks for the "C<SSH->" string, an "encryption" scheme as simple as
+ROT-13 is enough.
 
                                               ' 
                      (internal network)       '          (Internet)
@@ -300,14 +310,34 @@ cleartext part of your SSH connection.
                   |[connect]===>(8080)   |===='===>(443)[tcp][tcp]--->  ssh
                   +-------+      +-------+    '          +-------+     server
                                               '
+    Traffic                \________ ________/'
+    ---> ssh                        v         '
+    ===> ssh + rot13         Traffic scanned  ' 
+                               by the IDS     '
                                               '
 
-    ---> ssh traffic
-    ===> ssh + rot13 traffic
+The C<hook> connector option accepts a callback that will be called for
+each chunk of data received, before sending it out. The callback must have
+the following signature:
 
-Client-side proxy:
+    # Net::Proxy version 0.06
+    sub {
+        my ($dataref, $connector) = @_;
+        ...
+    }
+
+    # As from Net::Proxy version 0.07
+    sub {
+        my ($dataref, $connector, $socket) = @_;
+        ...
+    }
+
+The ROT-13 routine is straightforward:
 
     my $rot13 = sub { ${ $_[0] } =~ y/A-Za-z/N-ZA-Mn-za-m/ };
+
+
+Client-side proxy:
 
     Net::Proxy->new(
         {
@@ -335,8 +365,6 @@ Client-side proxy:
     )->register();
 
 Server-side proxy:
-
-    my $rot13 = sub { ${ $_[0] } =~ y/A-Za-z/N-ZA-Mn-za-m/ };
 
     Net::Proxy->new(
         {
