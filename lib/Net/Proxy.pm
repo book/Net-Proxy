@@ -552,24 +552,24 @@ in the connector, so as to share data between sockets.
 
 =item * tcp (C<Net::Proxy::Connector::tcp>)
 
-This is the simplest possible proxy. On the "in" side, it sits waiting
+This is the simplest possible proxy connector. On the "in" side, it sits waiting
 for incoming connections, and on the "out" side, it connects to the
 configured host/port.
 
 =item * connect (C<Net::Proxy::Connector::connect>)
 
-This proxy can connect to a TCP server though a web proxy that
+This proxy connector can connect to a TCP server though a web proxy that
 accepts HTTP CONNECT requests.
 
 =item * dual (C<Net::Proxy::Connector::dual>)
 
-This proxy is a Y-shaped proxy: depending on the client behaviour
+This proxy connector is a Y-shaped connector: depending on the client behaviour
 right after the connection is established, it connects it to one
 of two services, handled by two distinct connectors.
 
 =item * dummy (C<Net::Proxy::Connector::dummy>)
 
-This proxy does nothing. You can use it as a template for writing
+This proxy connector does nothing. You can use it as a template for writing
 new C<Net::Proxy::Connector> classes.
 
 =back
@@ -583,10 +583,10 @@ C<N/A> means that the given C<Net::Proxy::Connector> cannot be used
 in that position (either C<in> or C<out>).
 
      Connector  | in parameters   | out parameters
-    ------------+-----------------+----------------
+    ------------+-----------------+-----------------
      tcp        | host            | host
                 | port            | port
-    ------------+-----------------+----------------
+    ------------+-----------------+-----------------
      connect    | N/A             | host
                 |                 | port
                 |                 | proxy_host
@@ -594,13 +594,13 @@ in that position (either C<in> or C<out>).
                 |                 | proxy_user
                 |                 | proxy_pass
                 |                 | proxy_agent
-    ------------+-----------------+----------------
+    ------------+-----------------+-----------------
      dual       | host            | N/A
                 | port            |
                 | timeout         |
                 | server_first    |
                 | client_first    |
-    ------------+-----------------+----------------
+    ------------+-----------------+-----------------
      dummy      | N/A             | N/A
 
 C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
