@@ -14,8 +14,6 @@ sub init {
     $self->{timeout} ||= 1;
 }
 
-sub proto () { 'tcp' }
-
 # IN
 *listen = \&Net::Proxy::Connector::raw_listen;
 

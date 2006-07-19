@@ -164,18 +164,15 @@ sub raw_listen {
         Listen    => 1,
         LocalAddr => $self->{host},
         LocalPort => $self->{port},
-        Proto     => $self->proto(),
+        Proto     => 'tcp',
         ReuseAddr => $^O eq 'MSWin32' ? 0 : 1,
     );
 
     # this exception is not catched by Net::Proxy
-    die "Can't listen on $self->{host} port $self->{port} (@{[$self->proto()]}): $!" unless $sock;
+    die "Can't listen on $self->{host} port $self->{port}: $!" unless $sock;
 
     Net::Proxy->set_nick( $sock,
-            $self->proto()
-          . ' listener '
-          . $sock->sockhost() . ':'
-          . $sock->sockport() );
+        'listener ' . $sock->sockhost() . ':' . $sock->sockport() );
 
     return $sock;
 }

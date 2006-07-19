@@ -42,8 +42,6 @@ sub init {
     return;
 }
 
-sub proto () { 'tcp' }
-
 # IN
 *listen = \&Net::Proxy::Connector::raw_listen;
 
