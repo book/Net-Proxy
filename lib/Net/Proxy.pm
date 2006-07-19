@@ -602,6 +602,10 @@ in that position (either C<in> or C<out>).
                 | client_first    |
     ------------+-----------------+-----------------
      dummy      | N/A             | N/A
+    ------------+-----------------+-----------------
+     ssl        | host            | host
+                | port            | port
+                | start_cleartext | start_cleartext
 
 C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
 a C<Net::Proxy::Connector::dual>, since the later is linked to two
