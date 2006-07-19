@@ -1,0 +1,217 @@
+package Net::Proxy::Connector::ssl;
+use strict;
+use warnings;
+
+use Net::Proxy::Connector;
+use IO::Socket::SSL;
+use Scalar::Util qw( refaddr );
+use Carp;
+
+our @ISA = qw( Net::Proxy::Connector );
+
+my %IS_SSL;
+
+sub init {
+    my ($self) = @_;
+
+    # set up some defaults
+    $self->{host} ||= 'localhost';
+}
+
+# IN
+sub listen {
+    my ($self) = @_;
+    my $sock;
+
+    # start as a SSL socket (default)
+    if ( !$self->{start_cleartext} ) {
+        $sock = IO::Socket::SSL->new(
+            Listen    => 1,
+            LocalAddr => $self->{host},
+            LocalPort => $self->{port},
+            Proto     => 'tcp',
+            map { $_ => $self->{$_} } grep { /^SSL_/ } keys %$self
+        );
+    }
+
+    # or as a standard TCP socket, which may be upgraded later
+    else {
+        $sock = IO::Socket::INET->new(
+            Listen    => 1,
+            LocalAddr => $self->{host},
+            LocalPort => $self->{port},
+            Proto     => 'tcp',
+        );
+    }
+
+    # this exception is not catched by Net::Proxy
+    die "Can't listen on $self->{host} port $self->{port}: $!" unless $sock;
+
+    # remember the class of the socket
+    $IS_SSL{ refaddr $sock } = !$self->{start_cleartext};
+
+    Net::Proxy->set_nick( $sock,
+        'SSL listener ' . $sock->sockhost() . ':' . $sock->sockport() );
+
+    Net::Proxy->info( 'Started '
+          . Net::Proxy->get_nick($sock) . ' as '
+          . ( $self->{start_cleartext} ? 'cleartext' : 'SSL' ) );
+
+    return $sock;
+}
+
+*accept_from = \&Net::Proxy::Connector::raw_accept_from;
+
+# OUT
+sub connect {
+    my ($self) = @_;
+    my $sock;
+
+    # connect as a SSL socket (default)
+    if ( !$self->{start_cleartext} ) {
+        $sock = IO::Socket::SSL->new(
+            PeerAddr => $self->{host},
+            PeerPort => $self->{port},
+            Proto    => 'tcp',
+            Timeout  => $self->{timeout},
+            map { $_ => $self->{$_} } grep { /^SSL_/ } keys %$self
+        );
+    }
+
+    # or as a standard TCP socket, which may be upgraded later
+    else {
+        $sock = IO::Socket::INET->new(
+            PeerAddr => $self->{host},
+            PeerPort => $self->{port},
+            Proto    => 'tcp',
+            Timeout  => $self->{timeout},
+        );
+    }
+
+    die $self->{start_cleartext} ? $! : IO::Socket::SSL::errstr() unless $sock;
+
+    return $sock;
+}
+
+# READ
+*read_from = \&Net::Proxy::Connector::raw_read_from;
+
+# WRITE
+*write_to = \&Net::Proxy::Connector::raw_write_to;
+
+# SSL-related methods
+
+# upgrade the socket to SSL (if needed)
+sub upgrade_SSL {
+    my ( $self, $sock ) = @_;
+
+    if ( $IS_SSL{ refaddr $sock } ) {
+        carp( Net::Proxy->get_nick($sock) . ' already is a SSL socket' );
+        return $sock;
+    }
+
+    IO::Socket::SSL->start_SSL(
+        $sock,
+        SSL_server => $self->is_in(),
+        map { $_ => $self->{$_} } grep { /^SSL_/ } keys %$self
+    );
+    $IS_SSL{ refaddr $sock } = 1;
+
+    Net::Proxy->notice( 'Upgraded ' . Net::Proxy->get_nick($sock) . ' to SSL' );
+
+    return $sock;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+Net::Proxy::Connector::ssl - SSL Net::Proxy connector
+
+=head1 DESCRIPTION
+
+C<Net::Proxy::Connecter::ssl> is a C<Net::Proxy::Connector>
+that can manage SSL connections (thanks to C<IO::Socket::SSL>).
+
+By default, this connector creates SSL sockets. You will need to
+subclass it to create "smarter" connectors than can upgrade their
+connections to SSL.
+
+In addition to the options listed below, this connector accepts all
+C<SSL_...> options to C<IO::Socket::SSL>. They are transparently passed
+through to the appropriate C<IO::Socket::SSL> methods when needed.
+
+=head1 CONNECTOR OPTIONS
+
+The connector accept the following options:
+
+=head2 C<in>
+
+=over 4
+
+=item * host
+
+The listening address. If not given, the default is C<localhost>.
+
+=item * port
+
+The listening port.
+
+=item * start_cleartext
+
+If true, the connection will start in cleartext.
+It is possible to upgrade a socket to using SSL with
+the C<upgrade_SSL()> method.
+
+=back
+
+=head2 C<out>
+
+=over 4
+
+=item * host
+
+The listening address. If not given, the default is C<localhost>.
+
+=item * port
+
+The listening port.
+
+=item * start_cleartext
+
+If true, the connection will start in cleartext.
+It is possible to upgrade a socket to using SSL with
+the C<upgrade_SSL()> method.
+
+=back
+
+=head1 METHODS
+
+The C<Net::Proxy::Connector::ssl> connector has an extra method:
+
+=over 4
+
+=item upgrade_SSL( $sock )
+
+This method will upgrade a cleartext socket to SSL.
+If the socket is already in SSL, it will C<carp()>.
+
+=back
+
+=head1 AUTHOR
+
+Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
