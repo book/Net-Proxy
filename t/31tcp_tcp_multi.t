@@ -91,6 +91,7 @@ SKIP: {
             $fake_proxy->register();
             $fake_proxy->unregister();
 
+            Net::Proxy->set_verbosity( $ENV{NET_PROXY_VERBOSITY} || 0 );
             Net::Proxy->mainloop( @confs + 1 );
             exit;
         }

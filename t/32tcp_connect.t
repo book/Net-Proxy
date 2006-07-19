@@ -60,6 +60,7 @@ SKIP: {
 
             $proxy->register();
 
+            Net::Proxy->set_verbosity( $ENV{NET_PROXY_VERBOSITY} || 0 );
             Net::Proxy->mainloop(2);
             exit;
         }
