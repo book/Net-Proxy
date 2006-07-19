@@ -34,6 +34,6 @@ SKIP: {
 
     $proxy->register();
     eval { Net::Proxy->mainloop(); };
-    like( $@, qr/^Can't listen on localhost port \d+: /, 'Port in use' );
+    like( $@, qr/^Can't listen on localhost port \d+ \(tcp\): /, 'Port in use' );
 }
 
