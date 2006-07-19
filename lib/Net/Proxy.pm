@@ -653,7 +653,12 @@ L<http://thomer.com/howtos/nstx.html> for examples.
 
 =item *
 
-Write an UDP connector.
+Implement an UDP connector.
+
+=item *
+
+Implement a connector that can be plugged to the STDIN/STDOUT of an
+external process, like the C<ProxyCommand> option of OpenSSH.
 
 =item *
 
@@ -679,7 +684,7 @@ Look also here: L<http://gray-world.net/tools/>
 
 Add support for SSL/TLS connectors.
 
-Martin Werthmöller provided a full implementation of a connector than
+Martin Werthmöller provided a full implementation of a connector that
 can handle IMAP connections and upgrade them to TLS if the client sends
 a C<STARTTLS> command.
 
