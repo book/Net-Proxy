@@ -653,6 +653,10 @@ L<http://thomer.com/howtos/nstx.html> for examples.
 
 =item *
 
+Write an UDP connector.
+
+=item *
+
 Implement ICMP tunnel connectors.
 
 See
