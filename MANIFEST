@@ -5,6 +5,7 @@ lib/Net/Proxy/Connector.pm
 lib/Net/Proxy/Connector/connect.pm
 lib/Net/Proxy/Connector/dual.pm
 lib/Net/Proxy/Connector/dummy.pm
+lib/Net/Proxy/Connector/ssl.pm
 lib/Net/Proxy/Connector/tcp.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -35,4 +36,6 @@ t/41listen_fail.t
 t/90compile.t
 t/pod-coverage.t
 t/pod.t
+t/test.cert
+t/test.key
 t/Util.pm
