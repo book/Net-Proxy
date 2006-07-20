@@ -657,12 +657,16 @@ L<http://thomer.com/howtos/nstx.html> for examples.
 
 =item *
 
-Implement an UDP connector.
+Implement an UDP connector. (Is it feasible?)
 
 =item *
 
 Implement a connector that can be plugged to the STDIN/STDOUT of an
 external process, like the C<ProxyCommand> option of OpenSSH.
+
+=item *
+
+Implement C<Net::Proxy::Connector::unix>, for UNIX sockets.
 
 =item *
 
@@ -686,11 +690,15 @@ Look also here: L<http://gray-world.net/tools/>
 
 =item *
 
-Add support for SSL/TLS connectors.
+Implement a C<Net::Proxy::Connector::starttls> connector that can upgrade
+upgrade a connection to SSL transparently, even if the client or server
+doesn't support STARTTLS.
 
 Martin Werthmöller provided a full implementation of a connector that
 can handle IMAP connections and upgrade them to TLS if the client sends
-a C<STARTTLS> command.
+a C<STARTTLS> command. My implementation will split this in two parts
+C<Net::Proxy::Connector::ssl> and C<Net::Proxy::Connector::starttls>,
+that inherits from the former.
 
 =back
 
