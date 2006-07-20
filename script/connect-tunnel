@@ -9,9 +9,10 @@ our $VERSION = '0.06';
 
 # default configuration
 our %CONF = (
-    'user-agent' => "connect-tunnel/$VERSION",
-    proxy        => $ENV{HTTP_PROXY},
-    verbose      => 0,
+    'proxy-authentication' => '',
+    'proxy'                => $ENV{HTTP_PROXY},
+    'user-agent'           => "connect-tunnel/$VERSION",
+    'verbose'              => 0,
 );
 
 #
