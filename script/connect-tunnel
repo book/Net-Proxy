@@ -11,6 +11,7 @@ our $VERSION = '0.06';
 our %CONF = (
     'user-agent' => "connect-tunnel/$VERSION",
     proxy        => $ENV{HTTP_PROXY},
+    verbose      => 0,
 );
 
 #
@@ -34,7 +35,7 @@ die "--tunnel <port:host:hostport> option required$/"
   unless exists $CONF{tunnel};
 
 # split proxy-authentication
-if ( $CONF{'proxy-authentication'} ) {
+{
     my ( $user, $pass ) = split ':', $CONF{'proxy-authentication'}, 2;
     $CONF{'proxy-authentication'} = $CONF{'proxy-authentication'}
         ? [ proxy_user => $user, proxy_pass => $pass ]
