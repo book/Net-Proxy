@@ -200,6 +200,35 @@ If the socket is already in SSL, it will C<carp()>.
 
 =back
 
+=head1 CREATING A SELF-SIGNED CERTIFICATE
+
+I tend to forget this information, and the openssl documentation
+doesn't make this any clearer, so here are the most basic commands
+needed to create your own self-signed certificate (courtesy David
+Morel):
+
+    $ openssl genrsa -out key.pem 1024
+    $ openssl req -new -key key.pem -x509 -out cert.pem -days 365
+
+A certificate is required is you want to run a SSL server or a proxy
+with a C<Net::Proxy::Connector::ssl> as its C<in> connector.
+
+Once the key and certificate have been created, you can use them
+in your parameter list to C<Net::Proxy->new()> (they are passed through
+to C<IO::Socket::SSL>):
+
+    Net::Proxy->new(
+        {
+            in => {
+                host          => '0.0.0.0',
+                port          => 443,
+                SSL_key_file  => 'key.pem',
+                SSL_cert_file => 'cert.pem',
+            },
+            out => { type => 'tcp', port => '80' }
+        }
+    );
+
 =head1 AUTHOR
 
 Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
