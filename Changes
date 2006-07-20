@@ -1,5 +1,14 @@
 Revision history for Perl extension Net::Proxy
 
+0.07
+        [ENHANCEMENTS]
+        - added support for SSL proxies (ssl connector)
+        [NEW CONNECTOR]
+        - Net::Proxy::Connector::ssl
+        [TESTS]
+        - add support for NET_PROXY_VERBOSITY environnement variable
+          in the tests, to have more verbose tests if needed
+
 0.06 Thu Apr 20 21:27:00 CEST 2006
         [ENHANCEMENTS]
         - add support for "hooks" on received data, as proposed by Martin
@@ -32,7 +41,7 @@ Revision history for Perl extension Net::Proxy
         [DOCUMENTATION]
         - Correct SYNOPSIS for Net::Proxy::Connector::tcp
         - Added a SYNOPSIS for Net::Proxy::Connector::connect
-        [NEW CONNECTORS]
+        [NEW CONNECTOR]
         - Net::Proxy::Connector::dual
         [SCRIPTS]
         - previously unreleased sslh script ported to use Net::Proxy
