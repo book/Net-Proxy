@@ -2,7 +2,6 @@ use Test::More;
 use strict;
 use warnings;
 use IO::Socket::INET;
-use IO::Socket::SSL;
 use File::Spec::Functions;
 use t::Util;
 
@@ -18,26 +17,27 @@ my $tests = @lines;
 
 # TODO: skip all if no IO::Socket::SSL
 
-plan tests => $tests;
+plan tests => $tests + 1;
 
 init_rand(@ARGV);
 
 # lock 2 ports
 my @free = find_free_ports(2);
 
-$IO::Socket::SSL::DEBUG = $ENV{NET_PROXY_VERBOSITY} || 0;
-
 SKIP: {
-    skip "Not enough available ports", $tests if @free < 2;
+    eval { require IO::Socket::SSL; };
+    skip 'IO::Socket::SSL required to test ssl', $tests if $@;
+    skip 'Not enough available ports', $tests if @free < 2;
+
+    $IO::Socket::SSL::DEBUG = $ENV{NET_PROXY_VERBOSITY} || 0;
 
     my ( $proxy_port, $server_port ) = @free;
     my $pid = fork;
-    skip "proxy fork failed", $tests if !defined $pid;
+    skip 'proxy fork failed', $tests if !defined $pid;
     if ( $pid == 0 ) {
 
         my $proxy = Net::Proxy->new(
-            {
-                in => {
+            {   in => {
                     type          => 'ssl',
                     host          => 'localhost',
                     port          => $proxy_port,
@@ -62,45 +62,31 @@ SKIP: {
     }
     else {
 
-      SKIP: {
+    SKIP: {
 
-            # fork a server
-            $pid = fork;
-            skip "server fork failed", $tests if !defined $pid;
-            if ( $pid == 0 ) {
-                my $listener = listen_on_port($server_port)
-                  or skip "Couldn't start the server: $!", $tests;
+            # wait for the proxy to set up
+            sleep 1;
 
-                my $server = $listener->accept()
-                  or skip "Proxy didn't connect: $!", $tests;
+            # start a server
+            my $listener = listen_on_port($server_port)
+                or skip "Couldn't start the server: $!", $tests;
 
-                for my $line (@lines) {
-                    is( <$server>, $line, "Line received" );
-                }
-                $server->close();
+            # start a client
+            my $client = IO::Socket::SSL->new(
+                PeerAddr => 'localhost',
+                PeerPort => $proxy_port
+            ) or skip "Couldn't start the client: $!", $tests;
 
-                # the child process runs the proxy
-                exit;
+            my $server = $listener->accept()
+                or skip "Proxy didn't connect: $!", $tests;
+
+            for my $line (@lines) {
+                print $client $line;
+                is( <$server>, $line, "Line received" );
             }
-            else {
-
-                # wait for the proxy to set up
-                sleep 1;
-
-                # the parent process does the testing
-                my $client = IO::Socket::SSL->new(
-                    PeerAddr => 'localhost',
-                    PeerPort => $proxy_port
-                  )
-                  or skip "Couldn't start the client: $!", $tests;
-
-                for my $line (@lines) {
-
-                    # send some data through
-                    print $client $line;
-                }
-                $client->close();
-            }
+            $server->close();
+            is_closed( $client, 'peer' );
+            $client->close();
         }
     }
 }
