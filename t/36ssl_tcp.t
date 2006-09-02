@@ -29,6 +29,7 @@ SKIP: {
     skip 'IO::Socket::SSL required to test ssl', $tests if $@;
     skip 'Not enough available ports', $tests if @free < 2;
 
+    no warnings 'once';
     $IO::Socket::SSL::DEBUG = $ENV{NET_PROXY_VERBOSITY} || 0;
 
     my ( $proxy_port, $server_port ) = @free;
