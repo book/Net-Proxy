@@ -85,9 +85,9 @@ SKIP: {
                 print $client $line;
                 is( <$server>, $line, "Line received" );
             }
-            $server->close();
-            is_closed( $client, 'peer' );
             $client->close();
+            is_closed( $server, 'peer' );
+            $server->close();
         }
     }
 }
