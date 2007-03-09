@@ -15,9 +15,8 @@ my @lines = (
 );
 my $tests = @lines;
 
-# TODO: skip all if no IO::Socket::SSL
-
-plan tests => $tests + 1;
+my $all_tests = $tests + 1;
+plan tests => $all_tests;
 
 init_rand(@ARGV);
 
@@ -26,8 +25,8 @@ my @free = find_free_ports(2);
 
 SKIP: {
     eval { require IO::Socket::SSL; };
-    skip 'IO::Socket::SSL required to test ssl', $tests if $@;
-    skip 'Not enough available ports', $tests if @free < 2;
+    skip 'IO::Socket::SSL required to test ssl', $all_tests if $@;
+    skip 'Not enough available ports', $all_tests if @free < 2;
 
     no warnings 'once';
     $IO::Socket::SSL::DEBUG = $ENV{NET_PROXY_VERBOSITY} || 0;
