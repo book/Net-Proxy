@@ -5,7 +5,7 @@ use Carp;
 use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 # interal socket information table
 my %SOCK_INFO;
@@ -606,6 +606,14 @@ in that position (either C<in> or C<out>).
      ssl        | host            | host
                 | port            | port
                 | start_cleartext | start_cleartext
+    ------------+-----------------+-----------------
+     connect_ssl| N/A             | host
+                |                 | port
+                |                 | proxy_host
+                |                 | proxy_port
+                |                 | proxy_user
+                |                 | proxy_pass
+                |                 | proxy_agent
 
 C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
 a C<Net::Proxy::Connector::dual>, since the later is linked to two
@@ -704,7 +712,7 @@ that inherits from the former.
 
 =head1 COPYRIGHT
 
-Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2007 Philippe 'BooK' Bruhat, All Rights Reserved.
  
 =head1 LICENSE
 
