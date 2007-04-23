@@ -39,7 +39,7 @@ spare their bandwidth.
 Sometimes, the traffic you want to send or receive doesn't quite fit
 the model that the network designers had in mind.
 
-For example, if you need to modify network traffic, almost transparently, 
+For example, if you need to modify network traffic, almost transparently,
 at a high level, you probably need C<Net::Proxy>.
 
 =head1 DESCRIPTION
@@ -199,7 +199,7 @@ your SSH server so that it also listens on port 443:
     Port 22
     Port 443
 
-In the exemple above, you need to change the C<out>/C<port> from C<22> 
+In the exemple above, you need to change the C<out>/C<port> from C<22>
 to C<443>.
 
 Many SSH clients (like PuTTY) already include configuration options
@@ -232,9 +232,13 @@ client and a SSH client:
 
 =over 4
 
-=item * during a HTTP(S) connection, the client "speaks" first
+=item *
 
-=item * during a SSH connection, the server sends a banner first
+during a HTTP(S) connection, the client "speaks" first
+
+=item *
+
+during a SSH connection, the server sends a banner first
 
 =back
 
@@ -274,6 +278,7 @@ with the help of a timeout.
         }
     )->register();
 
+
 =head2 Hiding SSH connections going through the corporate proxy from IDS
 
 (This example requires at least C<Net::Proxy> version 0.06 to work.)
@@ -297,9 +302,9 @@ cleartext part of your SSH connection. Since the detection code simply
 looks for the "C<SSH->" string, an "encryption" scheme as simple as
 ROT-13 is enough.
 
-                                              ' 
+                                              '
                      (internal network)       '          (Internet)
-                                              ' 
+                                              '
                   +-------+      +-------+    '          +-------+
                   | local |      |  web  |    '          |reverse|
    ssh            | proxy |      | proxy |    '          | proxy |
@@ -309,7 +314,7 @@ ROT-13 is enough.
                                               '
     Traffic                \________ ________/'
     ---> ssh                        v         '
-    ===> ssh + rot13         Traffic scanned  ' 
+    ===> ssh + rot13         Traffic scanned  '
                                by the IDS     '
                                               '
 
@@ -344,7 +349,7 @@ Client-side proxy:
             },
             out => {
                 type => 'connect',
-                host => 'me.dyndns.org',
+                host => 'home.example.com',
                 port => 22,
                 hook => $rot13,
 
@@ -363,25 +368,95 @@ Server-side proxy:
 
     Net::Proxy->new(
         {   in => {
-                type => "tcp",
+                type => 'tcp',
                 host => '0.0.0.0',
                 port => 443,
                 hook => $rot13
             },
             out => {
-                type => "tcp",
+                type => 'tcp',
                 port => 22,
                 hook => $rot13
             }
         }
     )->register();
 
+=head2 Hiding a SSH connection under SSL through a corporate proxy
 
+(This example requires at least C<Net::Proxy> version 0.08 to work.)
+
+Another option to hide what you are doing in your connection through
+the corporate proxy, is to actually use SSL to connect to your SSH
+server (I<à la> B<stunnel>). This is what the proxy expects, after all.
+
+                                               '
+                   (internal network)          '         (Internet)
+                                               '
+                +-----------+      +-------+   '         +-------+
+                |   local   |      |  web  |   '         |reverse|
+  ssh           |   proxy   |      | proxy |   '         | proxy |
+ client -->(22)[tcp]        |      |       |   '         |       |
+                |[connect_ssl]===>(8080)   |==='==>(443)[ssl][tcp]--->  ssh
+                +-----------+      +-------+   '         +-------+     server
+                                               '
+   Traffic                    \_______ _______/'
+   ---> ssh                           v        '
+   ===> ssh over SSL           Traffic scanned '
+                                 by the IDS    '
+                                               '
+
+Client-side proxy:
+
+    Net::Proxy->new(
+        {   in => {
+                type => 'tcp',
+                host => '0.0.0.0',
+                port => 22,
+            },
+            out => {
+                type => 'connect_ssl',
+                host => 'home.example.com',
+                port => 443,
+
+                # proxy configuration
+                proxy_host => 'proxy.mycompany.com',
+                proxy_port => 8080,
+
+                # proxy credentials
+                proxy_user => 'me',
+                proxy_pass => 's3kr3t',
+            },
+        }
+    )->register();
+
+Server-side proxy:
+
+    Net::Proxy->new(
+        {   in => {
+                type => 'ssl',
+                host => '0.0.0.0',
+                port => 443,
+            },
+            out => {
+                type => 'tcp',
+                port => 22,
+            }
+        }
+    )->register();
 
 
 =head1 AUTHOR
 
 Philippe "BooK" Bruhat, C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+ 
+Copyright 2006-2007 Philippe 'BooK' Bruhat, All Rights Reserved.
+  
+=head1 LICENSE
+
+This tutorial is distributed under a Creative Commons
+Attribution-Noncommercial-No Derivative Works 3.0 License.
 
 =cut
 
