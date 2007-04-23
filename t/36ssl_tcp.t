@@ -81,6 +81,7 @@ SKIP: {
                 or skip "Proxy didn't connect: $!", $tests;
 
             for my $line (@lines) {
+                ( $client, $server ) = random_swap( $client, $server );
                 print $client $line;
                 is( <$server>, $line, "Line received" );
             }
