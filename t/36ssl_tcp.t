@@ -39,7 +39,6 @@ SKIP: {
         my $proxy = Net::Proxy->new(
             {   in => {
                     type          => 'ssl',
-                    host          => 'localhost',
                     port          => $proxy_port,
                     timeout       => 1,
                     SSL_cert_file => catfile( 't', 'test.cert' ),
