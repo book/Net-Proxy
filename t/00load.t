@@ -1,7 +1,12 @@
 use Test::More;
 use File::Find;
 
-my %prereqs = ( 'Net::Proxy::Connector::ssl' => [qw( IO::Socket::SSL )], );
+my %prereqs = (
+    'Net::Proxy::Connector::connect' => [qw( LWP::UserAgent  )],
+    'Net::Proxy::Connector::ssl'     => [qw( IO::Socket::SSL )],
+    'Net::Proxy::Connector::connect_ssl' =>
+        [qw( LWP::UserAgent IO::Socket::SSL )],
+);
 
 # compute the list of modules
 my @modules;
