@@ -14,6 +14,7 @@ my @lines = (
     "STARTTLS\n",
     "barkhausen schoenmaker sferics knoop fenice\n",
     "holy_icepicks holy_corpusles holy_Luthor_Burbank holy_hyperdermics\n",
+    "STARTTLS\n",
     "Woody_Long Alicia_Rio Dorothy_Le_May Janine_Lindemulder Barbara_Summer\n",
 );
 my $tests = @lines;
@@ -89,6 +90,7 @@ SKIP: {
 
             # remember which was the original server
             my $o_server = $server;
+            my $is_ssl = 0;
 
             for my $line (@lines) {
                 ( $client, $server ) = random_swap( $client, $server );
@@ -101,7 +103,7 @@ SKIP: {
                         SSL_cert_file => catfile( 't', 'test.cert' ),
                         SSL_key_file  => catfile( 't', 'test.key' ),
 
-                    );
+                    ) if ! $is_ssl++; # do not upgrade twice
                 }
                 else {
                     print $client $line;
