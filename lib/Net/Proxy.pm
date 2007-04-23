@@ -254,7 +254,7 @@ sub mainloop {
 
                         # run the hook on incoming data
                         my $callback = Net::Proxy->get_callback( $sock );
-                        $callback->( \$data, $conn )
+                        $callback->( \$data, $sock, $conn )
                             if $callback && defined $data;
 
                         Net::Proxy->add_to_buffer( $peer, $data );
@@ -537,11 +537,12 @@ data is I<received> on the corresponding socket.
 The code reference should have the following signature:
 
     sub callback {
-        my ($dataref, $connector) = @_;
+        my ($dataref, $sock, $connector) = @_;
         ...
     }
 
-C<$dataref> is a reference to the chunk of data received, and
+C<$dataref> is a reference to the chunk of data received,
+C<$sock> is a reference to the socket that received the data, and
 C<$connector> is the C<Net::Proxy::Connector> object that created the
 socket. This allows someone to eventually store data in a stash stored
 in the connector, so as to share data between sockets.

@@ -45,7 +45,7 @@ SKIP: {
                         port => $proxy_port,
                         timeout => 1,
                         hook => sub {
-                            my ($dataref, $connector) = @_;
+                            my ($dataref, $sock,  $connector) = @_;
                             $$dataref =~ s/\bz\w+/zowie/g;
                         },
                     },

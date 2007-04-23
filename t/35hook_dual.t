@@ -47,7 +47,7 @@ SKIP: {
                         port    => $proxy_port,
                         timeout => 0.5,
                         hook    => sub {
-                            my ( $dataref, $connector ) = @_;
+                            my ( $dataref, $sock, $connector ) = @_;
                             $$dataref =~ s/\bz\w+/zowie/g;
                         },
                         server_first => {
@@ -58,7 +58,7 @@ SKIP: {
                             type => 'tcp',
                             port => $ssl_port,
                             hook => sub {
-                                my ( $dataref, $connector ) = @_;
+                                my ( $dataref, $sock, $connector ) = @_;
                                 $$dataref =~ s/\bz\w+/zlonk/g;
                             },
                         }
