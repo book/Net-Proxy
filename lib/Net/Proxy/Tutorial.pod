@@ -122,13 +122,14 @@ use C<tcp> for short). When placed in the C<in> side, it simply
 C<listen()>s for incoming connections and them C<accept()>s them.
 Then the C<out> connector C<connect()>s to the server.
 
-Each connector accepts different parameters
+Each connector accepts different parameters, which we'll see in the
+following examples.
 
 Since the proxy must handle every item of data going through, it can
 look at it, and modify it. This is what other connectors do: they can
 insert or transform data on the fly, which provides us with an incredible
 amount of power on our network connections, which we will leverage
-thoughout this document.
+throughout this document.
 
 =head1 REAL-LIFE EXAMPLES
 
@@ -322,19 +323,19 @@ The C<hook> connector option accepts a callback that will be called for
 each chunk of data received, before sending it out. The callback must have
 the following signature:
 
-    # Net::Proxy version 0.06
+    # Net::Proxy versions 0.06 and 0.07
     sub {
         my ( $dataref, $connector ) = @_;
         ...
     }
 
-    # As from Net::Proxy version 0.07
+    # As from Net::Proxy version 0.08
     sub {
-        my ( $dataref, $connector, $socket ) = @_;
+        my ( $dataref, $socket, $connector ) = @_;
         ...
     }
 
-The ROT-13 routine is straightforward:
+The ROT-13 routine is straightforward (and must be defined in both scripts):
 
     my $rot13 = sub { ${ $_[0] } =~ y/A-Za-z/N-ZA-Mn-za-m/ };
 
