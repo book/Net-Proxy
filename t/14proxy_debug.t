@@ -80,11 +80,14 @@ SKIP: {
     open my $fh, $err or skip "Unable to open $err: $!";
     
     $i = 0;
-    while(<$fh>) {
-        is( $_, "$expected[$i]\n", "Expected line $i" );
+    while (<$fh>) {
+        like(
+            $_,
+            qr/\A\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d $expected[$i]\n\z/,
+            "Expected line $i"
+        );
         $i++;
     }
-
     
     # close and remove all files
     close $fh   or diag "close: $!";

@@ -4,8 +4,9 @@ use warnings;
 use Carp;
 use Scalar::Util qw( refaddr reftype );
 use IO::Select;
+use POSIX 'strftime';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # interal socket information table
 my %SOCK_INFO;
@@ -28,9 +29,17 @@ my $BUFFSIZE  = 16384;
 # some logging-related methods
 #
 sub set_verbosity { $VERBOSITY = $_[1]; }
-sub notice { return if $VERBOSITY < 1; print STDERR "$_[1]\n"; }
-sub info   { return if $VERBOSITY < 2; print STDERR "$_[1]\n"; }
-sub debug  { return if $VERBOSITY < 3; print STDERR "$_[1]\n"; }
+{
+    my $i;
+    for my $meth (qw( notice info debug )) {
+        no strict 'refs';
+        my $level = ++$i;
+        *$meth = sub {
+            return if $VERBOSITY < $level;
+            print STDERR strftime "%Y-%m-%d %H:%M:%S $_[1]\n", localtime;
+        };
+    }
+}
 
 #
 # constructor
