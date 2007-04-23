@@ -2,6 +2,7 @@ package Net::Proxy::Connector::connect;
 use strict;
 use warnings;
 use Carp;
+use LWP::UserAgent;
 
 use Net::Proxy::Connector;
 our @ISA = qw( Net::Proxy::Connector );
@@ -16,8 +17,6 @@ sub init {
     }
 
     # create a user agent class linked to this connector
-    require LWP::UserAgent;
-
     $self->{agent} = my $ua = LWP::UserAgent->new(
         agent      => $self->{proxy_agent},
         keep_alive => 1,
