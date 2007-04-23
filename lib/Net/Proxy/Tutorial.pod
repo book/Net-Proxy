@@ -170,16 +170,16 @@ ASCII-art:
 
 Here's how to set up the local C<Net::Proxy> instance:
 
-    my $proxy_connect = Net::Proxy->new(
+    Net::Proxy->new(
         in => {
             type => 'tcp',
             host => 'localhost',
             port => 22,
         },
         out => {
-            type       => 'connect',
-            host       => 'home.example.com',
-            port       => 22,
+            type => 'connect',
+            host => 'home.example.com',
+            port => 22,
 
             # proxy details
             proxy_host => 'proxy.mycompany.com',
@@ -189,7 +189,7 @@ Here's how to set up the local C<Net::Proxy> instance:
             proxy_user => 'me',
             proxy_pass => 's3kr3t',
         },
-    );
+    )->register();
 
 Most of the time, corporate web proxies do not allow connections on other
 ports than 443, the standard HTTPS port. You just need to reconfigure
@@ -253,29 +253,26 @@ client and a SSH client:
 C<Net::Proxy>'s C<dual> connector is able to detect between two such clients
 with the help of a timeout.
 
-    my $proxy = Net::Proxy->new(
-        {   in =>
-            {   
+    Net::Proxy->new(
+        {   in => {
                 type         => 'dual',
                 host         => '0.0.0.0',
                 port         => 443,
-                client_first =>
-                {
+                client_first => {
                     type => 'tcp',
                     port => 444,     # move the https server to another port
                 },
-                server_first =>
-                {
+                server_first => {
                     type => 'tcp',
                     port => 22,      # good old SSH
                 },
-  
+
                 # wait during a 2 second timeout
-                timeout      => 2,
+                timeout => 2,
             },
             out => { type => 'dummy' },
         }
-    );
+    )->register();
 
 =head2 Hiding SSH connections going through the corporate proxy from IDS
 
@@ -322,13 +319,13 @@ the following signature:
 
     # Net::Proxy version 0.06
     sub {
-        my ($dataref, $connector) = @_;
+        my ( $dataref, $connector ) = @_;
         ...
     }
 
     # As from Net::Proxy version 0.07
     sub {
-        my ($dataref, $connector, $socket) = @_;
+        my ( $dataref, $connector, $socket ) = @_;
         ...
     }
 
@@ -336,12 +333,10 @@ The ROT-13 routine is straightforward:
 
     my $rot13 = sub { ${ $_[0] } =~ y/A-Za-z/N-ZA-Mn-za-m/ };
 
-
 Client-side proxy:
 
     Net::Proxy->new(
-        {
-            in => {
+        {   in => {
                 type => 'tcp',
                 host => '0.0.0.0',
                 port => 22,
@@ -367,9 +362,12 @@ Client-side proxy:
 Server-side proxy:
 
     Net::Proxy->new(
-        {
-            in =>
-              { type => "tcp", host => '0.0.0.0', port => 443, hook => $rot13 },
+        {   in => {
+                type => "tcp",
+                host => '0.0.0.0',
+                port => 443,
+                hook => $rot13
+            },
             out => {
                 type => "tcp",
                 port => 22,
