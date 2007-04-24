@@ -22,12 +22,10 @@ plan tests => $tests;
 
 SKIP: {
     # check required modules for this test case
-    eval { require LWP::UserAgent; };
-    skip "LWP::UserAgent required to test ctor::connect_ssl", $tests if $@;
-    eval { require HTTP::Daemon; };
-    skip "HTTP::Daemon required to test ctor::connect_ssl", $tests if $@;
-    eval { require IO::Socket::SSL; };
-    skip 'IO::Socket::SSL required to test connect_ssl', $tests if $@;
+    for my $module (qw( LWP::UserAgent HTTP::Daemon IO::Socket::SSL )) {
+        eval "require $module;";
+        skip "$module required to test connect_ssl", $tests if $@;
+    }
 
     # lock 2 ports
     my @free = find_free_ports(2);
