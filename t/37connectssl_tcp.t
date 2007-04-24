@@ -20,20 +20,17 @@ init_rand(@ARGV);
 
 plan tests => $tests;
 
-# check required modules for this test case
-eval { require LWP::UserAgent; };
-skip "LWP::UserAgent required to test Net::Proxy::Connector::connect", $tests
-    if $@;
-eval { require HTTP::Daemon; };
-skip "HTTP::Daemon required to test Net::Proxy::Connector::connect", $tests
-    if $@;
-eval { require IO::Socket::SSL; };
-skip 'IO::Socket::SSL required to test connect_ssl', $tests if $@;
-
-# lock 2 ports
-my @free = find_free_ports(2);
-
 SKIP: {
+    # check required modules for this test case
+    eval { require LWP::UserAgent; };
+    skip "LWP::UserAgent required to test ctor::connect_ssl", $tests if $@;
+    eval { require HTTP::Daemon; };
+    skip "HTTP::Daemon required to test ctor::connect_ssl", $tests if $@;
+    eval { require IO::Socket::SSL; };
+    skip 'IO::Socket::SSL required to test connect_ssl', $tests if $@;
+
+    # lock 2 ports
+    my @free = find_free_ports(2);
     skip "Not enough available ports", $tests if @free < 2;
 
     my ($proxy_port, $web_proxy_port) = @free;
