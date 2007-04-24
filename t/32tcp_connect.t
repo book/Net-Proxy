@@ -20,12 +20,10 @@ init_rand(@ARGV);
 plan tests => $tests;
 
 # check required modules for this test case
-eval { require LWP::UserAgent; };
-skip "LWP::UserAgent required to test Net::Proxy::Connector::connect", $tests
-  if $@;
-eval { require HTTP::Daemon; };
-skip "HTTP::Daemon required to test Net::Proxy::Connector::connect", $tests
-  if $@;
+for my $module (qw( LWP::UserAgent HTTP::Daemon )) {
+    eval "require $module;";
+    skip "$module required to test connect", $tests if $@;
+}
 
 # lock 2 ports
 my @free = find_free_ports(2);
