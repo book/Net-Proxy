@@ -214,7 +214,7 @@ A certificate is required is you want to run a SSL server or a proxy
 with a C<Net::Proxy::Connector::ssl> as its C<in> connector.
 
 Once the key and certificate have been created, you can use them
-in your parameter list to C<Net::Proxy->new()> (they are passed through
+in your parameter list to C<< Net::Proxy->new() >> (they are passed through
 to C<IO::Socket::SSL>):
 
     Net::Proxy->new(
