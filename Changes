@@ -1,5 +1,15 @@
 Revision history for Perl extension Net::Proxy
 
+0.09 Thu Sep 13 11:01:21 CEST 2007
+        [ENHANCEMENTS]
+        - the notice(), info() and debug() methods now have a timestamp
+        [DOCUMENTATION]
+        - added information about the public SVN repository and the
+          mailing-list
+        [TESTS]
+        - prevent the t/37connectssl_tcp.t test script to die when one
+          of the prerequisites is missing (thus removing many FAILs)
+
 0.08 Mon Apr 23 19:08:30 CEST 2007
         [ENHANCEMENTS]
         - the hook callback now receives the socket on which the data
