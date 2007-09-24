@@ -7,7 +7,7 @@ Net::Proxy::Tutorial - Network proxies for fun and profit
 This document describes in detail how to use C<Net::Proxy> in several
 real-life situations.
 
-=head1 DEFINTIONS
+=head1 DEFINITIONS
 
 =head2 What is a proxy?
 
