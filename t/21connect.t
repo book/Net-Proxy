@@ -1,8 +1,12 @@
 use strict;
 use warnings;
-use Test::More tests => 13;
+use Test::More;
 use Net::Proxy::Connector;
 use Net::Proxy::Connector::connect;
+
+eval { require LWP::UserAgent; };
+plan skip_all => 'LWP::UserAgent not available' if $@;
+plan test => 13;
 
 delete $ENV{HTTP_PROXY};
 my $c;
