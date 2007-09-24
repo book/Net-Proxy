@@ -6,7 +6,7 @@ use Net::Proxy::Connector::connect;
 
 eval { require LWP::UserAgent; };
 plan skip_all => 'LWP::UserAgent not available' if $@;
-plan test => 13;
+plan tests => 13;
 
 delete $ENV{HTTP_PROXY};
 my $c;
