@@ -1,11 +1,16 @@
 Revision history for Perl extension Net::Proxy
 
-0.09 Thu Sep 13 11:01:21 CEST 2007
-        [ENHANCEMENTS]
-        - the notice(), info() and debug() methods now have a timestamp
+0.10
         [DOCUMENTATION]
         - added information about the public SVN repository and the
           mailing-list
+        [TESTS]
+        - prevent t/21connect.t, t/32tcp_connect.t, t/90compile.t to fail
+          when LWP::UserAgent is not installed
+
+0.09 Thu Sep 13 11:01:21 CEST 2007
+        [ENHANCEMENTS]
+        - the notice(), info() and debug() methods now have a timestamp
         [TESTS]
         - prevent the t/37connectssl_tcp.t test script to die when one
           of the prerequisites is missing (thus removing many FAILs)
