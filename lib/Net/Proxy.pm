@@ -6,7 +6,7 @@ use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 use POSIX 'strftime';
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # interal socket information table
 my %SOCK_INFO;
