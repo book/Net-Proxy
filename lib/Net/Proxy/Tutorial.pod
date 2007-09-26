@@ -118,7 +118,7 @@ Once a connection with the client is established, the proxy uses the
 C<out> connector to connect to the destination server.
 
 The simplest connector is named C<Net::Proxy::Connector::tcp> (we'll
-use C<tcp> for short). When placed in the C<in> side, it simply
+use C<tcp> for short). When placed on the C<in> side, it simply
 C<listen()>s for incoming connections and them C<accept()>s them.
 Then the C<out> connector C<connect()>s to the server.
 
@@ -221,7 +221,7 @@ and noone will find it anyway).
 Therefore, the only option is to run both the SSL web server and the SSH
 server on I<the same port>. How is that even possible? TCP clearly doesn't
 allow this (or we wouldn't need those long F<services> files in our F</etc>
-directories.
+directories).
 
 What you need is a proxy that can guess what the client wants, but without
 contacting the server. If it manages to find out which server the client
