@@ -15,7 +15,9 @@ sub last {
     return if !$next;
 
     my $last = $next;
-    $last = $next while $next = $next->next( $direction);
+    $last = $next
+        while $next
+        = $next->isa('Net::Proxy::Node') && $next->next($direction);
     return $last;
 }
 
@@ -39,6 +41,9 @@ Net::Proxy::Node - Base class for proxy chains elements
     $comp->set_next( in => $next_comp );
     $next = $comp->next('in');    # $next_comp;
 
+    # the item at the end of the chain
+    $last = $comp->last('in');
+
 =head1 DESCRIPTION
 
 C<Net::Proxy;:Node> is a simple class used to represent the chains
@@ -55,9 +60,21 @@ of the following methods:
 Return the next item in the chain, following direction C<$direction>
 (C<in> or C<out>).
 
+Return C<undef> if there is no next item, or no chain in that direction.
+
 =item set_next( $direction )
 
 Set the next item in the chain, when following direction C<$direction>.
+
+=item last( $direction )
+
+Return the last item at the end of the chain.
+
+Return C<undef> if the current objet is already the last item of
+the chain, or if there is no chain in that direction.
+
+Note that the last object in a chain may not be a C<Net::Proxy::Node>
+object. It must, however, be a blessed object.
 
 =head1 AUTHOR
 
