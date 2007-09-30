@@ -66,5 +66,16 @@ Net::Proxy::Component - A component in a Net::Proxy chain
 
 =head1 AUTHOR
 
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+ 
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
 =cut
 
