@@ -25,8 +25,8 @@ FACTORY
 
 sub new {
     my ( $class, $args ) = @_;
-
     my $self = bless { %{ $args || {} } }, $class;
+    $self->init() if $self->can('init');
     return $self;
 }
 
