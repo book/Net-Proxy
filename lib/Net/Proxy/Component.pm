@@ -34,19 +34,20 @@ sub new {
 # INSTANCE METHODS
 #
 sub process {
-    my ( $self, $message, $direction ) = @_;
+    my ( $self, $message, $from, $direction ) = @_;
 
     my $action = $message->type();
     if ( $self->can($action) ) {
-        $message = $self->$action( $message, $direction );
+        $message = $self->$action( $message, $from, $direction );
+        $action = $message->type();    # $message might have changed
     }
 
     # ABORT
-    return if $message->type() eq 'ABORT';
+    return if $action eq 'ABORT';
 
     # pass the message on to the next node
     my $next = $self->next($direction);
-    $next->process( $message, $direction )
+    $next->process( $message, $self, $direction )
         if defined $next && $next->isa('Net::Proxy::Node');
 
     return;
