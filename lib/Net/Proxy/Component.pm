@@ -24,7 +24,7 @@ FACTORY
 }
 
 sub new {
-    my ($class, $args) = @_;
+    my ( $class, $args ) = @_;
 
     my $self = bless { %{ $args || {} } }, $class;
     return $self;
@@ -34,7 +34,7 @@ sub new {
 # INSTANCE METHODS
 #
 sub process {
-    my ($self, $message, $direction) = @_;
+    my ( $self, $message, $direction ) = @_;
 
     my $action = $message->type();
     if ( $self->can($action) ) {
@@ -45,8 +45,8 @@ sub process {
     return if $message->type() eq 'ABORT';
 
     # pass the message on to the next node
-    my $next = $self->next( $direction );
-    $next->process( $message, $self )
+    my $next = $self->next($direction);
+    $next->process( $message, $direction )
         if defined $next && $next->isa('Net::Proxy::Node');
 
     return;
