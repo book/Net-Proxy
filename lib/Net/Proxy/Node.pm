@@ -5,13 +5,13 @@ use warnings;
 use Scalar::Util qw( refaddr );
 
 sub next {
-    my ($self, $direction ) = @_;
+    my ( $self, $direction ) = @_;
     return $self->{"_next_$direction"};
 }
 
 sub last {
-    my ($self, $direction ) = @_;
-    my $next = $self->next( $direction );
+    my ( $self, $direction ) = @_;
+    my $next = $self->next($direction);
     return if !$next;
 
     my $last = $next;
@@ -22,10 +22,9 @@ sub last {
 }
 
 sub set_next {
-    my ($self, $direction, $next ) = @_;
+    my ( $self, $direction, $next ) = @_;
     return $self->{"_next_$direction"} = $next;
 }
-
 
 1;
 
@@ -62,7 +61,7 @@ Return the next item in the chain, following direction C<$direction>
 
 Return C<undef> if there is no next item, or no chain in that direction.
 
-=item set_next( $direction )
+=item set_next( $direction, $item )
 
 Set the next item in the chain, when following direction C<$direction>.
 
@@ -78,7 +77,16 @@ object. It must, however, be a blessed object.
 
 =head1 AUTHOR
 
-Philippe Bruhat (BooK)
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+ 
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 
