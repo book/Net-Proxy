@@ -7,7 +7,7 @@ sub new {
     my ( $class, $args ) = @_;
 
     croak "First parameter of new() must be a HASH reference"
-        if ! defined $args || ref $args ne 'HASH';
+        if !defined $args || ref $args ne 'HASH';
     croak 'No type given for message' if !exists $args->{type};
 
     return bless {%$args}, $class;
