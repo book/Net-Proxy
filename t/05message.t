@@ -28,7 +28,7 @@ for my $test (@tests) {
     }
     else {
         isa_ok( $mesg, 'Net::Proxy::Message' );
-        is( $mesg->type, $args->[0]{type}, "of type $args->[0]{type}" );
-        is_deeply( $mesg, $args->[0], 'with all the data' );
+        is( $mesg->type, $args->[0]{type}, "  of type $args->[0]{type}" );
+        is_deeply( $mesg, $args->[0], '  with all the data' );
     }
 }
