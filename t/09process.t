@@ -36,6 +36,19 @@ sub ZLONK {
     return Net::Proxy::Message->new( { type => 'ABORT' } );
 }
 
+sub BAM {
+    my ( $self, $message, $from, $direction ) = @_;
+    is( $message->{type}, 'BAM',
+        "$self->{name} got message BAM ($direction)" );
+    if( ! $self->next( $direction ) ) {
+        # we're last, let's add a socket to the end
+        use IO::Socket;
+        $self->set_next( in => IO::Socket->new() );
+        ok( $self->next( 'in' ), 'Created a socket' );
+    }
+    return $message;    # pass it on
+}
+
 sub KAPOW {
     my ( $self, $message, $from, $direction ) = @_;
     is( $message->{type}, 'KAPOW',
@@ -45,7 +58,7 @@ sub KAPOW {
 
 package main;
 
-plan tests => 10;
+plan tests => 14;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::Block::test->new( { name => 'fact1' } );
@@ -62,7 +75,15 @@ $fact1->process( Net::Proxy::Message->new( { type => 'START' } ),
 $fact1->process( Net::Proxy::Message->new( { type => 'ZLONK' } ),
     undef, 'in' );
 
+# processed by all components, adds a socket at the end
+$start->process( Net::Proxy::Message->new( { type => 'BAM' } ),
+    undef, 'in' );
+
 # processed by all components
 $start->process( Net::Proxy::Message->new( { type => 'KAPOW' } ),
+    undef, 'in' );
+
+# processed by no component (for coverage)
+$start->process( Net::Proxy::Message->new( { type => 'ZOWIE' } ),
     undef, 'in' );
 
