@@ -7,6 +7,9 @@ use Scalar::Util qw( blessed );
 use Net::Proxy::Node;
 our @ISA = qw( Net::Proxy::Node );
 
+#
+# CLASS METHODS
+#
 sub build_instance_class {
     my ($class) = @_;
     my ($component) = $class =~ m/^Net::Proxy::Block::(.*)$/;
@@ -28,6 +31,9 @@ sub new {
     return $self;
 }
 
+#
+# INSTANCE METHODS
+#
 sub process {
     my ( $self, $message, $from, $direction ) = @_;
 
@@ -88,9 +94,22 @@ The new block is linked to the next factory in the chain.
 
 =head1 METHODS
 
-This base class provides a single method:
+This base class provides several methods:
 
 =over 4
+
+=item build_instance_class()
+
+This method automatically intialize the corresponding C<BlockInstance>
+associated with the C<Block> class. This simplifies the writing of
+C<Block>/C<BlockInstance> classes, and allows the author to have a
+single F<.pm> file where message-handling methods are stored for both
+classes.
+
+=item new( $args )
+
+Return a new C<Net::Proxy::Block> object, initialized with the content
+of the C<$args> hashref.
 
 =item process( $message, $from )
 
@@ -103,6 +122,17 @@ The C<INIT> message is send to the next factory in the chain, instead
 of a concrete block.
 
 =head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+ 
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 
 =cut
 
