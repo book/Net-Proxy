@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Net::Proxy::Node;
 
-plan tests => 80;
+plan tests => 96;
 
 my $a = bless {}, 'Net::Proxy::Node';
 my $b = bless {}, 'Net::Proxy::Node';
@@ -98,6 +98,28 @@ is( $c->last('out'), $a,    'c -> * (out)' );
 is( $d->last('in'),  $s,    'd -> s (in)' );
 is( $d->last('out'), $a,    'd -> * (out)' );
 
+# add a non object at the end of the chain
+my $h = {};
+$d->set_next( in => $h );
+
+is( $a->next('in'),  $b,    'a -> b (in)' );
+is( $a->next('out'), undef, 'a -> * (out)' );
+is( $b->next('in'),  $c,    'b -> c (in)' );
+is( $b->next('out'), $a,    'b -> a (out)' );
+is( $c->next('in'),  $d,    'c -> d (in)' );
+is( $c->next('out'), $b,    'c -> b (out)' );
+is( $d->next('in'),  $h,    'd -> h (in)' );
+is( $d->next('out'), $c,    'd -> c (out)' );
+
+is( $a->last('in'),  $h,    'a -> ... -> h (in)' );
+is( $a->last('out'), undef, 'a -> * (out)' );
+is( $b->last('in'),  $h,    'b -> ... -> h (in)' );
+is( $b->last('out'), $a,    'b -> * (out)' );
+is( $c->last('in'),  $h,    'c -> ... -> h (in)' );
+is( $c->last('out'), $a,    'c -> * (out)' );
+is( $d->last('in'),  $h,    'd -> s (in)' );
+is( $d->last('out'), $a,    'd -> * (out)' );
+
 # remove $c from the chain
 $b->set_next( in  => $d );
 $d->set_next( out => $b );
@@ -108,15 +130,15 @@ is( $b->next('in'),  $d,    'b -> d (in)' );
 is( $b->next('out'), $a,    'b -> a (out)' );
 is( $c->next('in'),  $d,    'c -> d (in)' );     # not a bug
 is( $c->next('out'), $b,    'c -> b (out)' );    # not a bug
-is( $d->next('in'),  $s,    'd -> s (in)' );
+is( $d->next('in'),  $h,    'd -> h (in)' );
 is( $d->next('out'), $b,    'd -> b (out)' );
 
-is( $a->last('in'),  $s,    'a -> ... -> s (in)' );
+is( $a->last('in'),  $h,    'a -> ... -> h (in)' );
 is( $a->last('out'), undef, 'a -> * (out)' );
-is( $b->last('in'),  $s,    'b -> ... -> s (in)' );
+is( $b->last('in'),  $h,    'b -> ... -> h (in)' );
 is( $b->last('out'), $a,    'b -> * (out)' );
-is( $c->last('in'),  $s,    'c -> ... -> s (in)' );    # not a bug
+is( $c->last('in'),  $h,    'c -> ... -> h (in)' );    # not a bug
 is( $c->last('out'), $a,    'c -> * (out)' );          # not a bug
-is( $d->last('in'),  $s,    'd -> s (in)' );
+is( $d->last('in'),  $h,    'd -> h (in)' );
 is( $d->last('out'), $a,    'd -> * (out)' );
 
