@@ -1,4 +1,4 @@
-package Net::Proxy::Component;
+package Net::Proxy::BlockInstance;
 
 use strict;
 use warnings;
@@ -9,19 +9,6 @@ our @ISA = qw( Net::Proxy::Node );
 #
 # CLASS METHODS
 #
-sub build_factory_class {
-    my ($class) = @_;
-    my ($component) = $class =~ m/^Net::Proxy::Component::(.*)$/;
-
-    # eval the factory building code
-    eval << "FACTORY";
-    package Net::Proxy::ComponentFactory::$component;
-    use Net::Proxy::ComponentFactory;
-    our \@ISA = qw( Net::Proxy::ComponentFactory );
-FACTORY
-
-    return;
-}
 
 sub new {
     my ( $class, $args ) = @_;
@@ -59,7 +46,7 @@ __END__
 
 =head1 NAME
 
-Net::Proxy::Component - A component in a Net::Proxy chain
+Net::Proxy::BlockInstance - A component in a Net::Proxy chain
 
 =head1 SYNOPSIS
 
