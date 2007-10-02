@@ -48,15 +48,17 @@ sub process {
     # ABORT
     return if $action eq 'ABORT';
 
-    # create a block
+    # create a block instance
     my $class = ref $self;
     $class =~ s/^Net::Proxy::Block::/Net::Proxy::BlockInstance::/;
     my $block = $class->new($self);
 
     # link the block to the rest of the chain
+    $from->set_next( $direction => $block )
+        if blessed $from && $from->isa('Net::Proxy::Node');
     $block->set_next( $direction => $self->next($direction) );
 
-    # pass the message on to the new block
+    # pass the message on to the new block instance
     $block->process( $message, $self, $direction );
 
     return;
