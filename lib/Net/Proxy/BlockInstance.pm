@@ -2,6 +2,7 @@ package Net::Proxy::BlockInstance;
 
 use strict;
 use warnings;
+use Scalar::Util qw( blessed );
 
 use Net::Proxy::Node;
 our @ISA = qw( Net::Proxy::Node );
@@ -35,7 +36,7 @@ sub process {
     # pass the message on to the next node
     my $next = $self->next($direction);
     $next->process( $message, $self, $direction )
-        if defined $next && $next->isa('Net::Proxy::Node');
+        if blessed $next && $next->isa('Net::Proxy::Node');
 
     return;
 }

@@ -2,7 +2,7 @@ package Net::Proxy::Node;
 
 use strict;
 use warnings;
-use Scalar::Util qw( refaddr );
+use Scalar::Util qw( refaddr blessed );
 
 sub next {
     my ( $self, $direction ) = @_;
@@ -16,8 +16,9 @@ sub last {
 
     my $last = $next;
     $last = $next
-        while $next
-        = $next->isa('Net::Proxy::Node') && $next->next($direction);
+        while $next = blessed $next
+        && $next->isa('Net::Proxy::Node')
+        && $next->next($direction);
     return $last;
 }
 
