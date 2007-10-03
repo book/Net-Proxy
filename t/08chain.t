@@ -14,6 +14,7 @@ __PACKAGE__->build_instance_class();
 
 sub init {
     my ($self) = @_;
+    $self->{name} ||= '<unnamed>';
     ok( 1, "$self->{name}->init() called" );
 }
 
@@ -37,7 +38,7 @@ plan tests => 5;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::Block::test->new( { name => 'fact1' } );
-my $fact2 = Net::Proxy::Block::test->new( { name => 'fact2' } );
+my $fact2 = Net::Proxy::Block::test->new( );
 
 $fact1->set_next( in => $fact2 )->set_next( in => { bam => 'kapow' } );
 
