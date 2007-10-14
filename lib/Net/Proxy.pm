@@ -6,7 +6,7 @@ use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 use POSIX 'strftime';
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 # interal socket information table
 my %SOCK_INFO;
@@ -31,9 +31,9 @@ my $BUFFSIZE  = 16384;
 sub set_verbosity { $VERBOSITY = $_[1]; }
 {
     my $i;
-    for my $meth (qw( notice info debug )) {
+    for my $meth (qw( error notice info debug )) {
         no strict 'refs';
-        my $level = ++$i;
+        my $level = $i++;
         *$meth = sub {
             return if $VERBOSITY < $level;
             print STDERR strftime "%Y-%m-%d %H:%M:%S $_[1]\n", localtime;
