@@ -409,6 +409,10 @@ Close the given sockets and cleanup the related internal structures.
 
 Set the logging level. C<0> means not messages except warnings and errors.
 
+=item error( $message )
+
+Log $message to STDERR, always.
+
 =item notice( $message )
 
 Log $message to STDERR if verbosity level is equal to C<1> or more.
