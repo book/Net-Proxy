@@ -60,7 +60,21 @@ sub listen {
     return $sock;
 }
 
-*accept_from = \&Net::Proxy::Connector::raw_accept_from;
+sub accept_from {
+    my ($self, $listen) = @_;
+    my $sock = $listen->accept();
+    die IO::Socket::SSL::errstr() if ! $sock;
+
+    Net::Proxy->set_nick( $sock,
+              $sock->peerhost() . ':'
+            . $sock->peerport() . ' -> '
+            . $sock->sockhost() . ':'
+            . $sock->sockport() );
+    Net::Proxy->notice( 'Accepted ' . Net::Proxy->get_nick( $sock ) );
+
+    return $sock;
+}
+
 
 # OUT
 sub connect {
