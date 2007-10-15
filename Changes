@@ -1,10 +1,20 @@
 Revision history for Perl extension Net::Proxy
 
+0.11 Mon Oct 15 03:44:30 CEST 2007
+        [ENHANCEMENTS]
+        - added an error() method, for messages that must always be shown
+        - better support for the cases where accept() fails
+        - better error message when accept() fails for a SSL socket
+        [DOCUMENTATION]
+        - added a tutorial about Net::Proxy, with code examples
+        [TESTS]
+        - prevent t/pod-coverage.t to fail on the upgrade_SSL method
+          mixed in Net::Proxy::Connector::connect_ssl
+
 0.10 Mon Oct  1 22:26:50 CEST 2007
         [DOCUMENTATION]
         - added information about the public SVN repository and the
           mailing-list
-        - added a tutorial about Net::Proxy, with code examples
         [TESTS]
         - prevent t/21connect.t, t/32tcp_connect.t, t/90compile.t to fail
           when LWP::UserAgent is not installed
