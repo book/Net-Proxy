@@ -19,5 +19,12 @@ pod_coverage_ok(
             [qr/^(?:listen|accept_from|connect|read_from|write_to|init)$/]
     }
     )
-    for grep {/::Connector::/} @modules;
+    for grep { !/::connect_ssl/ } grep {/::Connector::/} @modules;
+pod_coverage_ok(
+    $_,
+    {   trustme =>
+            [qr/^(?:listen|accept_from|connect|read_from|write_to|init|upgrade_SSL)$/]
+    }
+    )
+    for grep { /::connect_ssl/ } @modules;
 
