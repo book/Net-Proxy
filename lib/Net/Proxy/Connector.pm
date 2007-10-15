@@ -50,7 +50,12 @@ sub new_connection_on {
         'New connection on ' . Net::Proxy->get_nick($listener) );
 
     # call the actual Connector method
-    my $sock = $self->accept_from($listener); # FIXME may croak
+    my $sock = eval { $self->accept_from($listener); };
+    if( $@ ) {
+        Net::Proxy->error( $@ );
+        return;
+    }
+
     Net::Proxy->set_connector( $sock, $self );
     Net::Proxy->set_buffer( $sock, '' );
     Net::Proxy->set_callback( $sock, $self->{hook} ) if $self->{hook};
