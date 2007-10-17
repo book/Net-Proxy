@@ -12,7 +12,9 @@ use Net::Proxy::Connector::connect;
 
 plan tests => 13;
 
-delete $ENV{HTTP_PROXY};
+# delete all proxy keys from the environment
+delete $ENV{$_} for grep { /_proxy$/i } keys %ENV;
+
 my $c;
 my $args = {};
 
