@@ -2,10 +2,14 @@
 use strict;
 use warnings;
 use Net::Proxy;
-use LWP::UserAgent;
 use Getopt::Long;
+use Pod::Usage;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
+
+# die early if this module is not installed
+eval { require LWP::UserAgent; };
+die "LWP::UserAgent required to run connect-tunnel\n" if $@;
 
 # default configuration
 our %CONF = (
@@ -19,7 +23,8 @@ our %CONF = (
 # get and check the options
 #
 GetOptions( \%CONF, "verbose|v+", "tunnel|T=s@", "proxy|P=s",
-    "proxy-authentication|A=s", "local-only|L", "user-agent|U=s" );
+    "proxy-authentication|A=s", "local-only|L", "user-agent|U=s" )
+   or pod2usage();
 
 # set up the verbosity level
 Net::Proxy->set_verbosity( $CONF{verbose} );
@@ -254,7 +259,7 @@ Direct link: L<http://www.sans.org/rr/whitepapers/covert/1202.php>
 
 =head1 COPYRIGHT
 
-Copyright 2003-2006, Philippe Bruhat. All rights reserved.
+Copyright 2003-2007, Philippe Bruhat. All rights reserved.
 
 =head1 LICENSE
 
