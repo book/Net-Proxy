@@ -1,5 +1,14 @@
 Revision history for Perl extension Net::Proxy
 
+0.12 Thu Oct 18 00:49:42 CEST 2007
+        [ENHANCEMENTS]
+        - print a meaningful error message when the ssl connector can't listen
+        [SCRIPTS]
+        - connect-tunnel now dies early if LWP::UserAgent is not
+          installed (and t/90compile.t does pass as well)
+        [TESTS]
+        - prevent t/21connect.t to fail when a environment proxy is defined
+
 0.11 Mon Oct 15 03:44:30 CEST 2007
         [ENHANCEMENTS]
         - added an error() method, for messages that must always be shown
