@@ -33,7 +33,7 @@ __END__
 
 =head1 NAME
 
-Net::Proxy::Node - Base class for proxy chains elements
+Net::Proxy::Node - Chain navigation mixin class
 
 =head1 SYNOPSIS
 
@@ -46,8 +46,8 @@ Net::Proxy::Node - Base class for proxy chains elements
 
 =head1 DESCRIPTION
 
-C<Net::Proxy;:Node> is a simple class used to represent the chains
-of C<Net::Proxy::Components> and C<Net::Proxy::ComponentFactory>
+C<Net::Proxy;:Node> is a mixin class that provides methods to navigate
+along a chain of C<Net::Proxy::Block> and C<Net::Proxy::BlockInstance>
 objects used in C<Net::Proxy>.
 
 Both classes inherit from C<Net::Proxy::Node> a default implementation
