@@ -35,24 +35,10 @@ sub new {
 # INSTANCE METHODS
 #
 sub process {
-    my ( $self, $message, $from, $direction ) = @_;
+    my ( $self, $messages, $from, $direction ) = @_;
 
-    my $action = $message->type();
-    if ( $self->can($action) ) {
-        $message = $self->$action( $message, $from, $direction );
-        $action = $message->type();    # $message might have changed
-    }
-
-    # START is passed from factory to factory
-    if ( $action eq 'START' ) {
-        my $next = $self->next($direction);
-        $next->process( $message, $self, $direction )
-            if blessed $next && $next->isa('Net::Proxy::Node');
-        return;
-    }
-
-    # ABORT
-    return if $action eq 'ABORT';
+    # let the mixin class process the messages
+    $self->SUPER::process( $messages, $from, $direction );
 
     # create a block instance
     my $class = ref $self;
@@ -117,9 +103,6 @@ The default processing for any message. The message is processed by the
 appropriate method (if any) and then a concrete block is created,
 inserted in the chain linked to the actual sockets. The block then
 receives the message.
-
-The C<INIT> message is send to the next factory in the chain, instead
-of a concrete block.
 
 =head1 AUTHOR
 
