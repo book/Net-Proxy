@@ -2,7 +2,7 @@ package Net::Proxy::Node;
 
 use strict;
 use warnings;
-use Scalar::Util qw( refaddr blessed );
+use Scalar::Util qw( blessed );
 
 sub next {
     my ( $self, $direction ) = @_;
