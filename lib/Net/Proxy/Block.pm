@@ -51,7 +51,7 @@ sub process {
     $block->set_next( $direction => $self->next($direction) );
 
     # pass the message on to the new block instance
-    $block->process( $message, $self, $direction );
+    $block->process( $messages, $self, $direction );
 
     return;
 }
