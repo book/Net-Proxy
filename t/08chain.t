@@ -2,15 +2,17 @@ use strict;
 use warnings;
 use Test::More;
 use Net::Proxy::Message;
-use Net::Proxy::Block;
+use Net::Proxy::Component;
 
 my $start;
 
-package Net::Proxy::Block::test;
-use Test::More;
+package Net::Proxy::Component::test;
 
-our @ISA = qw( Net::Proxy::Block );
-__PACKAGE__->build_instance_class();
+our @ISA = qw( Net::Proxy::Component );
+__PACKAGE__->build_factory_class();
+
+package Net::Proxy::ComponentFactory::test;
+use Test::More;
 
 sub init {
     my ($self) = @_;
@@ -37,8 +39,8 @@ package main;
 plan tests => 5;
 
 # build a chain of factories
-my $fact1 = Net::Proxy::Block::test->new( { name => 'fact1' } );
-my $fact2 = Net::Proxy::Block::test->new( );
+my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
+my $fact2 = Net::Proxy::ComponentFactory::test->new( );
 
 $fact1->set_next( in => $fact2 )->set_next( in => { bam => 'kapow' } );
 
