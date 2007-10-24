@@ -22,7 +22,7 @@ sub new {
 # INSTANCE METHODS
 #
 sub process {
-    my ( $self, $message, $from, $direction ) = @_;
+    my ( $self, $messages, $from, $direction ) = @_;
 
     # let the mixin class process the messages
     $self->act_on( $messages, $from, $direction );
