@@ -4,13 +4,15 @@ use warnings;
 use Carp;
 
 sub new {
-    my ( $class, $args ) = @_;
+    my ( $class, $type, $args ) = @_;
+    $args = defined $args ? $args : {};
 
-    croak "First parameter of new() must be a HASH reference"
-        if !defined $args || ref $args ne 'HASH';
-    croak 'No type given for message' if !exists $args->{type};
+    croak "Second parameter of new() must be a HASH reference"
+        if ref $args ne 'HASH';
+    croak "No type given for message" if !$type;
+    croak "Type must be a string, not a $type" if ref $type;
 
-    return bless {%$args}, $class;
+    return bless { %$args, type => $type }, $class;
 }
 
 sub type { $_[0]{type} }
@@ -42,14 +44,10 @@ The C<Net::Proxy::Message> supports the following methods:
 
 =over 4
 
-=item new( { ... } )
+=item new( $type => { ... } )
 
-This method creates a new C<Net::Proxy::Message> object, which is
-simply a bless hash containing a copy of the 
-
-The only key that MUST be present at the message creation is the key
-C<type> which defines the type of the message. The message creation
-will fail if this key is not present.
+This method creates a new C<Net::Proxy::Message> object of type C<$type>.
+A message is simply a blessed hash containing a copy of the given arguments.
 
 =item type()
 
@@ -62,7 +60,7 @@ Return the message type.
 =head2 Reserved names
 
 Because the names are used by Perl, no message can be named C<BEGIN>,
-C<CHECK>, C<INIT>, C<END> or C<AUTOLOAD>.
+C<CHECK>, C<INIT>, C<END>, C<AUTOLOAD> or C<DESTROY>.
 
 =head1 AUTHOR
 
