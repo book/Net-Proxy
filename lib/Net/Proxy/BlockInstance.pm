@@ -21,6 +21,20 @@ sub new {
 #
 # INSTANCE METHODS
 #
+sub process {
+    my ( $self, $message, $from, $direction ) = @_;
+
+    # let the mixin class process the messages
+    $self->act_on( $messages, $from, $direction );
+
+    # pass the message on to the next node
+    my $next = $self->next($direction);
+    $next->process( $messages, $self, $direction )
+        if blessed $next && $next->isa('Net::Proxy::Node');
+
+    return;
+}
+
 
 1;
 
