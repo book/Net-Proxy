@@ -1,4 +1,4 @@
-package Net::Proxy::BlockInstance;
+package Net::Proxy::Component;
 
 use strict;
 use warnings;
@@ -10,6 +10,21 @@ our @ISA = qw( Net::Proxy::Node );
 #
 # CLASS METHODS
 #
+
+sub build_factory_class {
+    my ($class) = @_;
+    my ($component) = $class =~ m/^Net::Proxy::Component::(.*)$/;
+
+    # eval the factory building code
+    eval << "FACTORY";
+    package Net::Proxy::ComponentFactory::$component;
+    use Net::Proxy::ComponentFactory;
+    our \@ISA = qw( Net::Proxy::ComponentFactory );
+FACTORY
+    die $@ if $@;
+
+    return;
+}
 
 sub new {
     my ( $class, $args ) = @_;
@@ -42,7 +57,7 @@ __END__
 
 =head1 NAME
 
-Net::Proxy::BlockInstance - A component in a Net::Proxy chain
+Net::Proxy::Component - A component in a Net::Proxy chain
 
 =head1 SYNOPSIS
 
@@ -50,13 +65,21 @@ Net::Proxy::BlockInstance - A component in a Net::Proxy chain
 
 =head1 METHODS
 
-The C<Net::Proxy::BlockInstance> provides the following methods:
+The C<Net::Proxy::Component> provides the following methods:
 
 =over 4
 
+=item build_factory_class()
+
+This method automatically intialize the corresponding C<ComponentFactory>
+associated with the C<Component> class. This simplifies the writing of
+C<ComponentFactory>/C<Component> classes, and allows the author to have
+a single F<.pm> file (for the component) where message-handling methods
+are stored for both classes.
+
 =item new( $args )
 
-Return a new C<Net::Proxy::BlockInstance> object, initialized with the
+Return a new C<Net::Proxy::Component> object, initialized with the
 content of the C<$args> hashref.
 
 =item process( $messages, $from, $direction )

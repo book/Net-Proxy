@@ -1,4 +1,4 @@
-package Net::Proxy::Block;
+package Net::Proxy::ComponentFactory;
 
 use strict;
 use warnings;
@@ -10,21 +10,6 @@ our @ISA = qw( Net::Proxy::Node );
 #
 # CLASS METHODS
 #
-sub build_instance_class {
-    my ($class) = @_;
-    my ($component) = $class =~ m/^Net::Proxy::Block::(.*)$/;
-
-    # eval the factory building code
-    eval << "FACTORY";
-    package Net::Proxy::BlockInstance::$component;
-    use Net::Proxy::BlockInstance;
-    our \@ISA = qw( Net::Proxy::BlockInstance );
-FACTORY
-    die $@ if $@;
-
-    return;
-}
-
 sub new {
     my ( $class, $args ) = @_;
     my $self = bless { %{ $args || {} } }, $class;
@@ -43,7 +28,7 @@ sub process {
 
     # create a block instance
     my $class = ref $self;
-    $class =~ s/^Net::Proxy::Block::/Net::Proxy::BlockInstance::/;
+    $class =~ s/^Net::Proxy::ComponentFactory::/Net::Proxy::Component::/;
     my $block = $class->new($self);
 
     # link the block to the rest of the chain
@@ -63,13 +48,13 @@ __END__
 
 =head1 NAME
 
-Net::Proxy::Block - Base class for all Component factories
+Net::Proxy::ComponentFactory - Base class for all Component factories
 
 =head1 SYNOPSIS
 
 =head1 DESCRIPTION
 
-The C<Net::Proxy::Block> class is the base class for all
+The C<Net::Proxy::ComponentFactory> class is the base class for all
 block factories.
 
 When a chain is first created, it is actually a chain of factories.
@@ -85,17 +70,9 @@ This base class provides several methods:
 
 =over 4
 
-=item build_instance_class()
-
-This method automatically intialize the corresponding C<BlockInstance>
-associated with the C<Block> class. This simplifies the writing of
-C<Block>/C<BlockInstance> classes, and allows the author to have a
-single F<.pm> file where message-handling methods are stored for both
-classes.
-
 =item new( $args )
 
-Return a new C<Net::Proxy::Block> object, initialized with the content
+Return a new C<Net::Proxy::ComponentFactory> object, initialized with the content
 of the C<$args> hashref.
 
 =item process( $messages, $from, $direction )
