@@ -37,15 +37,15 @@ sub process {
         # actually process the message
         my $action = $message->type();
         if ( $self->can($action) ) {
-            $message = $self->$action( $message, $from, $direction );
-            push @$messages, $message if $message;
+            my @followup = $self->$action( $message, $from, $direction );
+            push @$messages, @followup if @followup;
         }
-
-        # pass the message to the next node
-        my $next = $self->next($direction);
-        $next->process( $message, $self, $direction )
-            if blessed $next && $next->isa('Net::Proxy::Node');
     }
+
+    # pass the message to the next node
+    my $next = $self->next($direction);
+    $next->process( $messages, $self, $direction )
+        if blessed $next && $next->isa('Net::Proxy::Node');
 }
 
 1;
