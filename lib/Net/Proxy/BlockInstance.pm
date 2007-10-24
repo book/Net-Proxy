@@ -48,6 +48,25 @@ Net::Proxy::BlockInstance - A component in a Net::Proxy chain
 
 =head1 DESCRIPTION
 
+=head1 METHODS
+
+The C<Net::Proxy::BlockInstance> provides the following methods:
+
+=over 4
+
+=item new( $args )
+
+Return a new C<Net::Proxy::BlockInstance> object, initialized with the
+content of the C<$args> hashref.
+
+=item process( $message, $from, $direction )
+
+The default processing for a message stack. The message are processed
+by the appropriate method (if any) and then the udpated stack is passed
+on to the rest of the chain, in the given C<$direction>.
+
+=back
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
