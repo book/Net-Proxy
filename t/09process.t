@@ -69,22 +69,18 @@ my $fact3 = Net::Proxy::ComponentFactory::test->new( { name => 'fact3' } );
 $fact1->set_next( in => $fact2 )->set_next( in => $fact3 );
 
 # START the factory chain
-$fact1->process( [ Net::Proxy::Message->new( { type => 'START' } ) ],
-    undef, 'in' );
+$fact1->process( [ Net::Proxy::Message->new('START') ], undef, 'in' );
 
 # processed once
-$fact1->process( [ Net::Proxy::Message->new( { type => 'ZLONK' } ) ],
+$fact1->process( [ Net::Proxy::Message->new('ZLONK') ],
     bless( [], 'Zlonk' ), 'in' );
 
 # processed by all components, adds a socket at the end
-$start->process( [ Net::Proxy::Message->new( { type => 'BAM' } ) ],
-    undef, 'in' );
+$start->process( [ Net::Proxy::Message->new('BAM') ], undef, 'in' );
 
 # processed by all components
-$start->process( [ Net::Proxy::Message->new( { type => 'KAPOW' } ) ],
-    undef, 'in' );
+$start->process( [ Net::Proxy::Message->new('KAPOW') ], undef, 'in' );
 
 # processed by no component (for coverage)
-$start->process( [ Net::Proxy::Message->new( { type => 'ZOWIE' } ) ],
-    undef, 'in' );
+$start->process( [ Net::Proxy::Message->new('ZOWIE') ], undef, 'in' );
 

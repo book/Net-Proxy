@@ -45,9 +45,9 @@ my $fact2 = Net::Proxy::ComponentFactory::test->new( );
 $fact1->set_next( in => $fact2 )->set_next( in => { bam => 'kapow' } );
 
 # START the factory chain
-$fact1->process( [ Net::Proxy::Message->new( { type => 'START' } ) ],
+$fact1->process( [ Net::Proxy::Message->new( 'START' ) ],
    undef, 'in' );
 
-$fact1->process( [ Net::Proxy::Message->new( { type => 'ZLONK' } ) ],
+$fact1->process( [ Net::Proxy::Message->new( 'ZLONK' ) ],
     undef, 'in' );
 
