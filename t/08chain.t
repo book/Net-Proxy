@@ -29,7 +29,7 @@ sub ZLONK {
     my ( $self, $message, $from, $direction ) = @_;
     is( $message->{type}, 'ZLONK',
         "$self->{name} got message ZLONK ($direction)" );
-    return Net::Proxy::Message->new( { type => 'ABORT' } );    # stop now
+    return; # stop now
 }
 
 package main;
@@ -43,9 +43,9 @@ my $fact2 = Net::Proxy::Block::test->new( );
 $fact1->set_next( in => $fact2 )->set_next( in => { bam => 'kapow' } );
 
 # START the factory chain
-$fact1->process( Net::Proxy::Message->new( { type => 'START' } ),
-    undef, 'in' );
+$fact1->process( [ Net::Proxy::Message->new( { type => 'START' } ) ],
+   undef, 'in' );
 
-$fact1->process( Net::Proxy::Message->new( { type => 'ZLONK' } ),
+$fact1->process( [ Net::Proxy::Message->new( { type => 'ZLONK' } ) ],
     undef, 'in' );
 
