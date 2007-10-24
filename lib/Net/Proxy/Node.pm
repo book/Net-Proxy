@@ -27,7 +27,7 @@ sub set_next {
     return $self->{"_next_$direction"} = $next;
 }
 
-sub process {
+sub act_on {
     my ( $self, $messages, $from, $direction ) = @_;
 
     push @$messages, undef;    # sentinel
@@ -42,10 +42,7 @@ sub process {
         }
     }
 
-    # pass the message to the next node
-    my $next = $self->next($direction);
-    $next->process( $messages, $self, $direction )
-        if blessed $next && $next->isa('Net::Proxy::Node');
+    return $messages;
 }
 
 1;
@@ -97,12 +94,12 @@ the chain, or if there is no chain in that direction.
 Note that the last object in a chain may not be a C<Net::Proxy::Node>
 object. It must, however, be a blessed object.
 
-=item process( $messages, $from, $direction )
+=item act_on( $messages, $from, $direction )
 
-Process a message list.
+Process a message list and return an updated version of it.
 
-Each message is processed by the appropriate method (if any),
-and passed to the next node in the chain.
+Each message is processed by the appropriate method (if any).
+The message list may be modified (messages tranformed, removed, added).
 
 =back
 
