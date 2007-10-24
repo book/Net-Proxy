@@ -98,12 +98,13 @@ classes.
 Return a new C<Net::Proxy::Block> object, initialized with the content
 of the C<$args> hashref.
 
-=item process( $message, $from )
+=item process( $messages, $from, $direction )
 
-The default processing for any message. The message is processed by the
-appropriate method (if any) and then a concrete block is created,
-inserted in the chain linked to the actual sockets. The block then
-receives the message.
+The default processing for a message stack. The messages are processed
+by the appropriate method (if any) and then a concrete block is
+created, inserted in the chain linked to the actual sockets (in the
+proper C<$direction>). The block then receives the message stack and
+processes it.
 
 =head1 AUTHOR
 
