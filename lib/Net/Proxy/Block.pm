@@ -38,7 +38,7 @@ sub process {
     my ( $self, $messages, $from, $direction ) = @_;
 
     # let the mixin class process the messages
-    $self->SUPER::process( $messages, $from, $direction );
+    $self->act_on( $messages, $from, $direction );
 
     # create a block instance
     my $class = ref $self;
