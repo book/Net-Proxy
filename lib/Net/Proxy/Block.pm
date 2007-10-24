@@ -18,8 +18,9 @@ sub build_instance_class {
     eval << "FACTORY";
     package Net::Proxy::BlockInstance::$component;
     use Net::Proxy::BlockInstance;
-    our \@ISA = qw( Net::Proxy::BlockInstance);
+    our \@ISA = qw( Net::Proxy::BlockInstance );
 FACTORY
+    die $@ if $@;
 
     return;
 }
