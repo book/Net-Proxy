@@ -59,7 +59,7 @@ The C<Net::Proxy::BlockInstance> provides the following methods:
 Return a new C<Net::Proxy::BlockInstance> object, initialized with the
 content of the C<$args> hashref.
 
-=item process( $message, $from, $direction )
+=item process( $messages, $from, $direction )
 
 The default processing for a message stack. The message are processed
 by the appropriate method (if any) and then the udpated stack is passed
