@@ -45,6 +45,25 @@ sub listen_on_port {
     );
 }
 
+# fork a proxy with the given args
+sub fork_proxy {
+    my ( $args, $count ) = @_;
+
+    my $pid = fork;
+    return if !defined $pid;
+
+    if ( $pid == 0 ) {
+
+        # the child process runs the proxy
+        my $proxy = Net::Proxy->new($args);
+        $proxy->register();
+
+        Net::Proxy->set_verbosity( $ENV{NET_PROXY_VERBOSITY} || 0 );
+        Net::Proxy->mainloop( $count                         || 1 );
+        exit;
+    }
+}
+
 # compute a seed and show it
 use POSIX qw( INT_MAX );
 
