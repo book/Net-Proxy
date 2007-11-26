@@ -62,6 +62,8 @@ sub fork_proxy {
         Net::Proxy->mainloop( $count                         || 1 );
         exit;
     }
+
+    return $pid;
 }
 
 # compute a seed and show it
