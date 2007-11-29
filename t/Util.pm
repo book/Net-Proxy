@@ -81,14 +81,18 @@ sub random_swap {
     return rand > 0.5 ? ( $first, $second ) : ( $second, $first );
 }
 
-# skip but fail
-# extends Test::More
+#
+# Testing functions
+#
 use Test::Builder;
+my $Tester = Test::Builder->new();
+
+# skip but fail
 sub skip_fail {
     my ($why, $how_many) = @_;
-    my $Test = Test::Builder->new();
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     for( 1 .. $how_many ) {
-        $Test->ok( 0, $why );
+        $Tester->ok( 0, $why );
     }
     no warnings;
     last SKIP;
@@ -98,13 +102,15 @@ use IO::Select;
 use Test::More;
 sub is_closed {
     my ($sock, $name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     $name ||= "$sock";
     my $select = IO::Select->new( $sock );
     my @read   =  $select->can_read();
     if( @read ) {
         my $buf;
         my $read = $read[0]->sysread( $buf, 4096 );
-        is( $read, 0, "$name closed" );
+        $Tester->is_eq( $read, 0, "$name closed" );
     }
 }
 
