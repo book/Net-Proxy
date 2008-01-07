@@ -15,7 +15,7 @@ __PACKAGE__->build_factory_class();
 sub init {
     my ($self) = @_;
     $self->{name} =~ s/fact/comp/;
-    ok( 1, "$self->{name} ($self) init()" );
+    ok( 1, "$self->{name} init()" );
     push @comps, $self;    # keep all created components
 }
 
