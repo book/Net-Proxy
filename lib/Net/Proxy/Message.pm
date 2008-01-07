@@ -9,8 +9,11 @@ sub new {
 
     croak "Second parameter of new() must be a HASH reference"
         if ref $args ne 'HASH';
-    croak "No type given for message" if !$type;
+    croak "No type given for message"          if !$type;
     croak "Type must be a string, not a $type" if ref $type;
+    croak "Message type '$1' is reserved"
+        if $type =~ /^(BEGIN|INIT|(?:UNIT)?CHECK|END
+                      |AUTOLOAD|DESTROY|CLONE(?:_SKIP)?)$/x;
 
     return bless { %$args, type => $type }, $class;
 }
@@ -27,7 +30,9 @@ Net::Proxy::Message - The message class used by Net::Proxy
 
 =head1 SYNOPSIS
 
-    my $message = Net::Proxy::Message->new( { type => 'CAN_READ' } );
+    $message = Net::Proxy::Message->new( 'CAN_READ' );
+
+    $message = Net::Proxy::Message->new( DATA => { data => 'zlonk bam' } );
 
 =head1 DESCRIPTION
 
@@ -60,7 +65,10 @@ Return the message type.
 =head2 Reserved names
 
 Because the names are used by Perl, no message can be named C<BEGIN>,
-C<CHECK>, C<INIT>, C<END>, C<AUTOLOAD> or C<DESTROY>.
+C<CHECK>, C<INIT>, C<UNITCHECK>, C<END>, C<CLONE>, C<CLONE_SKIP>,
+C<AUTOLOAD> or C<DESTROY>.
+
+C<< Net::Proxy::Message->new() >> will die if one of those names is used.
 
 =head1 AUTHOR
 
@@ -68,7 +76,7 @@ Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2007-2008 Philippe Bruhat (BooK), All Rights Reserved.
  
 =head1 LICENSE
 
