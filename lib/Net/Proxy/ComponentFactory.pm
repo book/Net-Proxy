@@ -26,6 +26,9 @@ sub process {
     # let the mixin class process the messages
     $self->act_on( $messages, $from, $direction );
 
+    # TODO: think of "factory only" messages,
+    # that should not create new component chains
+
     # create a component
     my $class = ref $self;
     $class =~ s/^Net::Proxy::ComponentFactory::/Net::Proxy::Component::/;
