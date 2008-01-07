@@ -30,8 +30,10 @@ sub set_next {
 sub act_on {
     my ( $self, $messages, $from, $direction ) = @_;
 
-    push @$messages, undef;    # sentinel
+    # skip actions if the chain is unidirectional
+    return $messages if $self->{only} && $self->{only} ne $direction;
 
+    push @$messages, undef;    # sentinel
     while ( my $message = shift @$messages ) {
 
         my $action = $message->type();
