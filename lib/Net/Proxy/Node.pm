@@ -37,17 +37,10 @@ sub act_on {
     while ( my $message = shift @$messages ) {
 
         my $action = $message->type();
-        if ( $self->can($action) ) {
+        push @$messages, $self->can($action)
+            ? $self->$action( $message, $from, $direction )    # process msg
+            : $message;                                        # just keep it
 
-            # actually process the message
-            my @followup = $self->$action( $message, $from, $direction );
-            push @$messages, @followup;
-        }
-        else {
-
-            # just keep the message
-            push @$messages, $message;
-        }
     }
 
     return $messages;
