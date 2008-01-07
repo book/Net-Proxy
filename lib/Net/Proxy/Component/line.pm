@@ -22,7 +22,7 @@ sub DATA {
     while ( $data =~ s/(.*?(?:\015\012?|\012\015?))// ) {
         push @messages, Net::Proxy::Message->new( DATA => { data => $1 } );
     }
-    $self->{buffer} = $data; # keep what's left for next time
+    $self->{buffer} = $data;    # keep what's left for next time
 
     return @messages;
 }
@@ -39,13 +39,24 @@ Net::Proxy::Component::line - Line buffering component
 
 =head1 DESCRIPTION
 
-=head1 METHODS
+C<Net::Proxy::Component::line> is a component that turns a randaom
+data stream into a stream of lines.
+
+=head1 MESSAGES
 
 The C<Net::Proxy::Component::line> handles the following messages:
 
 =over 4
 
 =item DATA
+
+A C<DATA> message is split in several C<DATA> messages (ending with
+either C<CR>, C<LF>, C<CR-LF> or C<LF-CR>).
+
+If it doesn't end with a newline, the last chunk of data in the message
+will be kept and prepended to the content of the next C<DATA> message.
+B<Warning:> if used on a binary stream, this component can lead to huge
+memory consumption.
 
 =back
 
