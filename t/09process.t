@@ -4,7 +4,7 @@ use Test::More;
 use Net::Proxy::Message;
 use Net::Proxy::Component;
 
-my $start;
+my @comps;
 
 package Net::Proxy::Component::test;
 use Test::More;
@@ -15,15 +15,15 @@ __PACKAGE__->build_factory_class();
 sub init {
     my ($self) = @_;
     $self->{name} =~ s/fact/comp/;
-    ok( 1, "$self->{name} init()" );
-    $start ||= $self;    # keep a link to the first component
+    ok( 1, "$self->{name} ($self) init()" );
+    push @comps, $self;    # keep all created components
 }
 
 sub ZLONK {
     my ( $self, $message, $from, $direction ) = @_;
     is( $message->{type}, 'ZLONK',
         "$self->{name} got message ZLONK ($direction)" );
-    return;              # stop now
+    return;                # stop now
 }
 
 sub BAM {
@@ -59,7 +59,7 @@ sub START {
 
 package main;
 
-plan tests => 14;
+plan tests => 21;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
@@ -75,12 +75,22 @@ $fact1->process( [ Net::Proxy::Message->new('START') ], undef, 'in' );
 $fact1->process( [ Net::Proxy::Message->new('ZLONK') ],
     bless( [], 'Zlonk' ), 'in' );
 
+# a second chain was created
+is( @comps, 6, "six component were created" );
+{
+    my $i = 0;
+    for my $name ( (qw( comp1 comp2 comp3 )) x 2 ) {
+        is( $comps[$i]{name}, $name, "component $i == $name" );
+        $i++;
+    }
+}
+
 # processed by all components, adds a socket at the end
-$start->process( [ Net::Proxy::Message->new('BAM') ], undef, 'in' );
+$comps[0]->process( [ Net::Proxy::Message->new('BAM') ], undef, 'in' );
 
 # processed by all components
-$start->process( [ Net::Proxy::Message->new('KAPOW') ], undef, 'in' );
+$comps[0]->process( [ Net::Proxy::Message->new('KAPOW') ], undef, 'in' );
 
 # processed by no component (for coverage)
-$start->process( [ Net::Proxy::Message->new('ZOWIE') ], undef, 'in' );
+$comps[0]->process( [ Net::Proxy::Message->new('ZOWIE') ], undef, 'in' );
 
