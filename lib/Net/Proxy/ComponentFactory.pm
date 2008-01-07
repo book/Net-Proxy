@@ -26,18 +26,18 @@ sub process {
     # let the mixin class process the messages
     $self->act_on( $messages, $from, $direction );
 
-    # create a block instance
+    # create a component
     my $class = ref $self;
     $class =~ s/^Net::Proxy::ComponentFactory::/Net::Proxy::Component::/;
-    my $block = $class->new($self);
+    my $comp = $class->new($self);
 
-    # link the block to the rest of the chain
-    $from->set_next( $direction => $block )
+    # link the component to the rest of the chain
+    $from->set_next( $direction => $comp )
         if blessed $from && $from->isa('Net::Proxy::Node');
-    $block->set_next( $direction => $self->next($direction) );
+    $comp->set_next( $direction => $self->next($direction) );
 
-    # pass the message on to the new block instance
-    $block->process( $messages, $self, $direction );
+    # pass the message on to the new component instance
+    $comp->process( $messages, $self, $direction );
 
     return;
 }
@@ -55,14 +55,14 @@ Net::Proxy::ComponentFactory - Base class for all Component factories
 =head1 DESCRIPTION
 
 The C<Net::Proxy::ComponentFactory> class is the base class for all
-block factories.
+component factories.
 
 When a chain is first created, it is actually a chain of factories.
 When the first message is passed to the factory, it processes the message,
 creates an actual C<Net::Proxy::BLockInstance> object, to which it passes the
 processed message.
 
-The new block is linked to the next factory in the chain.
+The new component is linked to the next factory in the chain.
 
 =head1 METHODS
 
@@ -78,9 +78,9 @@ of the C<$args> hashref.
 =item process( $messages, $from, $direction )
 
 The default processing for a message stack. The messages are processed
-by the appropriate method (if any) and then a concrete block is
+by the appropriate method (if any) and then a component is
 created, inserted in the chain linked to the actual sockets (in the
-proper C<$direction>). The block then receives the message stack and
+proper C<$direction>). The new component then receives the message stack and
 processes it.
 
 =head1 AUTHOR
