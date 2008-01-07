@@ -21,7 +21,8 @@ sub build_factory_class {
     use Net::Proxy::ComponentFactory;
     our \@ISA = qw( Net::Proxy::ComponentFactory );
 FACTORY
-    die $@ if $@;
+
+    #die $@ if $@; # can't happen. Uncomment when changing the above code
 
     return;
 }
@@ -49,7 +50,6 @@ sub process {
 
     return;
 }
-
 
 1;
 
