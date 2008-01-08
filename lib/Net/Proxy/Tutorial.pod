@@ -172,24 +172,25 @@ ASCII-art:
 Here's how to set up the local C<Net::Proxy> instance:
 
     Net::Proxy->new(
-        in => {
-            type => 'tcp',
-            host => 'localhost',
-            port => 22,
-        },
-        out => {
-            type => 'connect',
-            host => 'home.example.com',
-            port => 22,
+        {   in => {
+                type => 'tcp',
+                host => 'localhost',
+                port => 22,
+            },
+            out => {
+                type => 'connect',
+                host => 'home.example.com',
+                port => 22,
 
-            # proxy details
-            proxy_host => 'proxy.mycompany.com',
-            proxy_port => 8080,
+                # proxy details
+                proxy_host => 'proxy.mycompany.com',
+                proxy_port => 8080,
 
-            # proxy credentials
-            proxy_user => 'me',
-            proxy_pass => 's3kr3t',
-        },
+                # proxy credentials
+                proxy_user => 'me',
+                proxy_pass => 's3kr3t',
+            },
+        }
     )->register();
 
 Most of the time, corporate web proxies do not allow connections on other
