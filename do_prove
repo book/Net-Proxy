@@ -1,0 +1,6 @@
+#!/bin/sh
+
+./Build
+
+prove -b $* `cat mytests`
+

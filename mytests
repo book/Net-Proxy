@@ -1,0 +1,9 @@
+t/04node.t
+t/05message.t
+t/06component.t
+t/07factory.t
+t/08chain.t
+t/09process.t
+t/09process_only.t
+t/20components.t
+t/21line.t

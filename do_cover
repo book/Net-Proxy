@@ -1,0 +1,12 @@
+#!/bin/sh
+
+cover -delete
+
+./Build
+
+for t in `cat mytests` ; do 
+    perl -MDevel::Cover=-coverage,statement,branch,condition,subroutine,time -Ilib $t
+done
+
+cover -ignore_re '^t/' 
+
