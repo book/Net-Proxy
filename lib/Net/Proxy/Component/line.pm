@@ -39,7 +39,7 @@ Net::Proxy::Component::line - Line buffering component
 
 =head1 DESCRIPTION
 
-C<Net::Proxy::Component::line> is a component that turns a randaom
+C<Net::Proxy::Component::line> is a component that turns a random
 data stream into a stream of lines.
 
 =head1 MESSAGES
