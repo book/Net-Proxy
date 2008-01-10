@@ -1,5 +1,6 @@
 t/04node.t
 t/05message.t
+t/05queue.t
 t/06component.t
 t/07factory.t
 t/08chain.t
