@@ -1,7 +1,6 @@
 use strict;
 use warnings;
 use Test::More;
-use List::Util qw( shuffle );
 use Net::Proxy::MessageQueue;
 
 my @msgs = (
