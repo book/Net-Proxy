@@ -67,7 +67,7 @@ sub ONLY {
 
 package main;
 
-plan tests => 23;
+plan tests => 24;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
