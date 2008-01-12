@@ -26,8 +26,10 @@ sub process {
     # let the mixin class process the messages
     $self->act_on( $messages, $from, $direction );
 
-    # TODO: think of "factory only" messages,
-    # that should not create new component chains
+    # remove all messages reserved to the factories
+    @$messages = grep { ! $_->{factory} } @$messages;
+
+    return unless @$messages;
 
     # create a component
     my $class = ref $self;
@@ -92,7 +94,7 @@ Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2007-2008 Philippe Bruhat (BooK), All Rights Reserved.
  
 =head1 LICENSE
 
