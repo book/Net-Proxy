@@ -59,7 +59,7 @@ sub START {
 
 package main;
 
-plan tests => 24;
+plan tests => 20;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
@@ -75,11 +75,14 @@ $fact1->process( [ Net::Proxy::Message->new('START') ], undef, 'in' );
 $fact1->process( [ Net::Proxy::Message->new('ZLONK') ],
     bless( [], 'Zlonk' ), 'in' );
 
-# a second chain was created
-is( @comps, 6, "six component were created" );
+# a second chain was created...
+# it contains a single component, because the fist component dropped
+# the message after processing it, and it never reached the second
+# factory
+is( @comps, 4, "four component were created" );
 {
     my $i = 0;
-    for my $name ( (qw( comp1 comp2 comp3 )) x 2 ) {
+    for my $name ( (qw( comp1 comp2 comp3 comp1 )) ) {
         is( $comps[$i]{name}, $name, "component $i == $name" );
         $i++;
     }
