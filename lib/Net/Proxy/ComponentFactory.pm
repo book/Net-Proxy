@@ -26,9 +26,13 @@ sub process {
     # let the mixin class process the messages
     $self->act_on( $messages, $from, $direction );
 
-    # remove all messages reserved to the factories
-    @$messages = grep { ! $_->{factory} } @$messages;
+    # pass factory messages directly to the next factory
+    my $next = $self->next($direction);
+    $next->process( [ grep { $_->{factory} } @$messages ], $self, $direction )
+        if blessed $next && $next->isa('Net::Proxy::Node');
 
+    # remove factory messages and abort if none left
+    @$messages = grep { !$_->{factory} } @$messages;
     return unless @$messages;
 
     # create a component
