@@ -27,11 +27,11 @@ sub process {
     $self->act_on( $messages, $from, $direction );
 
     # remove all messages reserved to the factories
-    @$messages = grep { ! $_->{factory} } @$messages;
+    @$messages = grep { ! $_->{factory} } @$messages;
 
     return unless @$messages;
 
-    # create a component
+    # create a component
     my $class = ref $self;
     $class =~ s/^Net::Proxy::ComponentFactory::/Net::Proxy::Component::/;
     my $comp = $class->new($self);

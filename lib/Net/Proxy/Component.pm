@@ -8,7 +8,7 @@ use Net::Proxy::Node;
 our @ISA = qw( Net::Proxy::Node );
 
 #
-# CLASS METHODS
+# CLASS METHODS
 #
 
 sub build_factory_class {
@@ -22,7 +22,7 @@ sub build_factory_class {
     our \@ISA = qw( Net::Proxy::ComponentFactory );
 FACTORY
 
-    #die $@ if $@; # can't happen. Uncomment when changing the above code
+    #die $@ if $@; # can't happen. Uncomment when changing the above code
 
     return;
 }
