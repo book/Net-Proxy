@@ -3,6 +3,8 @@ use warnings;
 use Test::More;
 use Net::Proxy::MessageQueue;
 
+BEGIN { eval 'use Time::HiRes qw( time )' }
+
 my @msgs = (
 
     # [ from, to, mesg, direction ]

@@ -4,7 +4,8 @@ use strict;
 use warnings;
 use Carp;
 
-# TODO use Time::HiRes for fractional recall times
+# if available, transparently use Time::HiRes for fractional recall times
+BEGIN { eval 'use Time::HiRes qw( time )' }
 
 # the two messages queues we manage
 my @Queue;
