@@ -73,8 +73,10 @@ plan tests => 23;
 my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
 my $fact2 = Net::Proxy::ComponentFactory::test->new( { name => 'fact2' } );
 my $fact3 = Net::Proxy::ComponentFactory::test->new( { name => 'fact3' } );
+my $fact4 = Net::Proxy::ComponentFactory::test->new( { name => 'fact4' } );
 
 $fact1->set_next( in => $fact2 )->set_next( in => $fact3 );
+$fact4->set_next( in => bless( [], 'Powie' ) );
 
 # START the factory chain (and create a component chain)
 $fact1->process( [ Net::Proxy::Message->new('START') ], undef, 'in' );
@@ -85,6 +87,8 @@ $fact1->process( [ Net::Proxy::Message->new('ZLONK') ],
 
 # doesn't create any component
 $fact1->process( [ Net::Proxy::Message->new( ONLY => { factory => 1 } ) ],
+    undef, 'in' );
+$fact4->process( [ Net::Proxy::Message->new( ONLY => { factory => 1 } ) ],
     undef, 'in' );
 
 # a second chain was created...
