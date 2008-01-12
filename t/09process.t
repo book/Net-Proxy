@@ -57,9 +57,17 @@ sub START {
     return $message;    # pass it on
 }
 
+sub ONLY {
+    my ( $self, $message, $from, $direction ) = @_;
+    is( $message->{type}, 'ONLY',
+        "$self->{name} got message ONLY ($direction)" );
+    return $message;    # pass it on
+}
+
+
 package main;
 
-plan tests => 20;
+plan tests => 23;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
@@ -68,18 +76,21 @@ my $fact3 = Net::Proxy::ComponentFactory::test->new( { name => 'fact3' } );
 
 $fact1->set_next( in => $fact2 )->set_next( in => $fact3 );
 
-# START the factory chain
+# START the factory chain (and create a component chain)
 $fact1->process( [ Net::Proxy::Message->new('START') ], undef, 'in' );
 
-# processed once
+# processed once (create a chain with a single component)
 $fact1->process( [ Net::Proxy::Message->new('ZLONK') ],
     bless( [], 'Zlonk' ), 'in' );
 
+# doesn't create any component
+$fact1->process( [ Net::Proxy::Message->new( ONLY => { factory => 1 } ) ],
+    undef, 'in' );
+
 # a second chain was created...
 # it contains a single component, because the fist component dropped
-# the message after processing it, and it never reached the second
-# factory
-is( @comps, 4, "four component were created" );
+# the message after processing it, so it never reached the second factory
+is( @comps, 4, "four components were created" );
 {
     my $i = 0;
     for my $name ( (qw( comp1 comp2 comp3 comp1 )) ) {
