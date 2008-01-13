@@ -42,6 +42,11 @@ sub next {
     return;
 }
 
+sub timeout {
+    my $timeout = @Timed ? $Timed[-1][0] - time : 0;
+    return $timeout > 0 ? $timeout : 0;
+}
+
 1;
 
 __END__
@@ -101,7 +106,12 @@ C<at> introduces an absolute date, in seconds since the I<epoch>.
 
 =item next()
 
-Return the next message context 
+Return the next message context.
+
+=item timeout()
+
+Return the time available before the next timed message context
+is ready to be sent.
 
 =back
 
