@@ -24,16 +24,19 @@ my @timed = (
 # times when timed messages will be sent
 my @times = map { time + $_ } 1 .. 3;
 
-plan tests => @msgs + @timed + 5;
+plan tests => @msgs + @timed + 8;
 
 # empty queue
 is_deeply( [ Net::Proxy::MessageQueue->next() ],
     [], 'next() in list context' );
 is( Net::Proxy::MessageQueue->next(), undef, 'next() in scalar context' );
+is( Net::Proxy::MessageQueue->timeout, 0, 'Timeout == 0' );
 
 # add the messages
 Net::Proxy::MessageQueue->queue($_)  for @msgs;
 Net::Proxy::MessageQueue->timed(@$_) for @timed;
+cmp_ok( Net::Proxy::MessageQueue->timeout, '>', 0, 'Timeout >  0' );
+cmp_ok( Net::Proxy::MessageQueue->timeout, '<=', 1, 'Timeout <= 1' );
 
 # bad call to timed()
 eval { Net::Proxy::MessageQueue->timed( [], le => 1 ) };
