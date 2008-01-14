@@ -28,22 +28,15 @@ sub set_next {
 }
 
 sub act_on {
-    my ( $self, $messages, $from, $direction ) = @_;
+    my ( $self, $message, $from, $direction ) = @_;
 
     # skip actions if the chain is unidirectional
-    return $messages if $self->{only} && $self->{only} ne $direction;
+    return $message if $self->{only} && $self->{only} ne $direction;
 
-    push @$messages, undef;    # sentinel
-    while ( my $message = shift @$messages ) {
-
-        my $action = $message->type();
-        push @$messages, $self->can($action)
-            ? $self->$action( $message, $from, $direction )    # process msg
-            : $message;                                        # just keep it
-
-    }
-
-    return $messages;
+    my $action = $message->type();
+    return $self->can($action)
+        ? $self->$action( $message, $from, $direction )    # process msg
+        : $message;                                        # just keep it
 }
 
 1;
@@ -95,12 +88,10 @@ the chain, or if there is no chain in that direction.
 Note that the last object in a chain may not be a C<Net::Proxy::Node>
 object. It must, however, be a blessed object.
 
-=item act_on( $messages, $from, $direction )
+=item act_on( $message, $from, $direction )
 
-Process a message list and return an updated version of it.
-
-Each message is processed by the appropriate method (if any).
-The message list may be modified (messages tranformed, removed, added).
+Process a message and return zero or more messages, to be forwarded
+to the next element in the chain..
 
 =back
 
@@ -110,7 +101,7 @@ Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2007-2008 Philippe Bruhat (BooK), All Rights Reserved.
  
 =head1 LICENSE
 
