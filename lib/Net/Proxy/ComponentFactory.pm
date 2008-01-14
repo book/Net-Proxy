@@ -21,19 +21,19 @@ sub new {
 # INSTANCE METHODS
 #
 sub process {
-    my ( $self, $messages, $from, $direction ) = @_;
+    my ( $self, $message, $from, $direction ) = @_;
 
     # let the mixin class process the messages
-    $self->act_on( $messages, $from, $direction );
+    my @messages = $self->act_on( $message, $from, $direction );
 
-    # pass factory messages directly to the next factory
-    my $next = $self->next($direction);
-    $next->process( [ grep { $_->{factory} } @$messages ], $self, $direction )
-        if blessed $next && $next->isa('Net::Proxy::Node');
+    # forward factory messages directly to the next factory
+    if( my $next = $self->next($direction) ) {
+        $self->send_to( $next => $direction, grep { $_->{factory} } @messages );
+    }
 
     # remove factory messages and abort if none left
-    @$messages = grep { !$_->{factory} } @$messages;
-    return unless @$messages;
+    @messages = grep { !$_->{factory} } @messages;
+    return unless @messages;
 
     # create a component
     my $class = ref $self;
@@ -45,8 +45,8 @@ sub process {
         if blessed $from && $from->isa('Net::Proxy::Node');
     $comp->set_next( $direction => $self->next($direction) );
 
-    # pass the message on to the new component instance
-    $comp->process( $messages, $self, $direction );
+    # forward the message to the new component instance
+    $self->send_to( $comp => $direction, @messages );
 
     return;
 }
