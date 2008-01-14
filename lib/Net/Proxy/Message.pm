@@ -74,15 +74,15 @@ message:
 
 =over 4
 
-=item _at_ => $time
-
-Require the message to be delivered B<at> the given time or after.
-The time is given in seconds (possibly fractional) since the I<epoch>.
-
 =item _in_ => $delay
 
 Require the message to be delivered B<in> the given delay or after.
 The delay is given in seconds (possibly fractional).
+
+=item _at_ => $time
+
+Require the message to be delivered B<at> the given time or after.
+The time is given in seconds (possibly fractional) since the I<epoch>.
 
 =back
 

@@ -116,6 +116,8 @@ C<_at_> introduces an absolute date, in seconds since the I<epoch>.
 
 These key/value pairs are removed from the message.
 
+If both keys are present, C<_in_> takes precedence.
+
 =item next()
 
 Return the next message context.
