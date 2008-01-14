@@ -54,6 +54,11 @@ The C<Net::Proxy::Message> supports the following methods:
 This method creates a new C<Net::Proxy::Message> object of type C<$type>.
 A message is simply a blessed hash containing a copy of the given arguments.
 
+The signification of the key/value pairs depends on the message.
+
+Special keys that have a global meaning for C<Net::Proxy> or
+C<Net::Proxy::MessageQueue> are enclosed between underscores (C<_>).
+
 =item type()
 
 Return the message type.
@@ -61,6 +66,27 @@ Return the message type.
 =back
 
 =head1 MESSAGES
+
+=head2 Special keys
+
+The class C<Net::Proxy::MessageQueue> recognize two special keys in a
+message:
+
+=over 4
+
+=item _at_ => $time
+
+Require the message to be delivered B<at> the given time or after.
+The time is given in seconds (possibly fractional) since the I<epoch>.
+
+=item _in_ => $delay
+
+Require the message to be delivered B<in> the given delay or after.
+The delay is given in seconds (possibly fractional).
+
+=back
+
+These keys are removed from the message when it is added to the queue.
 
 =head2 Reserved names
 
