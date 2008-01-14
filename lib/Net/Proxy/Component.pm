@@ -38,15 +38,15 @@ sub new {
 # INSTANCE METHODS
 #
 sub process {
-    my ( $self, $messages, $from, $direction ) = @_;
+    my ( $self, $message, $from, $direction ) = @_;
 
     # let the mixin class process the messages
-    $self->act_on( $messages, $from, $direction );
+    my @messages = $self->act_on( $message, $from, $direction );
 
-    # pass the message on to the next node
-    my $next = $self->next($direction);
-    $next->process( $messages, $self, $direction )
-        if blessed $next && $next->isa('Net::Proxy::Node');
+    # forward the messages to the next node
+    if( my $next = $self->next($direction) ) {
+        $self->send_to( $next => $direction, @messages );
+    }
 
     return;
 }
@@ -84,9 +84,9 @@ content of the C<$args> hashref.
 
 =item process( $messages, $from, $direction )
 
-The default processing for a message stack. The message are processed
-by the appropriate method (if any) and then the udpated stack is passed
-on to the rest of the chain, in the given C<$direction>.
+The default processing for a message. The message is processed
+by the appropriate method (if any) and the resulting messages are
+forwarded to the rest of the chain, in the given C<$direction>.
 
 =back
 
@@ -96,7 +96,7 @@ Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2007 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2007-2008 Philippe Bruhat (BooK), All Rights Reserved.
  
 =head1 LICENSE
 
