@@ -4,6 +4,8 @@ use strict;
 use warnings;
 use Scalar::Util qw( blessed );
 
+use Net::Proxy::MessageQueue;
+
 sub next {
     my ( $self, $direction ) = @_;
     return $self->{"_next_$direction"};
@@ -37,6 +39,12 @@ sub act_on {
     return $self->can($action)
         ? $self->$action( $message, $from, $direction )    # process msg
         : $message;                                        # just keep it
+}
+
+sub send_to {
+    my ( $self, $to, $direction, @messages ) = @_;
+    Net::Proxy::MessageQueue->queue( map { [ $self, $to, $direction, $_ ] }
+            @messages );
 }
 
 1;
@@ -91,7 +99,12 @@ object. It must, however, be a blessed object.
 =item act_on( $message, $from, $direction )
 
 Process a message and return zero or more messages, to be forwarded
-to the next element in the chain..
+to the next element in the chain (according to the direction).
+
+=item send_to( $target, $direction, @messages )
+
+Send the given messages to the target in the given direction. Messages
+are actually added to the C<Net::Proxy::MessageQueue>.
 
 =back
 
