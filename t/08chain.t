@@ -31,23 +31,29 @@ sub ZLONK {
     my ( $self, $message, $from, $direction ) = @_;
     is( $message->{type}, 'ZLONK',
         "$self->{name} got message ZLONK ($direction)" );
-    return; # stop now
+    return;             # stop now
 }
 
 package main;
 
-plan tests => 5;
+plan tests => 6;
 
 # build a chain of factories
 my $fact1 = Net::Proxy::ComponentFactory::test->new( { name => 'fact1' } );
-my $fact2 = Net::Proxy::ComponentFactory::test->new( );
+my $fact2 = Net::Proxy::ComponentFactory::test->new();
 
 $fact1->set_next( in => $fact2 )->set_next( in => { bam => 'kapow' } );
 
 # START the factory chain
-$fact1->process( [ Net::Proxy::Message->new( 'START' ) ],
-   undef, 'in' );
+$fact1->process( Net::Proxy::Message->new('START'), undef, 'in' );
 
-$fact1->process( [ Net::Proxy::Message->new( 'ZLONK' ) ],
-    undef, 'in' );
+$fact1->process( Net::Proxy::Message->new('ZLONK'), undef, 'in' );
+
+# there is one message (START) waiting in the queue
+my @msgs;
+push @msgs, $_ while $_ = Net::Proxy::MessageQueue->next;
+is( @msgs, 1, '1 context left in the queue' );
+
+# $ctx = [ $from, $to, $direction, $message ]
+is( $msgs[0][3]->type, 'START', 'It contains a START message' );
 
