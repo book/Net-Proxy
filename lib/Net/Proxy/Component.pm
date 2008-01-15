@@ -22,7 +22,7 @@ sub build_factory_class {
     our \@ISA = qw( Net::Proxy::ComponentFactory );
 FACTORY
 
-    #die $@ if $@; # can't happen. Uncomment when changing the above code
+    die $@ if $@;    # usually dies when use Net::Proxy::ComponentFactory does
 
     return;
 }
