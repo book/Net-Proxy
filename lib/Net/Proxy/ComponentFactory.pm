@@ -44,8 +44,11 @@ sub process {
     my $comp = $class->new($self);
 
     # link the component to the rest of the chain
-    $from->set_next( $direction => $comp )
-        if blessed $from && $from->isa('Net::Proxy::Node');
+    if ( blessed $from && $from->isa('Net::Proxy::Node') ) {
+        my $reverse = $self->opposite($direction);
+        $from->set_next( $direction => $comp );
+        $comp->set_next( $reverse   => $from );
+    }
     $comp->set_next( $direction => $self->next($direction) );
 
     # forward the message to the new component instance
