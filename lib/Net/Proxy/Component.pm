@@ -44,7 +44,7 @@ sub process {
     my @messages = $self->act_on( $message, $from, $direction );
 
     # forward the messages to the next node
-    if( my $next = $self->next($direction) ) {
+    if ( my $next = $self->next($direction) ) {
         $self->send_to( $next => $direction, @messages );
     }
 

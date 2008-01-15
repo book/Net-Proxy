@@ -27,8 +27,11 @@ sub process {
     my @messages = $self->act_on( $message, $from, $direction );
 
     # forward factory messages directly to the next factory
-    if( my $next = $self->next($direction) ) {
-        $self->send_to( $next => $direction, grep { $_->{factory} } @messages );
+    if ( my $next = $self->next($direction) ) {
+        $self->send_to(
+            $next => $direction,
+            grep { $_->{factory} } @messages
+        );
     }
 
     # remove factory messages and abort if none left
