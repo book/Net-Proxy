@@ -3,7 +3,7 @@ use warnings;
 use Test::More;
 use Net::Proxy::Node;
 
-plan tests => 96;
+plan tests => 99;
 
 my $a = bless {}, 'Net::Proxy::Node';
 my $b = bless {}, 'Net::Proxy::Node';
@@ -142,3 +142,9 @@ is( $c->last('out'), $a,    'c -> * (out)' );          # not a bug
 is( $d->last('in'),  $h,    'd -> h (in)' );
 is( $d->last('out'), $a,    'd -> * (out)' );
 
+# test the opposite method
+is( $a->opposite( 'in' ), 'out', 'in => out' );
+is( $a->opposite( 'out' ), 'in', 'out => in' );
+
+eval { $a->opposite( 'zlonk' ) };
+like( $@, qr/^Unknown direction <zlonk>/, 'Unknown direction <zlonk>' );
