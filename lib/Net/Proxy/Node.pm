@@ -2,6 +2,7 @@ package Net::Proxy::Node;
 
 use strict;
 use warnings;
+use Carp;
 use Scalar::Util qw( blessed );
 
 use Net::Proxy::MessageQueue;
@@ -22,6 +23,13 @@ sub last {
         && $next->isa('Net::Proxy::Node')
         && $next->next($direction);
     return $last;
+}
+
+sub opposite {
+    my ( $self, $direction ) = @_;
+    return $direction eq 'in'  ? 'out' 
+        : $direction  eq 'out' ? 'in'
+        :                        croak "Unknown direction <$direction>";
 }
 
 sub set_next {
