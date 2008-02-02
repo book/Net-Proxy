@@ -54,7 +54,7 @@ sub next {
 
 sub timeout {
     my $timeout = @Timed ? $Timed[-1][0] - time : 0;
-    return $timeout > 0 ? $timeout : 0;
+    return $timeout > 0 ? $timeout : ();
 }
 
 1;
