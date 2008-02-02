@@ -18,7 +18,7 @@ sub queue {
     for my $ctx (@msg_ctx) {
 
         # compute the expiration date of the message
-        my ( $in, $at ) = delete @{$ctx->[3]}{qw( _in_ _at_ )};
+        my ( $in, $at ) = delete @{ $ctx->[3] }{qw( _in_ _at_ )};
         my $expires
             = $in ? time + $in
             : $at ? $at
@@ -30,6 +30,7 @@ sub queue {
             $i++ while @Timed > $i && $Timed[$i][0] > $expires;
             splice @Timed, $i, 0, [ $expires, $ctx ];
         }
+
         # normal message
         else {
             unshift @Queue, $ctx;
