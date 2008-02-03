@@ -57,6 +57,9 @@ sub CAN_READ {
 
     # connection closed
     if ( $close || $read == 0 ) {
+        $self->{sock}->close;
+        Net::Proxy->remove_reader_sockets( $self->{sock} );
+        delete $self->{sock};
         return Net::Proxy::Message->new( 'CONNECTION_CLOSED' );
     }
 
@@ -125,6 +128,16 @@ sub START_CONNECTION {
         $self->opposite($direction)
     );
     Net::Proxy->watch_reader_sockets( $self->{sock} );
+
+    return;
+}
+
+sub CONNECTION_CLOSED {
+    my ( $self, $message, $from, $direction ) = @_;
+
+    $self->{sock}->close;
+    Net::Proxy->remove_reader_sockets( $self->{sock} );
+    delete $self->{sock};
 
     return;
 }
