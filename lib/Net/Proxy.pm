@@ -6,24 +6,22 @@ use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 use POSIX 'strftime';
 
-our $VERSION = '0.10';
+our $VERSION = '0.20';
 
-# interal socket information table
-my %SOCK_INFO;
-my %LISTENER;
+use Net::Proxy::Message;
+use Net::Proxy::MessageQueue;
+
+# internal socket information table
+my %OWNER_OF;
 my %CLOSING;
-my $READERS;
-my $WRITERS;
+my $READERS = IO::Select->new();
+my $WRITERS = IO::Select->new();
+my $SOCKETS = IO::Select->new();
 my %PROXY;
 my %STATS;
 
 # Net::Proxy attributes
-my %CONNECTOR = (
-    in  => {},
-    out => {},
-);
 my $VERBOSITY = 0; # be silent by default
-my $BUFFSIZE  = 16384;
 
 #
 # some logging-related methods
@@ -72,8 +70,6 @@ sub new {
 
         # create and store the Connector object
         $args->{$conn}{_proxy_} = $self;
-        $CONNECTOR{$conn}{ refaddr $self} = $class->new( $args->{$conn} );
-        $CONNECTOR{$conn}{ refaddr $self}->set_proxy($self);
     }
 
     return $self;
@@ -82,29 +78,15 @@ sub new {
 sub register { $PROXY{ refaddr $_[0] } = $_[0]; }
 sub unregister { delete $PROXY{ refaddr $_[0] }; }
 
-#
-# The Net::Proxy attributes
-#
-sub in_connector  { return $CONNECTOR{in}{ refaddr $_[0] }; }
-sub out_connector { return $CONNECTOR{out}{ refaddr $_[0] }; }
+sub set_compdir_for {
+    my ( $class, $sock, $comp, $direction ) = @_;
+    $OWNER_OF{ refaddr $sock } = [ $comp, $direction ];
+    $SOCKETS->add( $sock );
+}
 
-#
-# create the socket setter/getter methods
-# these are actually Net::Proxy clas methods
-#
-BEGIN {
-    my $n = 0;
-    my $buffer_id;
-    for my $attr (qw( peer connector state nick buffer callback )) {
-        no strict 'refs';
-        my $i = $n;
-        *{"get_$attr"} = sub { $SOCK_INFO{ refaddr $_[1] }[$i]; };
-        *{"set_$attr"} = sub { $SOCK_INFO{ refaddr $_[1] }[$i] = $_[2]; };
-        $buffer_id = $n if $attr eq 'buffer';
-        $n++;
-    }
-    # special shortcut
-    sub add_to_buffer { $SOCK_INFO{ refaddr $_[1] }[$buffer_id] .= $_[2]; }
+sub get_compdir_for {
+    my ( $class, $sock ) = @_;
+    return @{ $OWNER_OF{ refaddr $sock } || [] };
 }
 
 #
@@ -123,15 +105,6 @@ for my $info (qw( opened closed )) {
 #
 # socket-related methods
 #
-sub add_listeners {
-    my ( $class, @socks ) = @_;
-    for my $sock (@socks) {
-        Net::Proxy->notice( 'Add ' . Net::Proxy->get_nick($sock) );
-        $LISTENER{ refaddr $sock} = $sock;
-    }
-    return;
-}
-
 sub close_sockets {
     my ( $class, @socks ) = @_;
 
@@ -181,6 +154,12 @@ sub watch_reader_sockets {
     return;
 }
 
+sub remove_reader_sockets {
+    my ( $class, @socks ) = @_;
+    $READERS->remove(@socks);
+    return;
+}
+
 sub watch_writer_sockets {
     my ( $class, @socks ) = @_;
     $WRITERS->add(@socks);
@@ -194,32 +173,16 @@ sub remove_writer_sockets {
 }
 
 #
-# destructor
-#
-sub DESTROY {
-    my ($self) = @_;
-    delete $CONNECTOR{in}{ refaddr $self};
-    delete $CONNECTOR{out}{ refaddr $self};
-}
-
-#
 # the mainloop itself
 #
 sub mainloop {
     my ( $class, $max_connections ) = @_;
     $max_connections ||= 0;
 
-    # initialise the loop
-    $READERS = IO::Select->new();
-    $WRITERS = IO::Select->new();
-
     # initialise all proxies
-    for my $proxy ( values %PROXY ) {
-        my $in    = $proxy->in_connector();
-        my @socks = $in->listen();
-        Net::Proxy->add_listeners(@socks);
-        Net::Proxy->watch_reader_sockets(@socks);
-        Net::Proxy->set_connector( $_, $in ) for @socks;
+    for my $chain ( values %PROXY ) {
+        Net::Proxy::MessageQueue->queue( [ undef, $chain, 'in',
+            Net::Proxy::Message->new( 'START_PROXY' => { factory => 1 } ) ] );
     }
 
     my $continue = 1;
@@ -227,65 +190,42 @@ sub mainloop {
         $SIG{$signal} = sub {
             Net::Proxy->notice("Caught $signal signal");
             $continue = 0;
+            exit; # FIXME 
         };
     }
 
     # loop indefinitely
-    while ( $continue and my @ready = IO::Select->select( $READERS, $WRITERS ) ) {
+    while (1) {
 
-        ## Net::Proxy->debug( 0+@{$ready[0]} . " sockets ready for reading" );
-        ## Net::Proxy->debug( join "\n  ", "Readers:", map { Net::Proxy->get_nick($_) } $READERS->handles() );
-        ## Net::Proxy->debug( 0+@{$ready[1]} . " sockets ready for writing" );
-        ## Net::Proxy->debug( join "\n  ", "Writers:", map { Net::Proxy->get_nick($_) } $WRITERS->handles() );
+        # process all available messages
+        while ( my $msg_ctx = Net::Proxy::MessageQueue->next() ) {
+            my ( $from, $to, $direction, $message ) = @$msg_ctx;
+            $to->process( $message, $from, $direction );
+        }
 
-        # first read
-    READER:
-        for my $sock (@{$ready[0]}) {
-            if ( _is_listener($sock) ) {
+        # get the $timeout from the message queue information
+        # (it's the time remaining until the next timed message)
+        # only timed messages should remain in the queue
+        my @msgs = qw( CAN_READ CAN_WRITE HAS_EXCEPTION );
+        my %can;
+        @can{@msgs} = IO::Select->select( $READERS, $WRITERS, $SOCKETS,
+            Net::Proxy::MessageQueue->timeout() );
 
-                # accept the new connection and connect to the destination
-                Net::Proxy->get_connector($sock)->new_connection_on($sock);
-            }
-            else {
-
-                # have we read too much?
-                my $peer = Net::Proxy->get_peer($sock);
-                next READER
-                    if !$peer
-                    || length( Net::Proxy->get_buffer($peer) ) >= $BUFFSIZE;
-
-                # read the data
-                if ( my $conn = Net::Proxy->get_connector($sock) ) {
-                    my $data = $conn->read_from($sock);
-                    next READER if !defined $data;
-
-                    if ($peer) {
-
-                        # run the hook on incoming data
-                        my $callback = Net::Proxy->get_callback( $sock );
-                        $callback->( \$data, $sock, $conn )
-                            if $callback && defined $data;
-
-                        Net::Proxy->add_to_buffer( $peer, $data );
-                        Net::Proxy->watch_writer_sockets($peer);
-
-                        ## Net::Proxy->debug( "Will write " . length( Net::Proxy->get_buffer($peer)). " bytes to " .  Net::Proxy->get_nick( $peer ));
-                    }
-                }
+        # send CAN_READ, CAN_WRITE and HAS_EXCEPTION messages
+        # to the owners of the sockets that are ready
+        for my $msg (@msgs) {
+            for my $sock ( @{ $can{$msg} } ) {
+                print ">>> sock $sock $msg\n";
+                my ( $node, $direction ) = Net::Proxy->get_compdir_for($sock);
+                Net::Proxy::MessageQueue->queue(
+                    [   $sock,      $node,
+                        $direction, Net::Proxy::Message->new($msg)
+                    ]
+                );
             }
         }
 
-        # then write
-        for my $sock (@{$ready[1]}) {
-            my $conn = Net::Proxy->get_connector($sock);
-            $conn->write_to($sock);
-        }
-
-    }
-    continue {
-        if( %CLOSING ) {
-            Net::Proxy->close_sockets( values %CLOSING );
-        }
+        # in case we have a limit on incoming connections
         if( $max_connections ) {
 
             # stop after that many connections
@@ -301,14 +241,9 @@ sub mainloop {
     }
 
     # close all remaining sockets
-    Net::Proxy->close_sockets( $READERS->handles(), $WRITERS->handles() );
+    Net::Proxy->close_sockets( $SOCKETS->handles() );
 }
-
-#
-# helper private FUNCTIONS
-#
-sub _is_listener { return exists $LISTENER{ refaddr $_[0] }; }
-
+ 
 1;
 
 __END__
