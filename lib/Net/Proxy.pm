@@ -19,6 +19,7 @@ my $WRITERS = IO::Select->new();
 my $SOCKETS = IO::Select->new();
 my %PROXY;
 my %STATS;
+my %LISTENER;
 
 # Net::Proxy attributes
 my $VERBOSITY = 0; # be silent by default
@@ -132,7 +133,6 @@ sub close_sockets {
         }
 
         # clean up internal structures
-        delete $SOCK_INFO{ refaddr $sock};
         delete $LISTENER{ refaddr $sock};
         delete $CLOSING{ refaddr $sock};
 
@@ -215,7 +215,6 @@ sub mainloop {
         # to the owners of the sockets that are ready
         for my $msg (@msgs) {
             for my $sock ( @{ $can{$msg} } ) {
-                print ">>> sock $sock $msg\n";
                 my ( $node, $direction ) = Net::Proxy->get_compdir_for($sock);
                 Net::Proxy::MessageQueue->queue(
                     [   $sock,      $node,
