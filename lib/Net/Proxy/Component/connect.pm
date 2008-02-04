@@ -1,11 +1,41 @@
-package Net::Proxy::Connector::connect;
 use strict;
 use warnings;
-use Carp;
+
+package Net::Proxy::Component::connect;
+use Net::Proxy::Component;
+our @ISA = qw( Net::Proxy::Component );
+__PACKAGE__->build_factory_class();
+
 use LWP::UserAgent;
 
-use Net::Proxy::Connector;
-our @ISA = qw( Net::Proxy::Connector );
+sub START_CONNECTION {
+    my ( $self, $message, $from, $direction ) = @_;
+
+    # connect to the proxy
+    my $req = HTTP::Request->new(
+        CONNECT => "http://$self->{host}:$self->{port}/" );
+    my $res = $self->{agent}->request($req);
+
+    # authentication failed
+    # FIXME - send a message back
+    die $res->status_line() if !$res->is_success();
+
+    # the socket connected to the proxy
+    $self->{sock} = $res->{client_socket};
+
+    # now turn into a classic tcp component
+    bless $self, 'Net::Proxy::Component::tcp';
+    Net::Proxy->set_compdir_for(
+        $self->{sock} => $self,
+        $self->opposite($direction)
+    );
+    Net::Proxy->watch_reader_sockets( $self->{sock} );
+
+    return;
+}
+
+package Net::Proxy::ComponentFactory::connect;
+use Carp;
 
 sub init {
     my ($self) = @_;
@@ -42,51 +72,28 @@ sub init {
     return $self;
 }
 
-# IN
-
-# OUT
-sub connect {
-    my ($self) = (@_);
-
-    # connect to the proxy
-    my $req = HTTP::Request->new(
-        CONNECT => "http://$self->{host}:$self->{port}/" );
-    my $res = $self->{agent}->request($req);
-
-    # authentication failed
-    die $res->status_line() if !$res->is_success();
-
-    # the socket connected to the proxy
-    return $res->{client_socket};
-}
-
-# READ
-*read_from = \&Net::Proxy::Connector::raw_read_from;
-
-# WRITE
-*write_to = \&Net::Proxy::Connector::raw_write_to;
-
 1;
 
 __END__
 
 =head1 NAME
 
-Net::Proxy::Connector::connect - Create CONNECT tunnels through HTTP proxies
+Net::Proxy::Component::connect - Create CONNECT tunnels through HTTP proxies
 
 =head1 SYNOPSIS
 
-    # sample proxy using Net::Proxy::Connector::tcp
-    #                and Net::Proxy::Connector::connect
+    # sample proxy using Net::Proxy::Component::tcp
+    #                and Net::Proxy::Component::connect
     use Net::Proxy;
 
     # listen on localhost:6789
     # and proxy to remotehost:9876 through proxy.company.com:8080
     # using the given credentials
-    my $proxy = Net::Proxy->new(
-        in  => { type => 'tcp', port => '6789' },
-        out => {
-            type        => 'connect',
+    my $chain = Net::Proxy->chain(
+        {   type => 'tcp',
+            port => '6789'
+        },
+        {   type        => 'connect',
             host        => 'remotehost',
             port        => '9876',
             proxy_host  => 'proxy.company.com',
@@ -96,13 +103,13 @@ Net::Proxy::Connector::connect - Create CONNECT tunnels through HTTP proxies
             proxy_agent => 'Mozilla/4.04 (X11; I; SunOS 5.4 sun4m)',
         },
     );
-    $proxy->register();
+    $chain->register();
 
     Net::Proxy->mainloop();
 
 =head1 DESCRIPTION
 
-C<Net::Proxy::Connecter::connect> is a C<Net::Proxy::Connector> that
+C<Net::Proxy::Connecter::connect> is a C<Net::Proxy::Component> that
 uses the HTTP CONNECT method to ask the proxy to create a tunnel to
 an outside server.
 
@@ -112,11 +119,9 @@ set of outside hosts).
 
 This connector is only an "out" connector.
 
-=head1 CONNECTOR OPTIONS
+=head1 COMPONENT OPTIONS
 
-C<Net::Proxy::Connector::connect> accepts the following options:
-
-=head1 C<out>
+C<Net::Proxy::Component::connect> accepts the following options:
 
 =over 4
 
@@ -160,7 +165,7 @@ All the authentication schemes supported by C<LWP::UserAgent> should be
 supported (we use an C<LWP::UserAgent> internally to contact the proxy).
 
 This means we should also support NTLM, since it is supported as from
-C<libwww-perl> 5.66. C<Net::Proxy::Connector::connect> has not been
+C<libwww-perl> 5.66. C<Net::Proxy::Component::connect> has not been
 actually tested with NTLM, though. Any report of success or failure
 with a NTLM proxy will be appreciated.
 
@@ -175,7 +180,7 @@ this distribution.
 
 =head1 COPYRIGHT
 
-Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2008 Philippe 'BooK' Bruhat, All Rights Reserved.
 
 =head1 LICENSE
 
