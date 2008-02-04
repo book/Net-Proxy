@@ -229,7 +229,7 @@ Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2008 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2008 Philippe 'BooK' Bruhat, All Rights Reserved.
 
 =head1 LICENSE
 
