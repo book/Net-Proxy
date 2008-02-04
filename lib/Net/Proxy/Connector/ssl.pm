@@ -32,6 +32,11 @@ sub listen {
             Proto     => 'tcp',
             map { $_ => $self->{$_} } grep { /^SSL_/ } keys %$self
         );
+
+        # this exception is not catched by Net::Proxy
+        die "Can't listen on $self->{host} port $self->{port}: "
+            . IO::Socket::SSL::errstr()
+            unless $sock;
     }
 
     # or as a standard TCP socket, which may be upgraded later
@@ -42,10 +47,11 @@ sub listen {
             LocalPort => $self->{port},
             Proto     => 'tcp',
         );
-    }
 
-    # this exception is not catched by Net::Proxy
-    die "Can't listen on $self->{host} port $self->{port}: $!" unless $sock;
+        # this exception is not catched by Net::Proxy
+        die "Can't listen on $self->{host} port $self->{port}: $!"
+            unless $sock;
+    }
 
     # remember the class of the socket
     $IS_SSL{ refaddr $sock } = !$self->{start_cleartext};
@@ -60,7 +66,21 @@ sub listen {
     return $sock;
 }
 
-*accept_from = \&Net::Proxy::Connector::raw_accept_from;
+sub accept_from {
+    my ($self, $listen) = @_;
+    my $sock = $listen->accept();
+    die IO::Socket::SSL::errstr() if ! $sock;
+
+    Net::Proxy->set_nick( $sock,
+              $sock->peerhost() . ':'
+            . $sock->peerport() . ' -> '
+            . $sock->sockhost() . ':'
+            . $sock->sockport() );
+    Net::Proxy->notice( 'Accepted ' . Net::Proxy->get_nick( $sock ) );
+
+    return $sock;
+}
+
 
 # OUT
 sub connect {

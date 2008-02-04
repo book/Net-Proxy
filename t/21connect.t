@@ -2,13 +2,19 @@ use strict;
 use warnings;
 use Test::More;
 use Net::Proxy::Connector;
+
+BEGIN {
+    eval { require LWP::UserAgent; };
+    plan skip_all => 'LWP::UserAgent not available' if $@;
+}
+
 use Net::Proxy::Connector::connect;
 
-eval { require LWP::UserAgent; };
-plan skip_all => 'LWP::UserAgent not available' if $@;
 plan tests => 13;
 
-delete $ENV{HTTP_PROXY};
+# delete all proxy keys from the environment
+delete $ENV{$_} for grep { /_proxy$/i } keys %ENV;
+
 my $c;
 my $args = {};
 

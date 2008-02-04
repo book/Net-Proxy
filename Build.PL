@@ -1,3 +1,4 @@
+require 5.006;
 use Module::Build;
 my $build = Module::Build->new(
     module_name => 'Net::Proxy',
@@ -8,7 +9,7 @@ my $build = Module::Build->new(
         'IO::Select'   => 0,
         'IO::Socket'   => 0,
     },
-    recommends         => { 'LWP::UserAgent' => 2, },
+    recommends         => { 'LWP::UserAgent' => 2, 'IO::Socket::SSL' => 1 },
     script_files       => [ glob 'script/*' ],
     add_to_cleanup     => ['Net-Proxy-*'],
 );

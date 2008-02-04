@@ -45,6 +45,27 @@ sub listen_on_port {
     );
 }
 
+# fork a proxy with the given args
+sub fork_proxy {
+    my ( $args, $count ) = @_;
+
+    my $pid = fork;
+    return if !defined $pid;
+
+    if ( $pid == 0 ) {
+
+        # the child process runs the proxy
+        my $proxy = Net::Proxy->new($args);
+        $proxy->register();
+
+        Net::Proxy->set_verbosity( $ENV{NET_PROXY_VERBOSITY} || 0 );
+        Net::Proxy->mainloop( $count                         || 1 );
+        exit;
+    }
+
+    return $pid;
+}
+
 # compute a seed and show it
 use POSIX qw( INT_MAX );
 
@@ -60,14 +81,18 @@ sub random_swap {
     return rand > 0.5 ? ( $first, $second ) : ( $second, $first );
 }
 
-# skip but fail
-# extends Test::More
+#
+# Testing functions
+#
 use Test::Builder;
+my $Tester = Test::Builder->new();
+
+# skip but fail
 sub skip_fail {
     my ($why, $how_many) = @_;
-    my $Test = Test::Builder->new();
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
     for( 1 .. $how_many ) {
-        $Test->ok( 0, $why );
+        $Tester->ok( 0, $why );
     }
     no warnings;
     last SKIP;
@@ -77,13 +102,15 @@ use IO::Select;
 use Test::More;
 sub is_closed {
     my ($sock, $name) = @_;
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+
     $name ||= "$sock";
     my $select = IO::Select->new( $sock );
     my @read   =  $select->can_read();
     if( @read ) {
         my $buf;
         my $read = $read[0]->sysread( $buf, 4096 );
-        is( $read, 0, "$name closed" );
+        $Tester->is_eq( $read, 0, "$name closed" );
     }
 }
 

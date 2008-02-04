@@ -21,90 +21,75 @@ SKIP: {
     skip 'Not enough available ports', $tests if @free < 3;
 
     my ( $proxy_port, $ssl_port, $ssh_port ) = @free;
-    my $pid = fork;
-
-SKIP: {
-
-        skip "fork failed", $tests if !defined $pid;
-        if ( $pid == 0 ) {
-
-            # the child process runs the proxy
-            my $proxy = Net::Proxy->new(
-                {   in => {
-                        type         => 'dual',
-                        port         => $proxy_port,
-                        timeout      => 0.5,
-                        server_first => {
-                            type => 'tcp',
-                            port => $ssh_port,
-                        },
-                        client_first => {
-                            type => 'tcp',
-                            port => $ssl_port,
-                        }
-                    },
-                    out => { type => 'dummy' },
+    my $pid = fork_proxy(
+        {   in => {
+                type         => 'dual',
+                port         => $proxy_port,
+                timeout      => 0.5,
+                server_first => {
+                    type => 'tcp',
+                    port => $ssh_port,
+                },
+                client_first => {
+                    type => 'tcp',
+                    port => $ssl_port,
                 }
-            );
+            },
+            out => { type => 'dummy' },
+        },
+        2
+    );
 
-            $proxy->register();
+    skip "fork failed", $tests if !defined $pid;
 
-            Net::Proxy->set_verbosity( $ENV{NET_PROXY_VERBOSITY} || 0 );
-            Net::Proxy->mainloop(2);
-            exit;
-        }
-        else {
+    # wait for the proxy to set up
+    sleep 1;
 
-            # wait for the proxy to set up
-            sleep 1;
+    # the parent process does the testing
+    my $ssh_listener = listen_on_port($ssh_port)
+        or skip "Couldn't start the ssh server: $!", $tests;
+    my $ssl_listener = listen_on_port($ssl_port)
+        or skip "Couldn't start the ssl server: $!", $tests;
+    my ( $client, $server );
 
-            # the parent process does the testing
-            my $ssh_listener = listen_on_port($ssh_port)
-                or skip "Couldn't start the ssh server: $!", $tests;
-            my $ssl_listener = listen_on_port($ssl_port)
-                or skip "Couldn't start the ssl server: $!", $tests;
-            my ( $client, $server );
+    # try 'ssh'
+    $client = connect_to_port($proxy_port)
+        or skip_fail "Couldn't start the client: $!", $tests;
+    sleep 1;    # wait for the timeout
+    $server = $ssh_listener->accept()
+        or skip_fail "Proxy didn't connect: $!", $tests;
 
-            # try 'ssh'
-            $client = connect_to_port($proxy_port)
-                or skip_fail "Couldn't start the client: $!", $tests;
-            sleep 1;    # wait for the timeout
-            $server = $ssh_listener->accept()
-                or skip_fail "Proxy didn't connect: $!", $tests;
-
-            # transmit data
-            for my $line (@lines) {
-                print $server $line;    # real server speaks first
-                is( <$client>, $line, "SSH line received" );
-                ( $client, $server ) = random_swap( $client, $server );
-            }
-
-            # close connections
-            $server->close();
-            is_closed( $client, 'peer' );
-            $client->close();
-
-            # try ssl
-            $client = connect_to_port($proxy_port)
-                or skip_fail "Couldn't start the client: $!", $tests;
-            print $client $lines[0];    # real client speaks first
-
-            $server = $ssl_listener->accept()
-                or skip_fail "Proxy didn't connect: $!", $tests;
-            is( <$server>, $lines[0], "SSL line received" );
-
-            # transmit the rest of the data
-            shift @lines;
-            for my $line ( @lines ) {
-                ( $client, $server ) = random_swap( $client, $server );
-                print $client $line;    # real client speaks first
-                is( <$server>, $line, "SSL line received" );
-            }
-
-            # close connections
-            $client->close();
-            is_closed( $server, 'peer' );
-            $server->close();
-        }
+    # transmit data
+    for my $line (@lines) {
+        print $server $line;    # real server speaks first
+        is( <$client>, $line, "SSH line received" );
+        ( $client, $server ) = random_swap( $client, $server );
     }
+
+    # close connections
+    $server->close();
+    is_closed( $client, 'peer' );
+    $client->close();
+
+    # try ssl
+    $client = connect_to_port($proxy_port)
+        or skip_fail "Couldn't start the client: $!", $tests;
+    print $client $lines[0];    # real client speaks first
+
+    $server = $ssl_listener->accept()
+        or skip_fail "Proxy didn't connect: $!", $tests;
+    is( <$server>, $lines[0], "SSL line received" );
+
+    # transmit the rest of the data
+    shift @lines;
+    for my $line (@lines) {
+        ( $client, $server ) = random_swap( $client, $server );
+        print $client $line;    # real client speaks first
+        is( <$server>, $line, "SSL line received" );
+    }
+
+    # close connections
+    $client->close();
+    is_closed( $server, 'peer' );
+    $server->close();
 }

@@ -30,9 +30,9 @@ my $VERBOSITY = 0; # be silent by default
 sub set_verbosity { $VERBOSITY = $_[1]; }
 {
     my $i;
-    for my $meth (qw( notice info debug )) {
+    for my $meth (qw( error notice info debug )) {
         no strict 'refs';
-        my $level = ++$i;
+        my $level = $i++;
         *$meth = sub {
             return if $VERBOSITY < $level;
             print STDERR strftime "%Y-%m-%d %H:%M:%S $_[1]\n", localtime;
@@ -378,6 +378,10 @@ Close the given sockets and cleanup the related internal structures.
 =item set_verbosity( $level )
 
 Set the logging level. C<0> means not messages except warnings and errors.
+
+=item error( $message )
+
+Log $message to STDERR, always.
 
 =item notice( $message )
 

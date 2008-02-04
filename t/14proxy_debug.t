@@ -25,8 +25,16 @@ my @messages = (
     'ansys_lm kis netinfo_local pcia_rxp_b xpl hri_port nkd stmf',
     'holy_greed holy_ghost_writer holy_jawbreaker holy_barracuda',
     'Rea Sushi Stretch Garfield Clive Caped_Avenger Squeak Arlene',
+    'spam toast ham lobster beans tomato aubergine',
+    'period bullet underscore pilcrow ellipsis dagger permille_sign',
+    'plugh foo quux foobar qux corge xyzzy',
+    'MBOX SIZE QUIT XFER OK NMBR RETR',
+    'Rerun Pigpen Charlie_Brown Schroeder Snoopy Marcie Linus',
+    'orca classroom versatile repay inception narrative chatter',
+    'Altair Electra Ancha Naos Canopus Merope Sadr',
+    'greed anger envy laziness gluttony pride lust',
 );
-my @expected = @messages[6,9,10,12,15,16,17];
+my @expected = @messages[ 0, 4, 8, 9, 12, 13, 14, 16, 17, 20 .. 24 ];
 
 my $err = 'stderr.out';
 
@@ -44,30 +52,37 @@ SKIP: {
 
     # run our tests now
     my $i = 0;
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(0);
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(1);
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(2);
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(1);
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(3);
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
     Net::Proxy->set_verbosity(0);
+    Net::Proxy->error( $messages[ $i++ ] );
     Net::Proxy->notice( $messages[ $i++ ] );
     Net::Proxy->info( $messages[ $i++ ] );
     Net::Proxy->debug( $messages[ $i++ ] );
