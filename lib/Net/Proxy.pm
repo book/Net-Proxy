@@ -76,6 +76,42 @@ sub new {
     return $self;
 }
 
+sub chain {
+    my ( $class, @comps ) = @_;
+
+    # basic check
+    croak 'All chain() parameters must be HASHREF'
+        if grep { ref $_ ne 'HASH' } @comps;
+
+    my $chain;
+    my $prev;
+
+    # create the whole chain
+    my $i = 1;
+    for my $comp (@comps) {
+
+        # check arguments
+        croak "'type' key required for component $i"
+            if !exists $comp->{type};
+
+        # load the class
+        my $class = 'Net::Proxy::Component::' . $comp->{type};
+        eval "require $class; 1;"
+            or croak
+            "Couldn't load $class for component $i ($comp->{type}): $@";
+
+        # set the
+        $chain ||= $comp = $class->new($comp);
+        if ($prev) {
+            $prev->set_next( in  => $comp );
+            $comp->set_next( out => $prev );
+        }
+        $i++;
+    }
+
+    return $chain;
+}
+
 sub register { $PROXY{ refaddr $_[0] } = $_[0]; }
 sub unregister { delete $PROXY{ refaddr $_[0] }; }
 
