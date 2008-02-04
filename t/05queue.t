@@ -27,7 +27,7 @@ my @timed = (
     ],
 );
 
-# times when timed messages will be sent
+# times when timed messages will be sent
 my @times = map { time + $_ } 1 .. 3;
 
 plan tests => @msgs + @timed + 7;
@@ -36,7 +36,7 @@ plan tests => @msgs + @timed + 7;
 is_deeply( [ Net::Proxy::MessageQueue->next() ],
     [], 'next() in list context' );
 is( Net::Proxy::MessageQueue->next(), undef, 'next() in scalar context' );
-is( Net::Proxy::MessageQueue->timeout, 0, 'Timeout == 0' );
+is( Net::Proxy::MessageQueue->timeout, undef, 'No timeout' );
 
 # add the messages
 Net::Proxy::MessageQueue->queue(@msgs, @timed );
@@ -60,7 +60,7 @@ is_deeply(
     'Timed message'
 );
 
-# wait again
+# wait again
 select( undef, undef, undef, 0.25 ) while time < $times[1];
 is_deeply(
     [ Net::Proxy::MessageQueue->next() ],
@@ -78,7 +78,7 @@ is_deeply(
     'Normal message'
 );
 
-# wait for the last timed message
+# wait for the last timed message
 select( undef, undef, undef, 0.25 ) while time < $times[2];
 is_deeply(
     [ Net::Proxy::MessageQueue->next() ],
