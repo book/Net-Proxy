@@ -1,10 +1,10 @@
 Revision history for Perl extension Net::Proxy
 
-0.10
+0.10 Mon Oct  1 22:26:50 CEST 2007
         [DOCUMENTATION]
         - added information about the public SVN repository and the
           mailing-list
-        - added a tutorial about Net::Proxy
+        - added a tutorial about Net::Proxy, with code examples
         [TESTS]
         - prevent t/21connect.t, t/32tcp_connect.t, t/90compile.t to fail
           when LWP::UserAgent is not installed

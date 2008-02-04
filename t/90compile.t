@@ -14,7 +14,7 @@ SKIP: {
         my $skip;
         for my $module ( @{ $prereq{$script} } ) {
             eval {"use $module;"};
-            $skip .= "$module ";
+            $skip .= "$module " if $@;
         }
         skip "'$script' missing prereq: $skip", 1 if $skip;
 
