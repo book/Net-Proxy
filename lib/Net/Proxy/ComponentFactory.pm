@@ -98,6 +98,8 @@ created, inserted in the chain linked to the actual sockets (in the
 proper C<$direction>). The new component then receives the message stack and
 processes it.
 
+=back
+
 =head1 AUTHOR
 
 Philippe Bruhat (BooK), C<< <book@cpan.org> >>.
