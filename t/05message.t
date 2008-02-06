@@ -8,9 +8,6 @@ use Net::Proxy::Message;
 my @tests = (
     [ [], qr/^No type given for message / ],
     [ [''], qr/^No type given for message / ],
-    map( { [ [$_], qr/^Message type '$_' is reserved/ ] }
-        qw( BEGIN CHECK INIT UNITCHECK END CLONE CLONE_SKIP AUTOLOAD DESTROY )
-    ),
     [   [ ZLONK => '' ],
         qr/^Second parameter of new\(\) must be a HASH reference/
     ],
