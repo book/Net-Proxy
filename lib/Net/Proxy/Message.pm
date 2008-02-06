@@ -11,9 +11,6 @@ sub new {
         if ref $args ne 'HASH';
     croak "No type given for message"          if !$type;
     croak "Type must be a string, not a $type" if ref $type;
-    croak "Message type '$1' is reserved"
-        if $type =~ /^(BEGIN|INIT|(?:UNIT)?CHECK|END
-                      |AUTOLOAD|DESTROY|CLONE(?:_SKIP)?)$/x;
 
     return bless { %$args, type => $type }, $class;
 }
@@ -88,13 +85,106 @@ The time is given in seconds (possibly fractional) since the I<epoch>.
 
 These keys are removed from the message when it is added to the queue.
 
-=head2 Reserved names
 
-Because the names are used by Perl, no message can be named C<BEGIN>,
-C<CHECK>, C<INIT>, C<UNITCHECK>, C<END>, C<CLONE>, C<CLONE_SKIP>,
-C<AUTOLOAD> or C<DESTROY>.
+=head2 Messages naming convention
 
-C<< Net::Proxy::Message->new() >> will die if one of those names is used.
+Some messages are generic and recognized by different types of
+C<Component> and C<ComponentFactory> objects. Others are very
+specific to a type of objects.
+
+The naming convention is the following:
+
+=over 4
+
+=item m_<I<MESSAGE>>
+
+Generic message.
+
+=item I<type>_<I<MESSAGE>>
+
+Message specific to components and factories of type C<type>.
+
+=back
+
+
+=head1 KNOWN MESSAGES
+
+All message handling subroutines have the following signature:
+
+    my ( $self, $message, $from, $direction ) = @_;
+
+Where
+
+=over 4
+
+=item *
+
+C<$self> is the component (or component factory)
+
+=item *
+
+C<$message> is the message
+
+=item *
+
+C<$from> is the sender. This is often a component or a factory, but also
+a socket. When the message is sent by the C<Net::Proxy> infrastructure,
+C<$from> is undef.
+
+=item *
+
+C<$direction> is the direction of the message. Any message resulting from
+the processing of this message will be send forward in the same direction.
+
+=back
+
+
+=head2 Generic messages
+
+The following messages are "sent" by a socket (i.e. C<$from> is a
+C<IO::Socket> object).
+
+=over 4
+
+=item m_ACCEPT
+
+=item m_CAN_READ
+
+=item m_CAN_WRITE
+
+=item m_HAS_EXCEPTION
+
+=back
+
+The following messages are sent by components or factories.
+
+=over 4
+
+=item m_DATA
+
+=item m_START_CONNECTION
+
+=item m_CONNECTION_CLOSED
+
+=back
+
+The following message is sent by the infrastructure (C<$from> is undef).
+
+=over 4
+
+=item m_START_PROXY
+
+=back
+
+=head2 Specific messages
+
+The following messages are sent/received by specific components or factories:
+
+=over 4
+
+=item dual_TIMEOUT
+
+=back
 
 =head1 AUTHOR
 
