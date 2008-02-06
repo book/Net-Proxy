@@ -36,7 +36,7 @@ for my $test (@tests) {
     my ( $data_in, $data_out ) = @$test;
 
     my $msg_in
-        = Net::Proxy::Message->new( DATA => { data => $data_in } );
+        = Net::Proxy::Message->new( m_DATA => { data => $data_in } );
     my @msgs_out = $comp->act_on( $msg_in, undef, 'in' );
 
     is( @msgs_out, @$data_out, 'Got ' . @$data_out . ' messages out' );
