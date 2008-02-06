@@ -9,16 +9,6 @@ __PACKAGE__->build_factory_class();
 
 my $BUFFSIZE = 4096;
 
-sub init {
-    my ($self) = @_;
-
-    # set up some defaults
-    $self->{host}    ||= 'localhost';
-    $self->{timeout} ||= 1;
-    $self->{buffer} = '';
-}
-
-
 #
 # messages
 #
@@ -143,6 +133,15 @@ sub CONNECTION_CLOSED {
 }
 
 package Net::Proxy::ComponentFactory::tcp;
+
+sub init {
+    my ($self) = @_;
+
+    # set up some defaults
+    $self->{host}    ||= 'localhost';
+    $self->{timeout} ||= 1;
+    $self->{buffer} = '';
+}
 
 sub START_PROXY {
     my ( $self, $message, $from, $direction ) = @_;
