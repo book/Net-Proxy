@@ -218,7 +218,7 @@ sub mainloop {
     # initialise all proxies
     for my $chain ( values %PROXY ) {
         Net::Proxy::MessageQueue->queue( [ undef, $chain, 'in',
-            Net::Proxy::Message->new( 'START_PROXY' => { factory => 1 } ) ] );
+            Net::Proxy::Message->new( 'm_START_PROXY' => { factory => 1 } ) ] );
     }
 
     my $continue = 1;
@@ -242,12 +242,12 @@ sub mainloop {
         # get the $timeout from the message queue information
         # (it's the time remaining until the next timed message)
         # only timed messages should remain in the queue
-        my @msgs = qw( CAN_READ CAN_WRITE HAS_EXCEPTION );
+        my @msgs = qw( m_CAN_READ m_CAN_WRITE m_HAS_EXCEPTION );
         my %can;
         @can{@msgs} = IO::Select->select( $READERS, $WRITERS, $SOCKETS,
             Net::Proxy::MessageQueue->timeout() );
 
-        # send CAN_READ, CAN_WRITE and HAS_EXCEPTION messages
+        # send m_CAN_READ, m_CAN_WRITE and m_HAS_EXCEPTION messages
         # to the owners of the sockets that are ready
         for my $msg (@msgs) {
             for my $sock ( @{ $can{$msg} } ) {

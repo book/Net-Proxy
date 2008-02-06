@@ -12,7 +12,7 @@ my $BUFFSIZE = 4096;
 #
 # messages
 #
-sub ACCEPT {
+sub m_ACCEPT {
     my ( $self, $message, $from, $direction ) = @_;
 
     # $from is the factory, whose socket we can accept() from
@@ -26,10 +26,10 @@ sub ACCEPT {
     Net::Proxy->watch_reader_sockets( $self->{sock} );
 
     # the connection has been accepted
-    return Net::Proxy::Message->new( 'START_CONNECTION' );
+    return Net::Proxy::Message->new( 'm_START_CONNECTION' );
 }
 
-sub CAN_READ {
+sub m_CAN_READ {
     my ( $self, $message, $from, $direction ) = @_;
 
     # $from is a socket we can read from
@@ -50,14 +50,14 @@ sub CAN_READ {
         $self->{sock}->close;
         Net::Proxy->remove_reader_sockets( $self->{sock} );
         delete $self->{sock};
-        return Net::Proxy::Message->new( 'CONNECTION_CLOSED' );
+        return Net::Proxy::Message->new( 'm_CONNECTION_CLOSED' );
     }
 
     # produce a DATA message
-    return Net::Proxy::Message->new( DATA => { data => $buffer } );
+    return Net::Proxy::Message->new( m_DATA => { data => $buffer } );
 }
 
-sub CAN_WRITE {
+sub m_CAN_WRITE {
     my ( $self, $message, $from, $direction ) = @_;
 
     # read from the buffer
@@ -83,7 +83,7 @@ sub CAN_WRITE {
     return;
 }
 
-sub DATA {
+sub m_DATA {
     my ( $self, $message, $from, $direction ) = @_;
 
     # simply buffer the data
@@ -99,7 +99,7 @@ sub DATA {
     return;
 }
 
-sub START_CONNECTION {
+sub m_START_CONNECTION {
     my ( $self, $message, $from, $direction ) = @_;
     
     $self->{sock} = IO::Socket::INET->new(
@@ -122,7 +122,7 @@ sub START_CONNECTION {
     return;
 }
 
-sub CONNECTION_CLOSED {
+sub m_CONNECTION_CLOSED {
     my ( $self, $message, $from, $direction ) = @_;
 
     $self->{sock}->close;
@@ -143,7 +143,7 @@ sub init {
     $self->{buffer} = '';
 }
 
-sub START_PROXY {
+sub m_START_PROXY {
     my ( $self, $message, $from, $direction ) = @_;
     return if ! $self->{Listen};
 
@@ -169,11 +169,12 @@ sub START_PROXY {
     return $message;
 }
 
-sub CAN_READ {
+sub m_CAN_READ {
     my ( $self, $message, $from, $direction ) = @_;
 
     # return a ACCEPT message that will be passed to the component
-    return Net::Proxy::Message->new( 'ACCEPT' );
+    return Net::Proxy::Message->new( 'm_ACCEPT' );
+
 }
 
 1;
@@ -219,6 +220,36 @@ The listening or peer address. If not given, the default is C<localhost>.
 =item * port
 
 The port on which to listen or connect.
+
+=back
+
+=head1 MESSAGES
+
+=head2 Messages handled by the Component
+
+=over 4
+
+=item m_ACCEPT
+
+=item m_CAN_READ
+
+=item m_CAN_WRITE
+
+=item m_DATA
+
+=item m_START_CONNECTION
+
+=item m_CONNECTION_CLOSED
+
+=back
+
+=head2 Messages handled by the ComponentFactory
+
+=over 4
+
+=item m_START_PROXY
+
+=item m_CAN_READ
 
 =back
 
