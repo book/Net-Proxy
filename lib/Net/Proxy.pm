@@ -90,18 +90,23 @@ sub chain {
         croak "'type' key required for component $i"
             if !exists $comp->{type};
 
-        # load the class
-        my $class = 'Net::Proxy::Component::' . $comp->{type};
-        eval "require $class; 1;"
+        # load the component class
+        my $module = 'Net::Proxy::Component::' . $comp->{type};
+        eval "require $module; 1;"
             or croak
-            "Couldn't load $class for component $i ($comp->{type}): $@";
+            "Couldn't load $module for component $i ($comp->{type}): $@";
 
-        # set the
-        $chain ||= $comp = $class->new($comp);
+        # compute the factory class name
+        my $class = 'Net::Proxy::ComponentFactory::' . $comp->{type};
+        my $fact  = $class->new($comp);
+
+        # set the beginning of the chain
+        $chain ||= $fact;
         if ($prev) {
-            $prev->set_next( in  => $comp );
-            $comp->set_next( out => $prev );
+            $prev->set_next( in  => $fact );
+            $fact->set_next( out => $prev );
         }
+        $prev = $fact;
         $i++;
     }
 
