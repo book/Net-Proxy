@@ -49,6 +49,7 @@ sub new {
 
     croak "Argument to new() must be a HASHREF" if ref $args ne 'HASH';
 
+    my @args;
     for my $conn (qw( in out )) {
 
         # check arguments
@@ -64,16 +65,11 @@ sub new {
             if $args->{$conn}{hook}
             && reftype( $args->{$conn}{hook} ) ne 'CODE';
  
-        # load the class
-        my $class = 'Net::Proxy::Connector::' . $args->{$conn}{type};
-        eval "require $class";
-        croak "Couldn't load $class for '$conn' connector: $@" if $@;
-
-        # create and store the Connector object
-        $args->{$conn}{_proxy_} = $self;
+        # call chain with the same parameters
+        push @args, $args->{$conn};
     }
 
-    return $self;
+    return Net::Proxy->chain( @args );
 }
 
 sub chain {
