@@ -38,8 +38,8 @@ like(
 eval { $proxy = Net::Proxy->new( { in => { type => 'zlonk' } } ); };
 like(
     $@,
-    qr/^Couldn't load Net::Proxy::Connector::zlonk for 'in' connector/,
-    q{NPC::zlonk doesn't exist}
+    qr/^'out' connector required /,
+    q{NPC::zlonk doesn't exist (but we do not care)}
 );
 
 # out argument
@@ -75,7 +75,7 @@ eval {
 };
 like(
     $@,
-    qr/^Couldn't load Net::Proxy::Connector::zlonk for 'out' connector/,
+    qr/^Couldn't load Net::Proxy::Component::zlonk for component 2 \(zlonk\):/,
     q{NPC::zlonk doesn't exist}
 );
 
