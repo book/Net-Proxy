@@ -57,6 +57,9 @@ sub process {
     return;
 }
 
+# for compatibility with older versions
+sub register { Net::Proxy->register( shift ) }
+
 1;
 
 __END__
