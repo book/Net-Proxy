@@ -7,6 +7,8 @@ t/08chain.t
 t/09process.t
 t/09process_only.t
 t/10proxy_chain.t
+t/10proxy_new.t
 t/20components.t
 t/21line.t
+t/30tcp_tcp.t
 t/pod.t
