@@ -153,11 +153,6 @@ sub close_sockets {
 
   SOCKET:
     for my $sock (@socks) {
-        if( my $data = Net::Proxy->get_buffer( $sock ) ) {
-            ## Net::Proxy->debug( length($data) . ' bytes left to write on ' . Net::Proxy->get_nick( $sock ) );
-            $CLOSING{ refaddr $sock} = $sock;
-            next SOCKET;
-        }
 
         Net::Proxy->notice( 'Closing ' . Net::Proxy->get_nick( $sock ) );
 
@@ -181,6 +176,7 @@ sub close_sockets {
         # clean up sockets
         $READERS->remove($sock);
         $WRITERS->remove($sock);
+        $SOCKETS->remove($sock);
         $sock->close();
     }
 
