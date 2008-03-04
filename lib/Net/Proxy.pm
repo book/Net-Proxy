@@ -64,6 +64,11 @@ sub new {
         croak "'hook' key is not a CODE reference for '$conn' connector"
             if $args->{$conn}{hook}
             && reftype( $args->{$conn}{hook} ) ne 'CODE';
+
+        # compatibility layer
+        if( $conn eq 'in' ) {
+           $args->{$conn}{Listen} = 1 if $args->{$conn}{type} eq 'tcp';
+        }
  
         # call chain with the same parameters
         push @args, $args->{$conn};
