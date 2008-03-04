@@ -118,8 +118,8 @@ sub chain {
     return $chain;
 }
 
-sub register { $PROXY{ refaddr $_[0] } = $_[0]; }
-sub unregister { delete $PROXY{ refaddr $_[0] }; }
+sub register { $PROXY{ refaddr $_[1] } = $_[1]; }
+sub unregister { delete $PROXY{ refaddr $_[1] }; }
 
 sub set_compdir_for {
     my ( $class, $sock, $comp, $direction ) = @_;
