@@ -154,20 +154,10 @@ sub close_sockets {
   SOCKET:
     for my $sock (@socks) {
 
-        Net::Proxy->notice( 'Closing ' . Net::Proxy->get_nick( $sock ) );
+        # FIXME
+        #Net::Proxy->notice( 'Closing ' . Net::Proxy->get_nick( $sock ) );
 
-        # clean up connector
-        if ( my $conn = Net::Proxy->get_connector($sock) ) {
-            $conn->close($sock) if $conn->can('close');
-
-            # count connections to the proxy "in connectors" only
-            my $proxy = $conn->get_proxy();
-            if ( refaddr $conn == refaddr $proxy->in_connector()
-                && !_is_listener($sock) )
-            {
-                $proxy->stat_inc_closed();
-            }
-        }
+        # FIXME stats
 
         # clean up internal structures
         delete $LISTENER{ refaddr $sock};
