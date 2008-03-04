@@ -47,8 +47,7 @@ sub m_CAN_READ {
 
     # connection closed
     if ( $close || $read == 0 ) {
-        $self->{sock}->close;
-        Net::Proxy->remove_reader_sockets( $self->{sock} );
+        Net::Proxy->close_sockets( $self->{sock} );
         delete $self->{sock};
         return Net::Proxy::Message->new( 'm_CONNECTION_CLOSED' );
     }
@@ -129,7 +128,7 @@ sub m_CONNECTION_CLOSED {
     Net::Proxy->remove_reader_sockets( $self->{sock} );
     delete $self->{sock};
 
-    return;
+    return $message;
 }
 
 package Net::Proxy::ComponentFactory::tcp;
