@@ -58,7 +58,8 @@ sub process {
 }
 
 # for compatibility with older versions
-sub register { Net::Proxy->register( shift ) }
+sub register   { Net::Proxy->register(shift) }
+sub unregister { Net::Proxy->unregister(shift) }
 
 1;
 
