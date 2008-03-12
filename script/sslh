@@ -194,7 +194,7 @@ speaks first for the other).
 
 =item Original idea and C version
 
-Frédéric Plé C<< <sslh@wattoo.org> >>.
+Frédéric Plé C<< <frederic.ple+sslh@gmail.com> >>.
 
 =item Perl versions
 
@@ -221,7 +221,7 @@ L<Net::Proxy>, L<Net::Proxy::Connector::dual>.
 
 =head1 COPYRIGHT
 
-Copyright 2003-2006, Philippe Bruhat. All rights reserved.
+Copyright 2003-2008, Philippe Bruhat. All rights reserved.
 
 =head1 LICENSE
 

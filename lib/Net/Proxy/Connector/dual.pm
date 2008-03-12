@@ -132,7 +132,7 @@ Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 =head1 ACKNOWLEDGMENTS
 
 This module is based on a script named B<sslh>, which I wrote with
-Frédéric Plé C<< <sslh@wattoo.org> >> (who had the original insight
+Frédéric Plé C<< <frederic.ple+sslh@gmail.com> >> (who had the original insight
 about the fact that not all servers speak first on the wire).
 
 Frédéric wrote a C program, while I wrote a Perl script (based on my
