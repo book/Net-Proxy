@@ -8,6 +8,14 @@ my @components = map { /(\w+)\.pm$/; $1 ? $1 : () }
     grep {-f}
     bsd_glob( File::Spec->catdir(qw( blib lib Net Proxy Component *.pm )) );
 
+my %required_args = (
+    connect => {
+        host       => 'localhost',
+        port       => 8080,
+        proxy_host => 'localhost',
+    },
+);
+
 plan tests => 5 * @components;
 
 for my $comp (@components) {
@@ -20,7 +28,8 @@ for my $comp (@components) {
         )
     {
         my $obj;
-        eval { $obj = $class->new() };
+        my @args = $required_args{$comp} || ();
+        eval { $obj = $class->new(@args) };
         is( $@, '', "$class->new()" );
         isa_ok( $obj, $class );
     }
