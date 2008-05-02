@@ -285,6 +285,14 @@ Net::Proxy - Framework for proxying network connections in many ways
 
     # proxy connections from localhost:6789 to remotehost:9876
     # using standard TCP connections
+
+    # new interface
+    my $proxy = Net::Proxy->new(
+        { type => 'tcp', port => '6789', Listen => 1 },
+        { type => 'tcp', host => 'remotehost', port => '9876' },
+    );
+
+    # old interface
     my $proxy = Net::Proxy->new(
         {   in  => { type => 'tcp', port => '6789' },
             out => { type => 'tcp', host => 'remotehost', port => '9876' },
@@ -309,15 +317,16 @@ to connect from the proxy to the destination.
 
 A proxy is a program that transfer data across a network boundary           
 between a client and a server. C<Net::Proxy> introduces the concept of         
-"connectors" (implemented as C<Net::Proxy::Connector> subclasses),
-which abstract the server part (connected to the              
-client) and the client part (connected to the server) of the proxy.         
+"components" (implemented as C<Net::Proxy::Component> subclasses),
+which abstract the server part (connected to the client),
+the intermediate filters (that can operate on the data flowing through the proxy),
+and the client part (connected to the server) of the proxy.         
                                                                             
 This architecture makes it easy to implement specific techniques to
 cross a given network boundary, possibly by using a proxy on one side
 of the network fence, and a reverse-proxy on the other side of the fence.
 
-See L<AVAILABLE CONNECTORS> for details about the existing connectors.
+See L<AVAILABLE COMPONENTS> for details about the existing connectors.
 
 =head1 METHODS
 
