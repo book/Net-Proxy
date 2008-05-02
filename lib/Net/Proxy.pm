@@ -222,6 +222,9 @@ sub mainloop {
         };
     }
 
+    # the messages we get from select()
+    my @msgs = qw( m_CAN_READ m_CAN_WRITE m_HAS_EXCEPTION );
+
     # loop indefinitely
     while (1) {
 
@@ -234,7 +237,6 @@ sub mainloop {
         # get the $timeout from the message queue information
         # (it's the time remaining until the next timed message)
         # only timed messages should remain in the queue
-        my @msgs = qw( m_CAN_READ m_CAN_WRITE m_HAS_EXCEPTION );
         my %can;
         @can{@msgs} = IO::Select->select( $READERS, $WRITERS, $SOCKETS,
             Net::Proxy::MessageQueue->timeout() );
