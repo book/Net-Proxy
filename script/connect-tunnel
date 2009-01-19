@@ -50,7 +50,7 @@ die "--tunnel <port:host:hostport> option required$/"
 
 for my $tunnel ( @{ $CONF{tunnel} } ) {
     die "--tunnel <port:host:hostport> format required$/"
-      if $tunnel !~ /^\d+:[\w.]+:\d+$/;
+      if $tunnel !~ /^\d+:[^:]+:\d+$/;
     my ( $port, $host, $hostport ) = split ':', $tunnel;
     my ( $proxy_host, $proxy_port) = split ':', $CONF{proxy};
 
