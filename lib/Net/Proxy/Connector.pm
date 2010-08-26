@@ -126,6 +126,10 @@ sub raw_read_from {
 
     # connection closed
     if ( $close || $read == 0 ) {
+        # $sock was closed either forcefully or gracefully, either way
+        # we have no chance to send remaining data
+        Net::Proxy->set_buffer( $sock, '' );
+
         my $peer = Net::Proxy->get_peer($sock);
         $self->get_proxy()->close_sockets( $sock, $peer );
         return;

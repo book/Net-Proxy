@@ -104,7 +104,7 @@ BEGIN {
         $n++;
     }
     # special shortcut
-    sub add_to_buffer { $SOCK_INFO{ refaddr $_[1] }[$buffer_id] .= $_[2]; }
+    sub add_to_buffer { $SOCK_INFO{ refaddr $_[1] }[$buffer_id] .= $_[2] if(!exists($CLOSING{$_[1]})); }
 }
 
 #
@@ -137,6 +137,9 @@ sub close_sockets {
 
   SOCKET:
     for my $sock (@socks) {
+        my $conn = Net::Proxy->get_connector($sock);
+        next SOCKET if(!defined($conn));
+
         if( my $data = Net::Proxy->get_buffer( $sock ) ) {
             ## Net::Proxy->debug( length($data) . ' bytes left to write on ' . Net::Proxy->get_nick( $sock ) );
             $CLOSING{ refaddr $sock} = $sock;
@@ -146,16 +149,14 @@ sub close_sockets {
         Net::Proxy->notice( 'Closing ' . Net::Proxy->get_nick( $sock ) );
 
         # clean up connector
-        if ( my $conn = Net::Proxy->get_connector($sock) ) {
-            $conn->close($sock) if $conn->can('close');
+        $conn->close($sock) if $conn->can('close');
 
-            # count connections to the proxy "in connectors" only
-            my $proxy = $conn->get_proxy();
-            if ( refaddr $conn == refaddr $proxy->in_connector()
-                && !_is_listener($sock) )
-            {
-                $proxy->stat_inc_closed();
-            }
+        # count connections to the proxy "in connectors" only
+        my $proxy = $conn->get_proxy();
+        if ( refaddr $conn == refaddr $proxy->in_connector()
+            && !_is_listener($sock) )
+        {
+            $proxy->stat_inc_closed();
         }
 
         # clean up internal structures
@@ -278,6 +279,7 @@ sub mainloop {
         # then write
         for my $sock (@{$ready[1]}) {
             my $conn = Net::Proxy->get_connector($sock);
+            next if(!defined($conn)); # may happen if read_from() closed socket
             $conn->write_to($sock);
         }
 
