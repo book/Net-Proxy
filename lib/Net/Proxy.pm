@@ -82,6 +82,9 @@ sub new {
 sub register { $PROXY{ refaddr $_[0] } = $_[0]; }
 sub unregister { delete $PROXY{ refaddr $_[0] }; }
 
+sub get_max_buffer_size { return $BUFFSIZE; }
+sub set_max_buffer_size { $BUFFSIZE = $_[1]; }
+
 #
 # The Net::Proxy attributes
 #
@@ -252,7 +255,7 @@ sub mainloop {
                 my $peer = Net::Proxy->get_peer($sock);
                 next READER
                     if !$peer
-                    || length( Net::Proxy->get_buffer($peer) ) >= $BUFFSIZE;
+                    || ($BUFFSIZE && length( Net::Proxy->get_buffer($peer) ) >= $BUFFSIZE);
 
                 # read the data
                 if ( my $conn = Net::Proxy->get_connector($sock) ) {
@@ -427,6 +430,14 @@ Log $message to STDERR if verbosity level is equal to C<3> or more.
 
 (Note: throughout the C<Net::Proxy> source code, calls to C<debug()> are
 commented with C<##>.)
+
+=item get_max_buffer_size( )
+
+=item set_max_buffer_size( $size )
+
+Get or set the maximum allowed length of the internal write buffers used
+by each connector.  A value of 0 means that the maximum length is not
+checked.  The default value is 16384 bytes (16kB).
 
 =back
 
