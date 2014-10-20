@@ -313,6 +313,8 @@ sub _is_listener { return exists $LISTENER{ refaddr $_[0] }; }
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Net::Proxy - Framework for proxying network connections in many ways
@@ -716,7 +718,7 @@ Implement a C<Net::Proxy::Connector::starttls> connector that can upgrade
 upgrade a connection to SSL transparently, even if the client or server
 doesn't support STARTTLS.
 
-Martin Werthmöller provided a full implementation of a connector that
+Martin WerthmÃ¶ller provided a full implementation of a connector that
 can handle IMAP connections and upgrade them to TLS if the client sends
 a C<STARTTLS> command. My implementation will split this in two parts
 C<Net::Proxy::Connector::ssl> and C<Net::Proxy::Connector::starttls>,

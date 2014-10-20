@@ -1,3 +1,5 @@
+=encoding utf-8
+
 =head1 NAME
 
 Net::Proxy::Tutorial - Network proxies for fun and profit
@@ -389,7 +391,7 @@ Server-side proxy:
 
 Another option to hide what you are doing in your connection through
 the corporate proxy, is to actually use SSL to connect to your SSH
-server (I<à la> B<stunnel>). This is what the proxy expects, after all.
+server (I<Ã  la> B<stunnel>). This is what the proxy expects, after all.
 
                                                '
                    (internal network)          '         (Internet)

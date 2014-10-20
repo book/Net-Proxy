@@ -90,6 +90,8 @@ Net::Proxy->mainloop();
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 sslh - Switch incoming connection between SSH and SSL/HTTPS servers
@@ -194,7 +196,7 @@ speaks first for the other).
 
 =item Original idea and C version
 
-Frédéric Plé C<< <frederic.ple+sslh@gmail.com> >>.
+FrÃ©dÃ©ric PlÃ© C<< <frederic.ple+sslh@gmail.com> >>.
 
 =item Perl versions
 
