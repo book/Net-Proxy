@@ -73,53 +73,53 @@ Net::Proxy::Connector::connect_ssl - Create SSL/CONNECT tunnels through HTTP pro
 
 =head1 DESCRIPTION
 
-C<Net::Proxy::Connecter::connect_ssl> is a C<Net::Proxy::Connector> that
+Net::Proxy::Connecter::connect_ssl is a L<Net::Proxy::Connector> that
 uses the HTTP CONNECT method to ask the proxy to create a tunnel to
 an outside server. The data is then encrypted using SSL.
 
 Obviously, you'll need a server that understands SSL (or a proxy using
-C<Net::Proxy::Connector::ssl>) at the other end.
+L<Net::Proxy::Connector::ssl>) at the other end.
 
 This connector is only an "out" connector.
 
 In addition to the options listed below, this connector accepts all
-C<SSL_...> options to C<IO::Socket::SSL>. They are transparently passed
-through to the appropriate C<IO::Socket::SSL> methods when upgrading
+C<SSL_...> options to L<IO::Socket::SSL>. They are transparently passed
+through to the appropriate L<IO::Socket::SSL> methods when upgrading
 the socket to SSL.
 
 =head1 CONNECTOR OPTIONS
 
-C<Net::Proxy::Connector::connect> accepts the following options:
+Net::Proxy::Connector::connect_ssl accepts the following options:
 
 =head1 C<out>
 
 =over 4
 
-=item * host
+=item host
 
 The destination host.
 
-=item * port
+=item port
 
 The destination port.
 
-=item * proxy_host
+=item proxy_host
 
 The web proxy name or address.
 
-=item * proxy_port
+=item proxy_port
 
 The web proxy port.
 
-=item * proxy_user
+=item proxy_user
 
 The authentication username for the proxy.
 
-=item * proxy_pass
+=item proxy_pass
 
 The authentication password for the proxy.
 
-=item * proxy_agent
+=item proxy_agent
 
 The user-agent string to use when connecting to the proxy.
 
@@ -131,17 +131,17 @@ Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
 =head1 HISTORY
 
-Because C<Net::Proxy> blocks when it tries to connect to itself,
+Because L<Net::Proxy> blocks when it tries to connect to itself,
 it wasn't possible to pass an SSL-encrypted connection through
 a proxy with a single script: you needed one for the SSL encapsulation,
 and another one for bypassing the proxy with the C<CONNECT> HTTP method.
 
-See C<Net::Proxy::Connector::connect> and C<Net::Proxy::Connector::ssl>
+See L<Net::Proxy::Connector::connect> and L<Net::Proxy::Connector::ssl>
 for details.
 
 =head1 COPYRIGHT
 
-Copyright 2007 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2007-2014 Philippe 'BooK' Bruhat, All Rights Reserved.
 
 =head1 LICENSE
 

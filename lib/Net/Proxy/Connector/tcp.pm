@@ -72,11 +72,11 @@ The connector accept the following options:
 
 =over 4
 
-=item * host
+=item host
 
 The listening address. If not given, the default is C<localhost>.
 
-=item * port
+=item port
 
 The listening port.
 
@@ -86,15 +86,15 @@ The listening port.
 
 =over 4
 
-=item * host
+=item host
 
 The remote host.
 
-=item * port
+=item port
 
 The remote port.
 
-=item * timeout
+=item timeout
 
 The socket timeout for connection (C<out> only).
 
@@ -106,7 +106,7 @@ Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2014 Philippe 'BooK' Bruhat, All Rights Reserved.
 
 =head1 LICENSE
 

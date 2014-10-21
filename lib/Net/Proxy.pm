@@ -339,43 +339,45 @@ Net::Proxy - Framework for proxying network connections in many ways
 
 =head1 DESCRIPTION
 
-A C<Net::Proxy> object represents a proxy that accepts connections
+A Net::Proxy object represents a proxy that accepts connections
 and then relays the data transfered between the source and the destination.
 
 The goal of this module is to abstract the different methods used
 to connect from the proxy to the destination.
 
-A proxy is a program that transfer data across a network boundary           
-between a client and a server. C<Net::Proxy> introduces the concept of         
-"connectors" (implemented as C<Net::Proxy::Connector> subclasses),
-which abstract the server part (connected to the              
-client) and the client part (connected to the server) of the proxy.         
-                                                                            
+A proxy is a program that transfer data across a network boundary
+between a client and a server. Net::Proxy introduces the concept of
+"connectors" (implemented as L<Net::Proxy::Connector> subclasses),
+which abstract the server part (connected to the
+client) and the client part (connected to the server) of the proxy.
+
 This architecture makes it easy to implement specific techniques to
 cross a given network boundary, possibly by using a proxy on one side
 of the network fence, and a reverse-proxy on the other side of the fence.
 
-See L<AVAILABLE CONNECTORS> for details about the existing connectors.
+See L</AVAILABLE CONNECTORS> for details about the existing connectors.
 
 =head1 METHODS
 
-If you only intend to use C<Net::Proxy> and not write new
+If you only intend to use Net::Proxy and not write new
 connectors, you only need to know about C<new()>, C<register()>
 and C<mainloop()>.
 
 =head2 Class methods
 
-=over 4
+=head3 new
 
-=item new( { in => { ... }, { out => { ... } } )
+    my $proxy = Net::Proxy->new( { in => { ... }, { out => { ... } } );
 
-Return a new C<Net::Proxy> object, with two connectors configured
+Return a new Net::Proxy object, with two connectors configured
 as described in the hashref.
 
 The connector parameters are described in the table below, as well
 as in each connector documentation.
 
-=item mainloop( $max_connections )
+=head3 mainloop
+
+    Net::Proxy->mainloop( $max_connections )
 
 This method initialises all the registered C<Net::Proxy> objects
 and then loops on all the sockets ready for reading, passing
@@ -385,155 +387,224 @@ to handle the specifics of each connection.
 If C<$max_connections> is given, the proxy will stop after having fully
 processed that many connections. Otherwise, this method does not return.
 
-=item add_listeners( @sockets )
+=head3 add_listeners
+
+    $proxy->add_listeners( @sockets );
 
 Add the given sockets to the list of listening sockets.
 
-=item watch_reader_sockets( @sockets )
+=head3 watch_reader_sockets
+
+    $proxy->watch_reader_sockets( @sockets );
 
 Add the given sockets to the readers watch list.
 
-=item watch_writer_sockets( @sockets )
+=head3 watch_writer_sockets
+
+    $proxy->watch_writer_sockets( @sockets );
 
 Add the given sockets to the writers watch list.
 
-=item remove_writer_sockets( @sockets )
+=head3 remove_writer_sockets
+
+    $proxy->remove_writer_sockets( @sockets );
 
 Remove the given sockets from the writers watch list.
 
-=item close_sockets( @sockets )
+=head3 close_sockets
+
+    $proxy->close_sockets( @sockets );
 
 Close the given sockets and cleanup the related internal structures.
 
-=item set_verbosity( $level )
+=head3 set_verbosity
+
+    $proxy->set_verbosity( $level );
 
 Set the logging level. C<0> means not messages except warnings and errors.
 
-=item error( $message )
+=head3 error
 
-Log $message to STDERR, always.
+    $proxy->error( $message );
 
-=item notice( $message )
+Log C<$message> to STDERR, always.
 
-Log $message to STDERR if verbosity level is equal to C<1> or more.
+=head3 notice
 
-=item info( $message )
+    $proxy->notice( $message );
 
-Log $message to STDERR if verbosity level is equal to C<2> or more.
+Log C<$message> to STDERR if verbosity level is equal to C<1> or more.
 
-=item debug( $message )
+=head3 info
 
-Log $message to STDERR if verbosity level is equal to C<3> or more.
+    $proxy->info( $message );
 
-(Note: throughout the C<Net::Proxy> source code, calls to C<debug()> are
+Log C<$message> to STDERR if verbosity level is equal to C<2> or more.
+
+=head3 debug
+
+    $proxy->debug( $message );
+
+Log C<$message> to STDERR if verbosity level is equal to C<3> or more.
+
+(Note: throughout the Net::Proxy source code, calls to C<debug()> are
 commented with C<##>.)
-
-=back
 
 Some of the class methods are related to the socket objects that handle
 the actual connections.
 
-=over 4
+=head3 get_peer
 
-=item get_peer( $socket )
+    my $peer = $proxy->get_peer( $socket );
 
-=item set_peer( $socket, $peer )
+Get the socket peer.
 
-Get or set the socket peer.
+=head3 set_peer
 
-=item get_connector( $socket )
+    $proxy->set_peer( $socket, $peer );
 
-=item set_connector( $socket, $connector )
+Set the socket peer.
 
-Get or set the socket connector (a C<Net::Proxy::Connector> object).
+=head3 get_connector
 
-=item get_state( $socket )
+    my $connector = $proxy->get_connector( $socket );
 
-=item set_state( $socket, $state )
+Get the socket connector (a L<Net::Proxy::Connector> object).
 
-Get or set the socket state. Some C<Net::Proxy::Connector> subclasses
+=head3 set_connector
+
+    $proxy->set_connector( $socket, $connector );
+
+Set the socket connector (a L<Net::Proxy::Connector> object).
+
+=head3 get_state
+
+    my $state = $proxy->get_state( $socket );
+
+Get the socket state.
+
+=head3 set_state
+
+    $proxy->set_state( $socket, $state );
+
+Set the socket state. Some C<Net::Proxy::Connector> subclasses
 may wish to use this to store some internal information about the
 socket or the connection.
 
-=item get_nick( $socket )
+=head3 get_nick
 
-=item set_nick( $socket, $nickname )
+    my $nick = $proxy->get_nick( $socket );
 
-Get or set the socket nickname. Typically used by C<Net::Proxy::Connector>
+Get the socket nickname.
+
+=head3 set_nick
+
+    $proxy->set_nick( $socket, $nickname );
+
+Set the socket nickname. Typically used by L<Net::Proxy::Connector>
 to give informative names to socket (used in the log messages).
 
-=item get_buffer( $socket )
+=head3 get_buffer
 
-=item set_buffer( $socket, $data )
+    my $buffer = $proxy->get_buffer( $socket );
 
-Get or set the content of the writing buffer for the socket.
-Used by C<Net::Proxy::Connector> in C<raw_read_from()> and
+Get the content of the writing buffer for the socket.
+
+=head3 set_buffer
+
+    $proxy->set_buffer( $socket, $data );
+
+Set the content of the writing buffer for the socket.
+Used by L<Net::Proxy::Connector> in C<raw_read_from()> and
 C<ranw_write_to()>.
 
-=item get_callback( $socket )
+=head3 get_callback
 
-=item set_callback( $socket, $coderef )
+    $proxy->get_callback( $socket );
 
-Get or set the callback currently associated with the socket.
+Get the callback currently associated with the socket.
 
-=item add_to_buffer( $socket, $data )
+=head3 set_callback
+
+    $proxy->set_callback( $socket, $coderef );
+
+Set the callback currently associated with the socket.
+
+=head3 add_to_buffer
+
+    $proxy->add_to_buffer( $socket, $data );
 
 Add data to the writing buffer of the socket.
 
-=back
-
 =head2 Instance methods
 
-=over 4
+=head3 register
 
-=item register()
+    $proxy->register();
 
-Register a C<Net::Proxy> object so that it will be included in
+Register a Net::Proxy object so that it will be included in
 the C<mainloop()> processing.
 
-=item unregister()
+=head3 unregister
 
-Unregister the C<Net::Proxy> object.
+    $proxy->unregister();
 
-=item in_connector()
+Unregister the Net::Proxy object.
 
-Return the C<Net::Proxy::Connector> objet that handles the incoming
+=head3 in_connector
+
+    my $connector = $proxy->in_connector();
+
+Return the L<Net::Proxy::Connector> objet that handles the incoming
 connection and handles the data coming from the "client" side.
 
-=item out_connector()
+=head3 out_connector
 
-Return the C<Net::Proxy::Connector> objet that creates the outgoing 
+    my $connector = $proxy->out_connector();
+
+Return the L<Net::Proxy::Connector> objet that creates the outgoing
 connection and handles the data coming from the "server" side.
-
-=back
 
 =head2 Statistical methods
 
 The following methods manage some statistical information
 about the individual proxies:
 
-=over 4
+=head3 stat_inc_opened
 
-=item stat_inc_opened()
+    $proxy->stat_inc_opened();
 
-=item stat_inc_closed()
+Increment the "opened" connection counter for this proxy.
 
-Increment the "opened" or "closed" connection counter for this proxy.
+=head3 stat_inc_closed
 
-=item stat_opened()
+    $proxy->stat_inc_closed();
 
-=item stat_closed()
+Increment the "closed" connection counter for this proxy.
 
-Return the count of "opened" or "closed" connections for this proxy.
+=head3 stat_opened
 
-=item stat_total_opened()
+    my $opened = $proxy->stat_opened();
 
-=item stat_total_closed()
+Return the count of "opened" connections for this proxy.
 
-Return the total count of "opened" or "closed" connection across
-all proxy objects.
+=head3 stat_closed
 
-=back
+    my $closed = $proxy->stat_closed();
+
+Return the count of "closed" connections for this proxy.
+
+=head3 stat_total_opened
+
+    my $opened = $proxy->stat_total_opened();
+
+Return the total count of "opened" connections across all proxy objects.
+
+=head3 stat_total_closed
+
+    my $closed = $proxy->stat_total_closed();
+
+Return the total count of "closed" connections across all proxy objects.
 
 =head1 CONNECTORS
 
@@ -564,36 +635,36 @@ in the connector, so as to share data between sockets.
 
 =over 4
 
-=item * tcp (C<Net::Proxy::Connector::tcp>)
+=item tcp (L<Net::Proxy::Connector::tcp>)
 
 This is the simplest possible proxy connector. On the "in" side, it sits waiting
 for incoming connections, and on the "out" side, it connects to the
 configured host/port.
 
-=item * connect (C<Net::Proxy::Connector::connect>)
+=item connect (L<Net::Proxy::Connector::connect>)
 
 This proxy connector can connect to a TCP server though a web proxy that
 accepts HTTP CONNECT requests.
 
-=item * dual (C<Net::Proxy::Connector::dual>)
+=item dual (L<Net::Proxy::Connector::dual>)
 
 This proxy connector is a Y-shaped connector: depending on the client behaviour
 right after the connection is established, it connects it to one
 of two services, handled by two distinct connectors.
 
-=item * dummy (C<Net::Proxy::Connector::dummy>)
+=item dummy (L<Net::Proxy::Connector::dummy>)
 
 This proxy connector does nothing. You can use it as a template for writing
-new C<Net::Proxy::Connector> classes.
+new L<Net::Proxy::Connector> classes.
 
 =back
 
 =head2 Summary
 
-This table summarises all the available C<Net::Proxy::Connector>
+This table summarises all the available L<Net::Proxy::Connector>
 classes and the parameters their constructors recognise.
 
-C<N/A> means that the given C<Net::Proxy::Connector> cannot be used
+C<N/A> means that the given L<Net::Proxy::Connector> cannot be used
 in that position (either C<in> or C<out>).
 
      Connector  | in parameters   | out parameters
@@ -629,8 +700,8 @@ in that position (either C<in> or C<out>).
                 |                 | proxy_pass
                 |                 | proxy_agent
 
-C<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
-a C<Net::Proxy::Connector::dual>, since the later is linked to two
+L<Net::Proxy::Connector::dummy> is used as the C<out> parameter for
+a L<Net::Proxy::Connector::dual>, since the later is linked to two
 different connector objects.
 
 =head1 AUTHOR
@@ -666,7 +737,7 @@ Enhance the httptunnel protocol to support multiple connections.
 Implement RFC 3093 - Firewall Enhancement Protocol (FEP), as
 C<Net::Proxy::Connector::FEP>. This RFC was published on April 1, 2001.
 
-This is probably impossible with C<Net::Proxy>, since the FEP driver is
+This is probably impossible with Net::Proxy, since the FEP driver is
 a rather low-level driver (at the IP level of the network stack).
 
 =item *
@@ -701,11 +772,11 @@ L<http://www.cs.uit.no/~daniels/PingTunnel/>,
 L<http://thomer.com/icmptx/> for examples.
 
 Since ICMP implies low-level packet reading and writing, it may not be
-possible for C<Net::Proxy> to handle it.
+possible for Net::Proxy to handle it.
 
 =item *
 
-Look for inspiration in the I<Firewall-Piercing HOWTO>, 
+Look for inspiration in the I<Firewall-Piercing HOWTO>,
 at L<http://fare.tunes.org/files/fwprc/>.
 
 Look also here: L<http://gray-world.net/tools/>
@@ -719,7 +790,7 @@ doesn't support STARTTLS.
 Martin Werthmöller provided a full implementation of a connector that
 can handle IMAP connections and upgrade them to TLS if the client sends
 a C<STARTTLS> command. My implementation will split this in two parts
-C<Net::Proxy::Connector::ssl> and C<Net::Proxy::Connector::starttls>,
+L<Net::Proxy::Connector::ssl> and C<Net::Proxy::Connector::starttls>,
 that inherits from the former.
 
 =back
@@ -734,32 +805,23 @@ You can also look for information at:
 
 =over 4
 
-=item * The Net::Proxy mailing-list
+=item The public source repository
 
-L<http://listes.mongueurs.net/mailman/listinfo/net-proxy/>
+L<http://github.com/book/Net-Proxy/>
 
-This list receive an email for each commit
-
-=item * The public source repository
-
-svn://svn.mongueurs.net/Net-Proxy/trunk/
-
-Also available through a web interface at
-L<http://svnweb.mongueurs.net/Net-Proxy>
-
-=item * AnnoCPAN: Annotated CPAN documentation
+=item AnnoCPAN: Annotated CPAN documentation
 
 L<http://annocpan.org/dist/Net-Proxy>
 
-=item * CPAN Ratings
+=item CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Net-Proxy>
 
-=item * RT: CPAN's request tracker
+=item RT: CPAN's request tracker
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Proxy>
 
-=item * Search CPAN
+=item Search CPAN
 
 L<http://search.cpan.org/dist/Net-Proxy>
 
@@ -767,8 +829,8 @@ L<http://search.cpan.org/dist/Net-Proxy>
 
 =head1 COPYRIGHT
 
-Copyright 2006-2007 Philippe 'BooK' Bruhat, All Rights Reserved.
- 
+Copyright 2006-2014 Philippe 'BooK' Bruhat, All Rights Reserved.
+
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it

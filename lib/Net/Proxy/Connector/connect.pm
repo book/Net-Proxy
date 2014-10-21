@@ -102,7 +102,7 @@ Net::Proxy::Connector::connect - Create CONNECT tunnels through HTTP proxies
 
 =head1 DESCRIPTION
 
-C<Net::Proxy::Connecter::connect> is a C<Net::Proxy::Connector> that
+Net::Proxy::Connecter::connect is a L<Net::Proxy::Connector> that
 uses the HTTP CONNECT method to ask the proxy to create a tunnel to
 an outside server.
 
@@ -114,37 +114,37 @@ This connector is only an "out" connector.
 
 =head1 CONNECTOR OPTIONS
 
-C<Net::Proxy::Connector::connect> accepts the following options:
+Net::Proxy::Connector::connect accepts the following options:
 
 =head1 C<out>
 
 =over 4
 
-=item * host
+=item host
 
 The destination host.
 
-=item * port
+=item port
 
 The destination port.
 
-=item * proxy_host
+=item proxy_host
 
 The web proxy name or address.
 
-=item * proxy_port
+=item proxy_port
 
 The web proxy port.
 
-=item * proxy_user
+=item proxy_user
 
 The authentication username for the proxy.
 
-=item * proxy_pass
+=item proxy_pass
 
 The authentication password for the proxy.
 
-=item * proxy_agent
+=item proxy_agent
 
 The user-agent string to use when connecting to the proxy.
 
@@ -175,7 +175,7 @@ this distribution.
 
 =head1 COPYRIGHT
 
-Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2014 Philippe 'BooK' Bruhat, All Rights Reserved.
 
 =head1 LICENSE
 

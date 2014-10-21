@@ -4,7 +4,7 @@ Net::Proxy::Tutorial - Network proxies for fun and profit
 
 =head1 SYNOPSIS
 
-This document describes in detail how to use C<Net::Proxy> in several
+This document describes in detail how to use L<Net::Proxy> in several
 real-life situations.
 
 =head1 DEFINITIONS
@@ -40,15 +40,15 @@ Sometimes, the traffic you want to send or receive doesn't quite fit
 the model that the network designers had in mind.
 
 For example, if you need to modify network traffic, almost transparently,
-at a high level, you probably need C<Net::Proxy>.
+at a high level, you probably need L<Net::Proxy>.
 
 =head1 DESCRIPTION
 
-In this section, we will see actual examples of use of C<Net::Proxy>.
+In this section, we will see actual examples of use of L<Net::Proxy>.
 
-=head2 A basic C<Net::Proxy> script
+=head2 A basic L<Net::Proxy> script
 
-Most C<Net::Proxy> based scripts look like the following:
+Most L<Net::Proxy> based scripts look like the following:
 
 =over 4
 
@@ -70,7 +70,7 @@ parameters:
 
 =item *
 
-The individual proxies are registered with the C<Net::Proxy> framework:
+The individual proxies are registered with the L<Net::Proxy> framework:
 
     $proxy->register();
 
@@ -80,7 +80,7 @@ Some framework options are defined:
 
     Net::Proxy->set_verbosity(1);
 
-Note: The C<set_verbosity()> method is available only since C<Net::Proxy>
+Note: The C<set_verbosity()> method is available only since L<Net::Proxy>
 version 0.04.
 
 =item *
@@ -92,7 +92,7 @@ connections to proxy around:
 
 =back
 
-=head2 The concepts behind C<Net::Proxy>
+=head2 The concepts behind L<Net::Proxy>
 
 Any time a proxy handles a network connection, it actually manages two
 connections: a connection from the client to the proxy, and a connection
@@ -100,7 +100,7 @@ from the proxy to the server. During normal processing, each chunk of
 data received on one connection is copied to the other connection, and
 vice-versa.
 
-C<Net::Proxy> introduces the concept of "connectors". Connectors are
+L<Net::Proxy> introduces the concept of "connectors". Connectors are
 used to represent the ends of the two connections that the proxy handles
 to create a single client-server connection.
 
@@ -111,13 +111,13 @@ to create a single client-server connection.
                       +-------+
 
 In the above ASCII diagram, C<(xx)> represents the listening port number,
-and C<[in]> (left) and C<[out]> (right) the C<Net::Proxy> connectors.
+and C<[in]> (left) and C<[out]> (right) the L<Net::Proxy> connectors.
 
 The C<in> connector accepts incoming connections on a listening port.
 Once a connection with the client is established, the proxy uses the
 C<out> connector to connect to the destination server.
 
-The simplest connector is named C<Net::Proxy::Connector::tcp> (we'll
+The simplest connector is named L<Net::Proxy::Connector::tcp> (we'll
 use C<tcp> for short). When placed on the C<in> side, it simply
 C<listen()>s for incoming connections and them C<accept()>s them.
 Then the C<out> connector C<connect()>s to the server.
@@ -135,7 +135,7 @@ throughout this document.
 
 =head2 Contacting a SSH server through the corporate web proxy
 
-(This example requires at least C<Net::Proxy> version 0.02 to work.)
+(This example requires at least L<Net::Proxy> version 0.02 to work.)
 
 In many companies, the corporate firewall doesn't let you connect outside
 with SSH. The only allowed access to the outside is via the web proxy.
@@ -169,7 +169,7 @@ ASCII-art:
                                              '
                                              '
 
-Here's how to set up the local C<Net::Proxy> instance:
+Here's how to set up the local L<Net::Proxy> instance:
 
     Net::Proxy->new(
         {   in => {
@@ -205,13 +205,13 @@ In the exemple above, you need to change the C<out>/C<port> from C<22>
 to C<443>.
 
 Many SSH clients (like PuTTY) already include configuration options
-to get through web proxies, so C<Net::Proxy> probably isn't necessary
+to get through web proxies, so L<Net::Proxy> probably isn't necessary
 any longer to handle this kind of traffic.
 
 
 =head2 Running two services on the same TCP port
 
-(This example requires at least C<Net::Proxy> version 0.03 to work.)
+(This example requires at least L<Net::Proxy> version 0.03 to work.)
 
 So you managed to get out of your corporate prison^Wnetwork by setting
 up your SSH server to listen on port 443. The problem is that you also
@@ -256,7 +256,7 @@ during a SSH connection, the server sends a banner first
                  '           +-------+
                  '
 
-C<Net::Proxy>'s C<dual> connector is able to detect between two such clients
+L<Net::Proxy>'s C<dual> connector is able to detect between two such clients
 with the help of a timeout.
 
     Net::Proxy->new(
@@ -283,7 +283,7 @@ with the help of a timeout.
 
 =head2 Hiding SSH connections going through the corporate proxy from IDS
 
-(This example requires at least C<Net::Proxy> version 0.06 to work.)
+(This example requires at least L<Net::Proxy> version 0.06 to work.)
 
 The first technique we presented (using a CONNECT request to get out
 of the corporate network) is so well-known that many Intrusion
@@ -385,7 +385,7 @@ Server-side proxy:
 
 =head2 Hiding a SSH connection under SSL through a corporate proxy
 
-(This example requires at least C<Net::Proxy> version 0.08 to work.)
+(This example requires at least L<Net::Proxy> version 0.08 to work.)
 
 Another option to hide what you are doing in your connection through
 the corporate proxy, is to actually use SSL to connect to your SSH
@@ -453,7 +453,7 @@ Philippe "BooK" Bruhat, C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
  
-Copyright 2006-2007 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2014 Philippe 'BooK' Bruhat, All Rights Reserved.
   
 =head1 LICENSE
 

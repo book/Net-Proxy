@@ -234,8 +234,8 @@ Net::Proxy::Connector - Base class for Net::Proxy protocols
 
 =head1 DESCRIPTION
 
-C<Net::Proxy::Connector> is the base class for all specialised
-protocols used by C<Net::Proxy>.
+Net::Proxy::Connector is the base class for all specialised
+protocols used by L<Net::Proxy>.
 
 =head1 METHODS
 
@@ -243,105 +243,117 @@ protocols used by C<Net::Proxy>.
 
 The base class provides the following methods:
 
-=over 4
+=head3 new
 
-=item new()
-
-=back
+The constructor.
 
 =head2 Instance methods
 
-=over 4
+=head3 set_proxy
 
-=item set_proxy( $proxy )
+    $connector->set_proxy( $proxy );
 
 Define the proxy that "owns" the connector.
 
-=item get_proxy()
+=head3 get_proxy
 
-Return the C<Net::Proxy> object that "owns" the connector.
+    my $proxy = $connector->get_proxy();
 
-=item is_in()
+Return the L<Net::Proxy> object that "owns" the connector.
 
-Return a boolean value indicating if the C<Net::Proxy::Connector>
+=head3 is_in
+
+    $connector->is_in();
+
+Return a boolean value indicating if the Net::Proxy::Connector
 object is the C<in> connector of its proxy.
 
-=item is_out()
+=head3 is_out
 
-Return a boolean value indicating if the C<Net::Proxy::Connector>
+    $connector->is_out();
+
+Return a boolean value indicating if the Net::Proxy::Connector
 object is the C<out> connector of its proxy.
 
-=item new_connection_on( $socket )
+=head3 new_connection_on
 
-This method is called by C<Net::Proxy> to handle incoming connections,
+    $connector->new_connection_on( $socket );
+
+This method is called by L<Net::Proxy> to handle incoming connections,
 and in turn call C<accept_from()> on the 'in' connector and
 C<connect()> on the 'out' connector.
 
-=item raw_read_from( $socket )
+=head3 raw_read_from
 
-This method can be used by C<Net::Proxy::Connector> subclasses in their
+    my $data = $connector->raw_read_from( $socket );
+
+This method can be used by Net::Proxy::Connector subclasses in their
 C<read_from()> methods, to fetch raw data on a socket.
 
-=item raw_write_to( $socket, $data )
+=head3 raw_write_to
 
-This method can be used by C<Net::Proxy::Connector> subclasses in their
+    $connector->raw_write_to( $socket, $data );
+
+This method can be used by Net::Proxy::Connector subclasses in their
 C<write_to()> methods, to send raw data on a socket.
 
-=item raw_listen( )
+=head3 raw_listen
 
-This method can be used by C<Net::Proxy::Connector> subclasses in their
+    my $sock = $connector->raw_listen();
+
+This method can be used by Net::Proxy::Connector subclasses in their
 C<listen()> methods, to create a listening socket on their C<host>
 and C<port> parameters.
 
-=item raw_accept_from( $socket )
+=head3 raw_accept_from
 
-This method can be used internaly by C<Net::Proxy::Connector> subclasses
+    my $sock = $connector->raw_accept_from( $socket );
+
+This method can be used internaly by Net::Proxy::Connector subclasses
 in their C<accept_from()> methods, to accept a newly connected socket.
 
-=back
+=head1 SUBCLASS METHODS
 
-=head1 Subclass methods
-
-The following methods should be defined in C<Net::Proxy::Connector>
+The following methods should be defined in Net::Proxy::Connector
 subclasses:
 
 =head2 Initialisation
 
-=over 4
+=head3 init
 
-=item init()
+    $connector->init;
 
-This method initalise the connector.
-
-=back
+This method initalizes the connector.
 
 =head2 Processing incoming/outgoing data
 
-=over 4
+=head3 read_from
 
-=item read_from( $socket )
+    my $data = $connector->read_from( $socket );
 
 Return the data that was possibly decapsulated by the connector.
 
-=item write_to( $socket, $data )
+=head3 write_to
+
+    $connector->write_to( $socket, $data );
 
 Write C<$data> to the given C<$socket>, according to the connector
 scheme.
 
-=back
-
 =head2 C<in> connector
 
-=over 4
+=head3 listen
 
-=item listen()
+    my $sock = $connector->listen();
 
 Initiate listening sockets and return them.
 
 This method can use the C<raw_listen()> method to do the low-level
 listen call.
 
-=item accept_from( $socket )
+=head3 accept_from
+
+    my $sock = $connector->accept_from( $socket );
 
 C<$socket> is a listening socket created by C<listen()>.
 This method returns the connected socket.
@@ -349,17 +361,13 @@ This method returns the connected socket.
 This method can use the C<raw_accept_from()> method to do the low-level
 accept call.
 
-=back
-
 =head2 C<out> connector
 
-=over 4
+=head3 connect
 
-=item connect()
+    my $sock = $connector->connect();
 
 Return a socket connected to the remote server.
-
-=back
 
 =head1 AUTHOR
 
@@ -367,7 +375,7 @@ Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
 
 =head1 COPYRIGHT
 
-Copyright 2006 Philippe 'BooK' Bruhat, All Rights Reserved.
+Copyright 2006-2014 Philippe 'BooK' Bruhat, All Rights Reserved.
 
 =head1 LICENSE
 
