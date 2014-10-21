@@ -1,0 +1,8 @@
+.build
+Net-Proxy-*
+cover_db
+*.bak
+*.swp
+*~
+mess
+setup
