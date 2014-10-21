@@ -1,12 +1,11 @@
 package Net::Proxy;
+
 use strict;
 use warnings;
 use Carp;
 use Scalar::Util qw( refaddr reftype );
 use IO::Select;
 use POSIX 'strftime';
-
-our $VERSION = '0.12';
 
 # interal socket information table
 my %SOCK_INFO;

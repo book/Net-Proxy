@@ -1,4 +1,5 @@
 package Net::Proxy::Connector::tcp;
+
 use strict;
 use warnings;
 use IO::Socket::INET;

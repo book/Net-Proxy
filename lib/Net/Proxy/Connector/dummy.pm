@@ -1,4 +1,5 @@
 package Net::Proxy::Connector::dummy;
+
 use strict;
 use warnings;
 

@@ -5,8 +5,6 @@ use Net::Proxy;
 
 use vars qw( %CONF $VERSION );
 
-$VERSION = 0.04;
-
 # default values
 %CONF = (
     port    => 'localhost:443',

@@ -1,4 +1,5 @@
 package Net::Proxy::Connector::ssl;
+
 use strict;
 use warnings;
 

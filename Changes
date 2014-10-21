@@ -1,5 +1,7 @@
 Revision history for Perl extension Net::Proxy
 
+{{$NEXT}}
+
 0.12 Thu Oct 18 00:49:42 CEST 2007
         [ENHANCEMENTS]
         - print a meaningful error message when the ssl connector can't listen

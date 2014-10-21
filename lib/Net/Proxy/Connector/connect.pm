@@ -1,4 +1,5 @@
 package Net::Proxy::Connector::connect;
+
 use strict;
 use warnings;
 use Carp;

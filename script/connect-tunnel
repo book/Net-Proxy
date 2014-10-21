@@ -5,8 +5,6 @@ use Net::Proxy;
 use Getopt::Long;
 use Pod::Usage;
 
-our $VERSION = '0.07';
-
 # die early if this module is not installed
 eval { require LWP::UserAgent; };
 die "LWP::UserAgent required to run connect-tunnel\n" if $@;
