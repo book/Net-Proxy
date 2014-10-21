@@ -13,7 +13,7 @@ die "LWP::UserAgent required to run connect-tunnel\n" if $@;
 our %CONF = (
     'proxy-authentication' => '',
     'proxy'                => $ENV{HTTP_PROXY},
-    'user-agent'           => "connect-tunnel/$VERSION",
+    'user-agent'           => "connect-tunnel/$Net::Proxy::VERSION",
     'verbose'              => 0,
 );
 
