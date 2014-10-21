@@ -209,7 +209,7 @@ the C<upgrade_SSL()> method.
 
 =head1 METHODS
 
-The C<Net::Proxy::Connector::ssl> connector has an extra method:
+The Net::Proxy::Connector::ssl connector has an extra method:
 
 =head2 upgrade_SSL
 

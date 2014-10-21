@@ -125,6 +125,18 @@ The user-agent string to use when connecting to the proxy.
 
 =back
 
+=head1 METHODS
+
+The Net::Proxy::Connector::connect_ssl connector has an extra method,
+obtained from L<Net::Proxy::Connector::ssl>:
+
+=head2 upgrade_SSL
+
+    $connector->upgrade_SSL( $sock )
+
+This method will upgrade a cleartext socket to SSL.
+If the socket is already in SSL, it will C<carp()>.
+
 =head1 AUTHOR
 
 Philippe 'BooK' Bruhat, C<< <book@cpan.org> >>.
