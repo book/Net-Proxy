@@ -3,10 +3,8 @@ use strict;
 use Getopt::Long;
 use Net::Proxy;
 
-use vars qw( %CONF $VERSION );
-
 # default values
-%CONF = (
+our %CONF = (
     port    => 'localhost:443',
     timeout => 2,
     ssh     => 'localhost:22',
