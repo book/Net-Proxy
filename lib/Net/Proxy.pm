@@ -393,61 +393,61 @@ processed that many connections. Otherwise, this method does not return.
 
 =head3 add_listeners
 
-    $proxy->add_listeners( @sockets );
+    Net::Proxy->add_listeners( @sockets );
 
 Add the given sockets to the list of listening sockets.
 
 =head3 watch_reader_sockets
 
-    $proxy->watch_reader_sockets( @sockets );
+    Net::Proxy->watch_reader_sockets( @sockets );
 
 Add the given sockets to the readers watch list.
 
 =head3 watch_writer_sockets
 
-    $proxy->watch_writer_sockets( @sockets );
+    Net::Proxy->watch_writer_sockets( @sockets );
 
 Add the given sockets to the writers watch list.
 
 =head3 remove_writer_sockets
 
-    $proxy->remove_writer_sockets( @sockets );
+    Net::Proxy->remove_writer_sockets( @sockets );
 
 Remove the given sockets from the writers watch list.
 
 =head3 close_sockets
 
-    $proxy->close_sockets( @sockets );
+    Net::Proxy->close_sockets( @sockets );
 
 Close the given sockets and cleanup the related internal structures.
 
 =head3 set_verbosity
 
-    $proxy->set_verbosity( $level );
+    Net::Proxy->set_verbosity( $level );
 
 Set the logging level. C<0> means not messages except warnings and errors.
 
 =head3 error
 
-    $proxy->error( $message );
+    Net::Proxy->error( $message );
 
 Log C<$message> to STDERR, always.
 
 =head3 notice
 
-    $proxy->notice( $message );
+    Net::Proxy->notice( $message );
 
 Log C<$message> to STDERR if verbosity level is equal to C<1> or more.
 
 =head3 info
 
-    $proxy->info( $message );
+    Net::Proxy->info( $message );
 
 Log C<$message> to STDERR if verbosity level is equal to C<2> or more.
 
 =head3 debug
 
-    $proxy->debug( $message );
+    Net::Proxy->debug( $message );
 
 Log C<$message> to STDERR if verbosity level is equal to C<3> or more.
 
@@ -471,43 +471,44 @@ checked. The default value is 16384 bytes (16kB).
 
 Note that this is a global value, shared by all proxies and connectors.
 
+=head2 Class methods related to sockets
 
 Some of the class methods are related to the socket objects that handle
 the actual connections.
 
 =head3 get_peer
 
-    my $peer = $proxy->get_peer( $socket );
+    my $peer = Net::Proxy->get_peer( $socket );
 
 Get the socket peer.
 
 =head3 set_peer
 
-    $proxy->set_peer( $socket, $peer );
+    Net::Proxy->set_peer( $socket, $peer );
 
 Set the socket peer.
 
 =head3 get_connector
 
-    my $connector = $proxy->get_connector( $socket );
+    my $connector = Net::Proxy->get_connector( $socket );
 
 Get the socket connector (a L<Net::Proxy::Connector> object).
 
 =head3 set_connector
 
-    $proxy->set_connector( $socket, $connector );
+    Net::Proxy->set_connector( $socket, $connector );
 
 Set the socket connector (a L<Net::Proxy::Connector> object).
 
 =head3 get_state
 
-    my $state = $proxy->get_state( $socket );
+    my $state = Net::Proxy->get_state( $socket );
 
 Get the socket state.
 
 =head3 set_state
 
-    $proxy->set_state( $socket, $state );
+    Net::Proxy->set_state( $socket, $state );
 
 Set the socket state. Some C<Net::Proxy::Connector> subclasses
 may wish to use this to store some internal information about the
@@ -515,26 +516,26 @@ socket or the connection.
 
 =head3 get_nick
 
-    my $nick = $proxy->get_nick( $socket );
+    my $nick = Net::Proxy->get_nick( $socket );
 
 Get the socket nickname.
 
 =head3 set_nick
 
-    $proxy->set_nick( $socket, $nickname );
+    Net::Proxy->set_nick( $socket, $nickname );
 
 Set the socket nickname. Typically used by L<Net::Proxy::Connector>
 to give informative names to socket (used in the log messages).
 
 =head3 get_buffer
 
-    my $buffer = $proxy->get_buffer( $socket );
+    my $buffer = Net::Proxy->get_buffer( $socket );
 
 Get the content of the writing buffer for the socket.
 
 =head3 set_buffer
 
-    $proxy->set_buffer( $socket, $data );
+    Net::Proxy->set_buffer( $socket, $data );
 
 Set the content of the writing buffer for the socket.
 Used by L<Net::Proxy::Connector> in C<raw_read_from()> and
@@ -542,19 +543,19 @@ C<ranw_write_to()>.
 
 =head3 get_callback
 
-    $proxy->get_callback( $socket );
+    Net::Proxy->get_callback( $socket );
 
 Get the callback currently associated with the socket.
 
 =head3 set_callback
 
-    $proxy->set_callback( $socket, $coderef );
+    Net::Proxy->set_callback( $socket, $coderef );
 
 Set the callback currently associated with the socket.
 
 =head3 add_to_buffer
 
-    $proxy->add_to_buffer( $socket, $data );
+    Net::Proxy->add_to_buffer( $socket, $data );
 
 Add data to the writing buffer of the socket.
 
