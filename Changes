@@ -2,6 +2,21 @@ Revision history for Perl extension Net::Proxy
 
 {{$NEXT}}
 
+0.13 Sun Nov 2 2014
+    [ENHANCEMENTS]
+    - dependency on perl 5.6 should be written as 5.006 (RT #36752, Andreas König)
+    - Make maximum buffer size user-configurable (RT #60751, Daniel Burr)
+    - Fix several bugs happening when a connection closes (RT #60641, Daniel Burr)
+    [DOCUMENTATION]
+    - reformat the documentation for better linkability
+    [SCRIPTS]
+    - connect-tunnel: Fix RT #42525 (Peter Oliver) by making the --tunnel regexp more liberal
+    - added the eg/forwarder.pl example script
+    [PACKAGING]
+    - the distribution is now packaged using Dist::Zilla
+    [TESTS]
+    - pod and compilation tests are now handled by Dist::Zilla plugins
+
 0.12 Thu Oct 18 00:49:42 CEST 2007
     [ENHANCEMENTS]
     - print a meaningful error message when the ssl connector can't listen
