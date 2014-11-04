@@ -58,8 +58,9 @@ SKIP: {
 
     # start a client
     my $client = IO::Socket::SSL->new(
-        PeerAddr => 'localhost',
-        PeerPort => $proxy_port
+        PeerAddr        => 'localhost',
+        PeerPort        => $proxy_port,
+        SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE(),
     ) or skip "Couldn't start the client: $!", $tests;
 
     my $server = $listener->accept()
