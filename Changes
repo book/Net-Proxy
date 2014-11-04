@@ -8,6 +8,7 @@ Revision history for Perl extension Net::Proxy
       and the duplicates RT #44842 and #56027)
     - Make maximum buffer size user-configurable (RT #60751, Daniel Burr)
     - Fix several bugs happening when a connection closes (RT #60641, Daniel Burr)
+    - closed RT #43911 (not a bug)
     [DOCUMENTATION]
     - reformat the documentation for better linkability
     [SCRIPTS]
