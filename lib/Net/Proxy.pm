@@ -373,7 +373,7 @@ and C<mainloop()>.
 
 =head3 new
 
-    my $proxy = Net::Proxy->new( { in => { ... }, { out => { ... } } );
+    my $proxy = Net::Proxy->new( { in => { ... }, out => { ... } } );
 
 Return a new Net::Proxy object, with two connectors configured
 as described in the hashref.
